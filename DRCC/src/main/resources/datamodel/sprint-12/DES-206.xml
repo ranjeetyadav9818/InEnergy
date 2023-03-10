@@ -1,0 +1,36 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-206" author="antonio">
+        <createTable tableName="ASSET_GROUP">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="LEVEL" type="INTEGER(10)"/>
+            <column name="ASSET_GROUP_PARENT_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="DES-206-1" author="antonio">
+        <addForeignKeyConstraint baseTableName="ASSET_GROUP"
+                                 baseColumnNames="ASSET_GROUP_PARENT_ID"
+                                 constraintName="FK_ASSET_GROUP_PARENT"
+                                 referencedTableName="ASSET_GROUP"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="DES-206-2" author="antonio">
+        <insert tableName="ASSET_GROUP">
+            <column name="UUID" valueComputed="UUID()"/>
+            <column name="NAME" value="All Assets"/>
+            <column name="LEVEL" valueNumeric="0"/>
+        </insert>
+        <rollback>
+            delete from ASSET_GROUP;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

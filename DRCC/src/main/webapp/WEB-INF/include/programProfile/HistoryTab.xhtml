@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+
+    <p:dataTable value="#{controller.historyList}" var="history" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false">
+        <p:column headerText="Entity" filterBy="#{history.entity}" filterMatchMode="contains" sortBy="#{history.entity}">
+            <h:outputText value="#{history.entity}"/>
+        </p:column>
+        <p:column headerText="Field" filterBy="#{history.field}" filterMatchMode="contains" sortBy="#{history.field}">
+            <h:outputText value="#{historyDataTranslator.getField(history)}"/>
+        </p:column>
+        <p:column headerText="Old Value" filterBy="#{history.oldValue}" filterMatchMode="contains" sortBy="#{history.oldValue}">
+            <h:outputText value="(new)" rendered="#{history.oldValue eq null}"/>
+            <h:outputText value="#{historyDataTranslator.getOldValue(history)}"/>
+        </p:column>
+        <p:column headerText="New Value" filterBy="#{history.newValue}" filterMatchMode="contains" sortBy="#{history.newValue}">
+            <h:outputText value="(removed)" rendered="#{history.newValue eq null}"/>
+            <h:outputText value="#{historyDataTranslator.getNewValue(history)}"/>
+        </p:column>
+        <p:column headerText="Last Modification Date" sortBy="#{history.creationDate}">
+            <h:outputText value="#{history.creationDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy h:mm a" timeZone="America/Los_Angeles"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Author" filterBy="#{history.author}" filterMatchMode="contains" sortBy="#{history.author}">
+            <h:outputText value="#{history.author}"/>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:clx="http://java.sun.com/jsf/composite/components">
+
+    <j:useBean id="line" type="com.inenergis.entity.billing.InvoiceLine"/>
+    <j:useBean id="controller" type="com.inenergis.controller.customerData.GasAgreementPointMapList"/>
+    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="text-align: -webkit-center; margin-top: 10px">
+        <h:panelGroup styleClass="md-inputfield">
+            <p:chart type="bar" model="#{controller.electricUsageThisPeriodChart}" rendered="#{gasAgreementPointMapList.selectedInvoice ne null and controller.electricUsageThisPeriodChart ne null}" style="margin-top: 10px;"/>
+        </h:panelGroup>
+        <h:panelGroup styleClass="md-inputfield">
+            <p:chart type="pie" model="#{controller.feesPieChart}" rendered="#{gasAgreementPointMapList.selectedInvoice ne null and controller.feesPieChart ne null}" style="margin-top: 10px;"/>
+        </h:panelGroup>
+    </p:panelGrid>
+
+    <p:dataTable value="#{controller.selectedInvoice.invoiceLines}" id="invoiceDetailTabG" widgetVar="custTableInvoiceDetail" lazy="false" var="line"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100" rendered="#{gasAgreementPointMapList.selectedInvoice ne null}"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{line.uuid}" style="text-align: center;margin-top: 10px"
+                 expandableRowGroups="true" sortBy="#{line.tier.name}">
+        <f:facet name="header">
+            Charges Detail
+        </f:facet>
+        <p:column headerText="Fee" filterBy="#{line.concept}" filterMatchMode="contains" sortBy="#{line.concept}">
+            <h:outputText value="#{line.concept}"/>
+        </p:column>
+        <p:column headerText="Tier" filterBy="#{line.tier.name}" filterMatchMode="contains" sortBy="#{line.tier.name}">
+            <h:outputText value="#{line.tier.name}" rendered="#{line.rateProfileAncillaryFee eq null}"/>
+        </p:column>
+        <p:column headerText="Price" filterBy="#{line.pricePerWatt}" filterMatchMode="contains" sortBy="#{line.pricePerWatt}">
+            <clx:MoneyOutputComponent value="#{line.pricePerTherms}" rendered="#{line.rateProfileAncillaryFee eq null}"/>
+        </p:column>
+        <p:column headerText="Energy" filterBy="#{line.kwh}" filterMatchMode="contains" sortBy="#{line.kwh}">
+            <h:outputText value="#{line.therms}"><f:convertNumber maxFractionDigits="6"/></h:outputText> <h:outputText value="Therms" rendered="#{line.rateProfileAncillaryFee eq null}"/>
+        </p:column>
+        <p:column headerText="Total" filterBy="#{line.total}" filterMatchMode="contains" sortBy="#{line.total}">
+            <clx:MoneyOutputComponent value="#{line.total}"/>
+        </p:column>
+    </p:dataTable>
+
+    <p:commandButton action="#{controller.onCloseSelectedInvoice()}" update="@form" value="Close"
+                     rendered="#{gasAgreementPointMapList.selectedInvoice ne null}" style="margin-top: 20px;"/>
+    <ui:remove>
+        <p:spacer width="5px"/>
+        <p:commandButton update="@form" value="Download PDF" ajax="false"
+                         rendered="#{gasAgreementPointMapList.selectedInvoice ne null}" style="margin-top: 20px;">
+            <p:dataExporter type="pdf" target="invoiceDetailTab invoiceSummaryTab" preProcessor="#{controller.invoicePDFHelper.preProcessInvoicePDF}"
+                            fileName="#{controller.selectedInvoice.getInvoiceName()}" options="#{controller.invoicePdfOptions}"/>
+        </p:commandButton>
+    </ui:remove>
+</ui:composition>

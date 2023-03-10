@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{resourceRegistrationDetailController.lazyLocationSubmissionStatusDataModel}" id="TbLocations" widgetVar="custTableA" lazy="true" var="loc" reflow="true" rows="25" rowsPerPageTemplate="25,50,100" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{loc.uuid}" selectionMode="single">
+        <p:ajax event="rowSelect" listener="#{resourceRegistrationDetailController.onSelectLocation}" update="formRRD"/>
+        <p:column headerText="SA ID"  filterBy="#{loc.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}" field="programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId" filterMatchMode="contains">
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}" />
+        </p:column>
+        <p:column headerText="UU ID" filterBy="#{loc.programServiceAgreementEnrollment.serviceAgreement.saUuid}" field="programServiceAgreementEnrollment.serviceAgreement.saUuid" filterMatchMode="contains">
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.serviceAgreement.saUuid}"/>
+        </p:column>
+        <p:column headerText="Customer Name" filterBy="#{loc.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}" field="programServiceAgreementEnrollment.serviceAgreement.account.person.customerName" filterMatchMode="contains">
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}"/>
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.serviceAgreement.account.person.businessName}"/>
+        </p:column>
+        <p:column headerText="Service Address 1" filterBy="#{loc.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}" field="programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1} "/>
+        </p:column>
+        <p:column headerText="Service City" filterBy="#{loc.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}" field="programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr} " />
+        </p:column>
+        <p:column headerText="Aggregator" filterBy="#{loc.programServiceAgreementEnrollment.aggregator.name}" field="programServiceAgreementEnrollment.aggregator.name" filterMatchMode="contains">
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.aggregator.name} " />
+        </p:column>
+        <p:column headerText="Program" filterBy="#{loc.programServiceAgreementEnrollment.program.name}" field="programServiceAgreementEnrollment.program.name" filterMatchMode="contains">
+            <h:outputText value="#{loc.programServiceAgreementEnrollment.program.name} " />
+        </p:column>
+        <p:column headerText="Estimated Capacity (kW)" filterBy="" field="" filterMatchMode="contains">
+            <h:outputText value="#{loc.getCalculatedCapacityAsKwDecimal()}"><f:convertNumber pattern="###.##"/></h:outputText>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

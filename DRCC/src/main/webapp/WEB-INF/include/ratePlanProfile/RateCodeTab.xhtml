@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+
+    <script type="text/javascript">
+        function handleDrop(event, ui) {
+            var droppedSegment = ui.draggable;
+            droppedSegment.fadeOut('fast');
+        }
+    </script>
+    <div class="card card-w-title">
+        <h3>Available Codes</h3>
+        <p:dataTable id="dtAvailableRateCodes" value="#{controller.rateCodes}" var="rateCode" reflow="true" rows="25"
+                     rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+            <p:column style="width:20px" rendered="#{not controller.viewModeOn}">
+                <h:outputText id="dragIcon" styleClass="ui-icon ui-icon-zoom-out-map"/>
+                <p:draggable for="dragIcon" revert="true" helper="clone"/>
+            </p:column>
+            <p:column headerText="Code" styleClass="topAligned" width="20%">
+                <h:outputText value="#{rateCode.name}"/>
+            </p:column>
+            <p:column headerText="Description" styleClass="topAligned">
+                <h:outputText value="#{rateCode.description}"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+
+    <div class="card card-w-title">
+        <h3>Rate Code Builder</h3>
+        <h:panelGroup styleClass="md-inputfield">
+            <p:inputText id="idSelectedCode" value="#{controller.selectedProfile.buildRateCodeId()}" label="Rate Code ID" disabled="true" size="40"/>
+            <p:outputLabel value="Rate Code ID:" for="idSelectedCode"/>
+            <p:spacer width="10px"/>
+            <p:commandButton action="#{controller.clearRateCodeProfiles()}" update="@form" value="Clear Codes" rendered="#{not controller.viewModeOn}"/>
+        </h:panelGroup>
+        <p:dataTable id="dtRateCodeBuilder" value="#{controller.selectedProfile.rateCodeProfiles}" var="rateCodeProfile" reflow="true" rows="25"
+                     rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false" editable="true" editMode="cell"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+            <p:column headerText="Order" width="10%" style="text-align: center" rendered="#{not controller.viewModeOn}">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText styleClass="ui-icon ui-icon-pencil" style="display: inline-block;margin-right:8px;"/>
+                        <h:outputText value="#{rateCodeProfile.order}"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:inputText value="#{rateCodeProfile.order}" size="12">
+                            <p:ajax event="change" process="@this" update="dtRateCodeBuilder form:profileTabView:idSelectedCode"
+                                    listener="#{controller.reOrderRateCodeProfiles}"/>
+                        </p:inputText>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+            <p:column headerText="Code" width="20%">
+                <h:outputText value="#{rateCodeProfile.rateCode.name}"/>
+            </p:column>
+            <p:column headerText="Desccription">
+                <h:outputText value="#{rateCodeProfile.rateCode.description}"/>
+            </p:column>
+            <p:column headerText="Action" style="text-align: center; width: 5%" rendered="#{not controller.viewModeOn}">
+                <p:commandButton action="#{controller.removeRateCodeProfile(rateCodeProfile)}" update="@form" icon="ui-icon-undo"/>
+            </p:column>
+        </p:dataTable>
+        <p:droppable tolerance="touch" datasource="dtAvailableRateCodes" onDrop="handleDrop" rendered="#{not controller.viewModeOn}">
+            <p:ajax listener="#{controller.onRateCodeDrop}" update="dtRateCodeBuilder dtAvailableRateCodes idSelectedCode"/>
+        </p:droppable>
+    </div>
+
+</ui:composition>

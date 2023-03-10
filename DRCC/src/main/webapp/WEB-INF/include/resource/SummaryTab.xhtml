@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dataTable value="#{resourceController.lazyIsoResourceDataModel}" id="TbPending" widgetVar="custTableP" lazy="true" var="isoResource"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{isoResource.uuid}" selectionMode="single">
+
+        <p:ajax event="rowSelect" listener="#{resourceController.onSelect}" update="form"/>
+
+        <p:column headerText="Resource ID" filterBy="#{isoResource.name}">
+            <h:outputText value="#{isoResource.name}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['data.mapping.sublap']}" filterBy="#{isoResource.isoSublap}" field="isoSublap">
+            <h:outputText value="#{isoResource.isoSublap}"/>
+        </p:column>
+
+        <p:column headerText="LSE" filterBy="#{isoResource.isoLse}" field="isoLse">
+            <h:outputText value="#{isoResource.isoLse}"/>
+        </p:column>
+
+        <p:column headerText="Resource Type">
+            <h:outputText value="#{isoResource.type}"/>
+        </p:column>
+
+        <p:column headerText="Estimated Capacity (MW)">
+            <h:outputText value="#{isoResource.getCalculatedCapacityInMW()}"/>
+        </p:column>
+
+        <p:column headerText="Current Registration ID">
+            <h:outputText value="#{isoResource.getActiveRegistration().isoRegistrationId}"/>
+        </p:column>
+
+        <p:column headerText="Current Reg Start Date">
+            <h:outputText value="#{isoResource.getActiveRegistration().activeStartDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="New Registration Assignment Review">
+            <h:outputText value="#{isoResource.registrationReview.name}"/>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

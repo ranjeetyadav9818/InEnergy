@@ -1,0 +1,15 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet context="ddl" id="pre-fixCommoditiesTag.xml" author="egamas">
+        <tagDatabase tag="pre-fixCommoditiesTag.xml" />
+    </changeSet>
+
+    <changeSet id="fixCommodities1" author="egamas">
+        <dropNotNullConstraint tableName="ENERGY_CONTRACT_COMMODITY" columnName="COMMODITY_POWER_SOURCE" columnDataType="varchar(255)"/>
+        <dropNotNullConstraint tableName="ENERGY_CONTRACT_QUANTITY" columnName="DATE_FROM" columnDataType="datetime"/>
+        <dropNotNullConstraint tableName="ENERGY_CONTRACT_QUANTITY" columnName="DATE_TO" columnDataType="datetime"/>
+    </changeSet>
+</databaseChangeLog>

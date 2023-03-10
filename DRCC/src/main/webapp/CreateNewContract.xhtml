@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration"/>
+                <p:menuitem value="Energy Contracts"/>
+                <p:menuitem value="Add New" outcome="CreateNewContract"/>
+            </p:breadCrumb>
+
+            <div class="ContainerIndent">
+                <p:tabView id="profileTabView">
+                    <c:set var="tabViewId" value="profileTabView"/>
+                    <p:tab id="AgreementDetails" title="Agreement Details">
+                        <ui:include src="WEB-INF/include/energyContract/AgreementDetailsTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="FinancialDetails" title="Financial Details">
+                        <ui:include src="WEB-INF/include/energyContract/FinancialDetailsTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="Linkage" title="Linkage">
+                        <ui:include src="WEB-INF/include/energyContract/LinkageTab.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+            <h:panelGroup style="display:block;margin: 20px 0 40px 0;">
+                <p:commandButton update="@none" value="Save" action="#{energyContractController.save()}"/>
+                <p:spacer width="10"/>
+                <p:commandButton update="@none" value="Save and Close" action="#{energyContractController.saveAndClose()}"/>
+                <p:spacer width="10"/>
+                <p:commandButton update="@form" process="@this" value="Clear" action="#{energyContractController.clear()}"/>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

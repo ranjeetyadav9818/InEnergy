@@ -1,0 +1,82 @@
+app:
+  name: Microbot - Token Security
+
+dev:
+  mode: true
+
+jwt:
+  header: Authorization
+  expires_in: 10000 #seconds
+  secret: queenvictoria
+
+server:
+  port: 5000
+spring:
+  profiles:
+    active: enrique
+
+#logging.level.org.hibernate.SQL=debug
+
+mysql:
+  jdbc:
+    url: jdbc:mysql://localhost:3306/DRCC?useSSL=false
+    user: root
+    pass: root
+    driverClassName: com.mysql.jdbc.Driver
+  hibernate:
+    dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    show_sql: false
+redshift:
+  jdbc:
+    url: jdbc:postgresql://public.c4t8oqlq7wzz.us-east-1.redshift.amazonaws.com:5439/test
+    user: dbuser
+    pass: pXfLT4rwDZkviFQ4*K7s
+    driverClassName: org.postgresql.Driver
+  hibernate:
+    dialect: org.hibernate.dialect.PostgreSQL82Dialect
+    show_sql: true
+    temp:
+      use_jdbc_metadata_defaults: false
+
+elastic:
+  url: http://localhost
+  port: 9200
+
+customer:
+  portal:
+    url: "http://localhost:4200"
+
+pge:
+  api:
+    password: Layer7ControlCenter
+    username: DemandResponseDRCC
+    url: https://apiqa.pge.com/tst/demandresponse/v1/meterdata/availability
+    numberOfDaysToCheck: 50
+    availableDaysToBeReady: 45
+    peakdemand:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/meterdata/peakdemand
+    resourceregistration:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/resource/registration
+    bid:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/bid
+    bidstatus:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/bid/status
+  certificate:
+    location: /opt/certificates/pgeCertificate.p12
+    password: yw4ZZUx5DL9p5edN
+
+jms:
+  host: tcp://localhost:61616
+  username: admin
+  password: admin
+
+location:
+  enrollment:
+    default: MB-CAMEL-ENROLLMENT_ENRIQUE
+    deadletter: MB-CAMEL-ENROLLMENT-DEADLETTER_ENRIQUE
+  unenrollment:
+    default: MB-CAMEL-UNENROLLMENT
+    deadletter: MB-CAMEL-UNENROLLMENT-DEADLETTER
+  reenrollment:
+    default: MB-CAMEL-REENROLLMENT
+    deadletter: MB-CAMEL-REENROLLMENT-DEADLETTER

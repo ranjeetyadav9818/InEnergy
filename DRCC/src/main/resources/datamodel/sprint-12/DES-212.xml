@@ -1,0 +1,127 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-212" author="vm">
+        <renameTable oldTableName="ASSET" newTableName="BEHIND_THE_METER_ASSET"/>
+    </changeSet>
+    <changeSet id="DES-212-2" author="vm">
+        <addColumn tableName="BEHIND_THE_METER_ASSET">
+            <column type="varchar(255)" name="DESCRIPTION"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-212-3" author="vm">
+        <addColumn tableName="BEHIND_THE_METER_ASSET">
+            <column type="TINYINT(1)" name="ACTIVE"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-212-4" author="vm">
+        <dropColumn tableName="BEHIND_THE_METER_ASSET" columnName="ACTIVE"/>
+    </changeSet>
+    <changeSet id="DES-212-5" author="vm">
+        <addColumn tableName="BEHIND_THE_METER_ASSET">
+            <column type="TINYINT(1)" name="ACTIVE" defaultValue="1"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-212-6" author="vm">
+        <renameColumn tableName="BEHIND_THE_METER_ASSET" oldColumnName="SERIAL_NUMBER"
+                      newColumnName="SUPPLIER_PART_NUMBER" columnDataType="VARCHAR(255)"/>
+    </changeSet>
+    <changeSet id="DES-212-7" author="vm">
+        <addColumn tableName="BEHIND_THE_METER_ASSET">
+            <column name="ASSET_GROUP_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="BEHIND_THE_METER_ASSET"
+                                 baseColumnNames="ASSET_GROUP_ID"
+                                 constraintName="FK_BEHIND_THE_METER_ASSET_ASSET_GROUP"
+                                 referencedTableName="ASSET_GROUP"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-212-8" author="vm">
+        <createTable tableName="DISTRIBUTION_ASSET">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
+            <column name="ACTIVE" type="TINYINT(1)" defaultValue="1"/>
+            <column name="MANUFACTURER_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="SUPPLIER_PART_NUMBER" type="VARCHAR(255)"/>
+            <column name="MODEL" type="VARCHAR(255)"/>
+            <column name="ASSET_GROUP_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="DISTRIBUTION_ASSET" baseColumnNames="MANUFACTURER_ID"
+                                 constraintName="FK_DISTRIBUTION_ASSET_MANUFACTURER"
+                                 referencedTableName="MANUFACTURER"
+                                 referencedColumnNames="ID"/>
+        <addForeignKeyConstraint baseTableName="DISTRIBUTION_ASSET" baseColumnNames="ASSET_GROUP_ID"
+                                 constraintName="FK_DISTRIBUTION_ASSET_ASSET_GROUP"
+                                 referencedTableName="ASSET_GROUP"
+                                 referencedColumnNames="ID"/>
+
+    </changeSet>
+    <changeSet id="DES-212-9" author="vm">
+        <createTable tableName="TRANSPORTATION_ASSET">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
+            <column name="ACTIVE" type="TINYINT(1)" defaultValue="1"/>
+            <column name="MANUFACTURER_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="SUPPLIER_PART_NUMBER" type="VARCHAR(255)"/>
+            <column name="MODEL" type="VARCHAR(255)"/>
+            <column name="ASSET_GROUP_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="TRANSPORTATION_ASSET" baseColumnNames="MANUFACTURER_ID"
+                                 constraintName="FK_TRANSPORTATION_ASSET_MANUFACTURER"
+                                 referencedTableName="MANUFACTURER"
+                                 referencedColumnNames="ID"/>
+        <addForeignKeyConstraint baseTableName="TRANSPORTATION_ASSET" baseColumnNames="ASSET_GROUP_ID"
+                                 constraintName="FK_TRANSPORTATION_ASSET_ASSET_GROUP"
+                                 referencedTableName="ASSET_GROUP"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-212-10" author="vm">
+        <addColumn tableName="BEHIND_THE_METER_ASSET">
+            <column name="MAKE" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-212-11" author="vm">
+        <addColumn tableName="DISTRIBUTION_ASSET">
+            <column name="MAKE" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-212-12" author="vm">
+        <addColumn tableName="DISTRIBUTION_ASSET">
+            <column name="ASSET_PROFILE_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="DISTRIBUTION_ASSET"
+                                 baseColumnNames="ASSET_PROFILE_ID"
+                                 constraintName="FK_DISTRIBUTION_ASSET_ASSET_PROFILE"
+                                 referencedTableName="ASSET_PROFILE" referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-212-13" author="vm">
+        <renameTable oldTableName="TRANSPORTATION_ASSET" newTableName="TRANSMISSION_ASSET"/>
+    </changeSet>
+    <changeSet id="DES-212-14" author="vm">
+        <addColumn tableName="TRANSMISSION_ASSET">
+            <column name="MAKE" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-212-15" author="vm">
+        <addColumn tableName="TRANSMISSION_ASSET">
+            <column name="ASSET_PROFILE_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="TRANSMISSION_ASSET"
+                                 baseColumnNames="ASSET_PROFILE_ID"
+                                 constraintName="FK_TRANSMISSION_ASSET_ASSET_PROFILE"
+                                 referencedTableName="ASSET_PROFILE" referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-212-16" author="vm">
+        <dropColumn tableName="BEHIND_THE_METER_ASSET" columnName="TYPE"/>
+    </changeSet>
+</databaseChangeLog>

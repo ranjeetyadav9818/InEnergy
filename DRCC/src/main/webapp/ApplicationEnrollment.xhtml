@@ -1,0 +1,351 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="#{applicationEnrollmentController.applicationEnrollment.program.name} program"
+                            url="ProgramManagement.xhtml?o=#{parameterEncoderService.encode(applicationEnrollmentController.applicationEnrollment.program.id)}"/>
+                <p:menuitem value="SA #{applicationEnrollmentController.applicationEnrollment.serviceAgreement.serviceAgreementId}"
+                            url="CustomerList.xhtml?o=#{parameterEncoderService.encode(applicationEnrollmentController.applicationEnrollment.serviceAgreement.serviceAgreementId)}"/>
+                <p:menuitem value="Application ID #{applicationEnrollmentController.applicationEnrollment.id}"/>
+            </p:breadCrumb>
+
+            <div class="card">
+                <p:carousel numVisible="4" circular="true" responsive="true" value="#{applicationEnrollmentController.applicationDetails}"
+                            rendered="#{applicationEnrollmentController.applicationEnrollment.program.commodity eq 'Electricity'}"  var="applicationDetails">
+                    <i class="material-icons #{applicationDetails.icon} Fs20 hardblue TexAlCenter"/>
+                    <h:outputText class="Fs20 hardblue" value="#{applicationDetails.name}"/>
+                    <h:dataTable var="db" value="#{applicationDetails.dataBeans}" style="border:0;">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+
+                <p:carousel numVisible="4" circular="true" responsive="true" value="#{applicationEnrollmentController.gasApplicationDetails}"
+                            rendered="#{applicationEnrollmentController.applicationEnrollment.program.commodity eq 'Gas'}"  var="applicationDetails">
+                    <i class="material-icons #{applicationDetails.icon} Fs20 hardblue TexAlCenter"/>
+                    <h:outputText class="Fs20 hardblue" value="#{applicationDetails.name}"/>
+                    <h:dataTable var="db" value="#{applicationDetails.dataBeans}" style="border:0;">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+            </div>
+
+
+            <p:tabView dynamic="true" scrollable="true" id="tabView">
+                <p:tab title="Summary">
+                    <!--<p:panel>-->
+                    <div class="card card-w-title">
+                        <h1>Enrollment Summary</h1>
+                        <p:panelGrid columns="5" columnClasses=",,width60,,">
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Program: "/></p:row>
+                            <p:row>#{applicationEnrollmentController.applicationEnrollment.program.name}</p:row>
+                            <p:row/>
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Eligibility Status: "/></p:row>
+                            <p:row>
+                                <h:outputText value="Eligible" rendered="#{applicationEnrollmentController.applicationEnrollment.isEligible()}"/>
+                                <h:outputText value="Ineligible" rendered="#{not applicationEnrollmentController.applicationEnrollment.isEligible()}"/>
+                            </p:row>
+
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Option: "/></p:row>
+                            <p:row>Pending... </p:row>
+                            <p:row/>
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Enrollment Status: "/></p:row>
+                            <p:row rendered="#{not applicationEnrollmentController.summaryEditable}">#{applicationEnrollmentController.applicationEnrollment.enrollmentStatus}</p:row>
+                            <p:row rendered="#{applicationEnrollmentController.summaryEditable}">
+                                <p:selectOneMenu value="#{applicationEnrollmentController.enrollmentStatusChange}">
+                                    <f:selectItems value="#{applicationEnrollmentController.getAvailableEnrollmentStatuses()}" var="reason"
+                                                   itemLabel="#{reason}" itemValue="#{reason}"/>
+                                </p:selectOneMenu>
+                            </p:row>
+
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Product: "/></p:row>
+                            <p:row>#{applicationEnrollmentController.applicationEnrollment.lastLocation.activeResource.isoProduct.name} </p:row>
+                            <p:row/>
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Workflows: "/></p:row>
+                            <p:row>#{applicationEnrollmentController.getWorkflowStatuses()}</p:row>
+
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Aggregator Name: "/></p:row>
+                            <p:row>#{applicationEnrollmentController.applicationEnrollment.aggregator.name} </p:row>
+                            <p:row/>
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Effective Start Date: "/></p:row>
+                            <p:row rendered="#{not applicationEnrollmentController.summaryEditable}">
+                                <h:outputText value="#{applicationEnrollmentController.applicationEnrollment.effectiveStartDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                                </h:outputText>
+                            </p:row>
+                            <p:row rendered="#{applicationEnrollmentController.summaryEditable}">
+                                <p:calendar value="#{applicationEnrollmentController.applicationEnrollment.effectiveStartDate}" pattern="MM/dd/yyyy"
+                                            mask="true" timeZone="America/Los_Angeles" placeholder="mm/dd/yyyy" binding="${enrollmentStartDate}"/>
+                            </p:row>
+
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Enrollment Source: "/></p:row>
+                            <p:row>#{applicationEnrollmentController.applicationEnrollment.enrollmentSource} </p:row>
+                            <p:row/>
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Effective End Date: "/></p:row>
+                            <p:row rendered="#{not applicationEnrollmentController.summaryEditable}">
+                                <h:outputText value="#{applicationEnrollmentController.applicationEnrollment.effectiveEndDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                                </h:outputText>
+                            </p:row>
+                            <p:row rendered="#{applicationEnrollmentController.summaryEditable}">
+                                <p:calendar value="#{applicationEnrollmentController.applicationEnrollment.effectiveEndDate}"
+                                            pattern="MM/dd/yyyy" timeZone="America/Los_Angeles" mask="true"
+                                            placeholder="mm/dd/yyyy" mindate="#{enrollmentStartDate.value}" label="Effective End Date">
+                                    <f:attribute name="startDate" value="#{enrollmentStartDate}"/>
+                                    <f:validator validatorId="endDateRangeValidator"/>
+                                </p:calendar>
+                            </p:row>
+
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Enrollment Channel: "/></p:row>
+                            <p:row>#{applicationEnrollmentController.applicationEnrollment.enrollmentChannel} </p:row>
+                            <p:row/>
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="DRMS ID: "/></p:row>
+                            <p:row rendered="#{not applicationEnrollmentController.summaryEditable}">#{applicationEnrollmentController.applicationEnrollment.drmsId}</p:row>
+                            <p:row rendered="#{applicationEnrollmentController.summaryEditable}"><p:inputText
+                                    value="#{applicationEnrollmentController.applicationEnrollment.drmsId}"/></p:row>
+
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Dual Enrollment: "/></p:row>
+                            <p:row>#{applicationEnrollmentController.applicationEnrollment.getOtherEnrollments()} </p:row>
+                            <p:row/>
+                            <p:row><h:outputText styleClass="hardblue TexAlLeft" value="Unenrollment Reason: "/></p:row>
+                            <p:row rendered="#{not applicationEnrollmentController.summaryEditable}">#{applicationEnrollmentController.applicationEnrollment.unenrollReason}</p:row>
+                            <p:row rendered="#{applicationEnrollmentController.summaryEditable}">
+                                <p:selectOneMenu value="#{applicationEnrollmentController.applicationEnrollment.unenrollReason}">
+                                    <f:selectItem itemLabel="" itemValue="#{reason}"/>
+                                    <f:selectItems value="#{constantsProvider.unenrollmentReasons}" var="reason" itemLabel="#{reason}"
+                                                   itemValue="#{reason}"/>
+                                </p:selectOneMenu>
+                            </p:row>
+
+                        </p:panelGrid>
+                        <h:panelGroup styleClass="buttons" rendered="#{not applicationEnrollmentController.summaryEditable}">
+                            <p:commandButton value="Modify" action="#{applicationEnrollmentController.modifySummary()}" update="@form"/>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="buttons" rendered="#{applicationEnrollmentController.summaryEditable}">
+                            <p:commandButton value="Cancel" action="#{applicationEnrollmentController.cancelSummary()}" update="@form" process="@this"/>
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Save" action="#{applicationEnrollmentController.saveSummary()}" update="@form"/>
+                        </h:panelGroup>
+                    </div>
+                    <div class="EmptyBox20"></div>
+
+                    <div class="card card-w-title">
+                        <h1>Enrollment Application Submission Attribute</h1>
+                        <p:dataTable value="#{applicationEnrollmentController.enrollmentAttributes}" var="attribute" reflow="true" paginator="false"
+                                     style="max-width: 500px">
+                            <p:column headerText="Attribute" filterBy="#{attribute.key}">
+                                <h:outputText value="#{attribute.key}"/>
+                            </p:column>
+                            <p:column headerText="Application Data" filterBy="#{attribute.value}">
+                                <h:outputText value="#{attribute.value}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+
+                </p:tab>
+                <p:tab title="Eligibility">
+                    <div class="card card-w-title">
+                        <h1>Eligibility Validation Summary</h1>
+                        <p:dataTable value="#{applicationEnrollmentController.applicationEnrollment.snapshots}" var="check">
+                            <p:column headerText="Attribute">
+                                <h:outputText value="#{check.attribute}"/>
+                            </p:column>
+                            <p:column headerText="Status">
+                                <h:outputText value="Eligible" rendered="#{check.eligible}"/>
+                                <h:outputText styleClass="red" value="Ineligible" rendered="#{not check.eligible}"/>
+                            </p:column>
+                            <p:column headerText="Value">
+                                <h:outputText value="#{check.value}"/>
+                            </p:column>
+                            <p:column headerText="Effective Date">
+                                <h:outputText value="#{check.effectiveDate}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Override Reason">
+                                <h:outputText value="#{check.overrideReason}"/>
+                            </p:column>
+                            <p:column headerText="Override User">
+                                <h:outputText value="#{check.overrideUser}"/>
+                            </p:column>
+                            <p:column headerText="Actions">
+                                <h:outputText value=""/>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </p:tab>
+                <p:tab title="Workflow" id="workflowTab">
+                    <ui:include src="WEB-INF/include/programManagement/WorkflowTab.xhtml"/>
+                </p:tab>
+                <p:tab title="Notes" id="notes">
+                    <c:set value="#{applicationEnrollmentController}" var="controller"/>
+                    <ui:include src="WEB-INF/include/general/NotesTab.xhtml"/>
+                </p:tab>
+                <p:tab title="FSL" rendered="#{applicationEnrollmentController.applicationEnrollment.fsls.size() > 0}">
+                    <h3 class="hardblue TexAlLeft">Firm Service Level History</h3>
+                    <p:dataTable value="#{applicationEnrollmentController.applicationEnrollment.fsls}" var="fsl">
+                        <p:column headerText="Effective Start Date">
+                            <h:outputText value="#{fsl.effectiveStartDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Effective End Date">
+                            <h:outputText value="#{fsl.effectiveEndDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="FSL">
+                            <h:outputText value="#{fsl.value}"/>
+                        </p:column>
+                        <p:column headerText="Last Updated">
+                            <h:outputText value="#{fsl.lastUpdated}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Last Updated By">
+                            <h:outputText value="#{fsl.lastUpdatedBy}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <div class="EmptyBox20"></div>
+                    <h:panelGroup styleClass="buttons" rendered="#{applicationEnrollmentController.newFSL eq null}">
+                        <p:commandButton value="Add new FSL" action="#{applicationEnrollmentController.addNewFSL()}" update="@form"/>
+                    </h:panelGroup>
+                    <p:panel rendered="#{applicationEnrollmentController.newFSL ne null}">
+                        <p:panelGrid columns="3">
+                            <p:outputLabel value="FSL: " for="fslValue"/>
+                            <p:inputNumber id="fslValue" value="#{applicationEnrollmentController.newFSL.value}" required="true" decimalPlaces="2"/>
+                            <h:outputText
+                                    value="(acceptable range: #{applicationEnrollmentController.fslRange.getMinKw()} kW - #{applicationEnrollmentController.fslRange.getMaxKw()} kW, based on #{applicationEnrollmentController.fslRange.dataAvailabilityAllMonths} months)"/>
+
+                            <p:spacer rendered="#{applicationEnrollmentController.fslRange.noDataWarning}"/>
+                            <p:spacer rendered="#{applicationEnrollmentController.fslRange.noDataWarning}"/>
+                            <p:row rendered="#{applicationEnrollmentController.fslRange.noDataWarning}">
+                                <h:outputText value="Warning: there is not enough data to evaluate all rules" styleClass="red"/>
+                            </p:row>
+
+                            <p:outputLabel value="Effective Start Date: " for="fslDate"/>
+                            <p:calendar id="fslDate" value="#{applicationEnrollmentController.newFSL.effectiveStartDate}" required="true"
+                                        pattern="MM/dd/yyyy" mask="true" placeholder="mm/dd/yyyy"/>
+                            <p:spacer/>
+                        </p:panelGrid>
+
+                        <p:panel rendered="#{!applicationEnrollmentController.fslInRange}">
+                            <div class="EmptyBox10"></div>
+                            <h4 class="orange">FSL is out of range, if you want to continue, please provide an overriding reason:</h4>
+                            <p:panelGrid columns="2" style="background-color:white !important;">
+                                <p:outputLabel for="overridingReasonFsl" value="Overriding Reason:"/>
+                                <p:inputText required="true" value="#{applicationEnrollmentController.overridingReason}" id="overridingReasonFsl"/>
+                            </p:panelGrid>
+                        </p:panel>
+
+                        <div class="EmptyBox20"></div>
+
+                        <h:panelGroup styleClass="buttons">
+                            <p:commandButton value="Save" action="#{applicationEnrollmentController.saveNewFSL()}" update="@form"/>
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Cancel" action="#{applicationEnrollmentController.cancelNewFSL()}" process="@this" update="@form"/>
+                        </h:panelGroup>
+                    </p:panel>
+                </p:tab>
+                <p:tab title="Demand History">
+                    <p:dataTable value="#{applicationEnrollmentController.lazyDemandHistoryDataModel}" widgetVar="custTableP" lazy="true"
+                                 rendered="#{applicationEnrollmentController.applicationEnrollment.program.commodity eq 'Electricity'}"
+                                 var="demandHistory" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{demandHistory.uuid}">
+
+                        <p:column headerText="Date" filterBy="#{demandHistory.monthYear}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.monthYear}"/>
+                        </p:column>
+
+                        <p:column headerText="Max kW Demand" filterBy="#{demandHistory.maxKwDemand}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.maxKwDemand}"/>
+                        </p:column>
+
+                        <p:column headerText="Summer On-Peak kW" filterBy="#{demandHistory.summerOnPeakKw}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.summerOnPeakKw}"/>
+                        </p:column>
+
+                        <p:column headerText="Summer On-Peak kW/h" filterBy="#{demandHistory.summerOnPeakKwH}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.summerOnPeakKwH}"/>
+                        </p:column>
+
+                        <p:column headerText="Summer On Peak hours" filterBy="#{demandHistory.summerOnPeakHours}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.summerOnPeakHours}"/>
+                        </p:column>
+
+                        <p:column headerText="Winter Partial-Peak kW" filterBy="#{demandHistory.winterPartialPeakKw}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.winterPartialPeakKw}"/>
+                        </p:column>
+
+                        <p:column headerText="Winter Partial-Peak kW/H" filterBy="#{demandHistory.winterPartialPeakKwH}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.winterPartialPeakKwH}"/>
+                        </p:column>
+
+                        <p:column headerText="Winter Partial Peak Hours" filterBy="#{demandHistory.winterPartialPeakHours}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.winterPartialPeakHours}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:dataTable value="#{applicationEnrollmentController.lazyDemandHistoryDataModel}" widgetVar="custTableP" lazy="true"
+                                 rendered="#{applicationEnrollmentController.applicationEnrollment.program.commodity eq 'Gas'}"
+                                 var="demandHistory" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{demandHistory.uuid}">
+
+                        <p:column headerText="Date" filterBy="#{demandHistory.monthYear}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.monthYear}"/>
+                        </p:column>
+
+                        <p:column headerText="Max Therms Demand" filterBy="#{demandHistory.maxKwDemand}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.maxKwDemand}"/>
+                        </p:column>
+
+                        <p:column headerText="Summer On-Peak Therms " filterBy="#{demandHistory.summerOnPeakKw}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.summerOnPeakKw}"/>
+                        </p:column>
+
+                        <p:column headerText="Summer On-Peak Therms /H" filterBy="#{demandHistory.summerOnPeakKwH}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.summerOnPeakKwH}"/>
+                        </p:column>
+
+                        <p:column headerText="Summer On Peak Hours" filterBy="#{demandHistory.summerOnPeakHours}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.summerOnPeakHours}"/>
+                        </p:column>
+
+                        <p:column headerText="Winter Partial-Peak Therms " filterBy="#{demandHistory.winterPartialPeakKw}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.winterPartialPeakKw}"/>
+                        </p:column>
+
+                        <p:column headerText="Winter Partial-Peak Therms /H" filterBy="#{demandHistory.winterPartialPeakKwH}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.winterPartialPeakKwH}"/>
+                        </p:column>
+
+                        <p:column headerText="Winter Partial Peak Hours" filterBy="#{demandHistory.winterPartialPeakHours}" styleClass="topAligned">
+                            <h:outputText value="#{demandHistory.winterPartialPeakHours}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+            <!--</div>-->
+        </h:form>
+    </ui:define>
+</ui:composition>

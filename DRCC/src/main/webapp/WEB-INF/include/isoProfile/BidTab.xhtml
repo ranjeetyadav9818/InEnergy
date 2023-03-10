@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <h:panelGroup id="bidRules">
+        <h3 class="with-icon">Risk Dashboard Threshold Management</h3>
+        <p:commandButton action="#{isoProfilesController.addRiskCondition()}" update="bidRules" icon="ui-icon-add"/>
+
+        <p:panelGrid columns="1">
+            <p:outputLabel rendered="#{empty isoProfilesController.profile.riskConditions}">No bid rules defined yet</p:outputLabel>
+        </p:panelGrid>
+
+        <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty isoProfilesController.profile.riskConditions}">
+            <p:outputLabel value="Category"/>
+            <p:outputLabel value="Source"/>
+            <p:outputLabel value="Comparison"/>
+            <p:outputLabel value="Target"/>
+            <p:column/>
+            <p:column/>
+
+            <c:forEach items="#{isoProfilesController.profile.riskConditions}" var="riskCondition">
+                <p:selectOneMenu label="Category" id="bidCategory" value="#{riskCondition.category}" required="true" autoWidth="false"
+                                 style="width: 109px;">
+                    <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                    <f:selectItems value="#{isoProfilesController.riskCategories}" var="bidCategory" itemValue="#{bidCategory}"
+                                   itemLabel="#{bidCategory.name}"/>
+                </p:selectOneMenu>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:selectOneMenu label="Source" id="bidSource" value="#{riskCondition.source}" required="true" autoWidth="false" style="width: 150px;">
+                        <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                        <f:selectItems value="#{isoProfilesController.riskSources}" var="bidSource" itemValue="#{bidSource}" itemLabel="#{bidSource.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <p:selectOneMenu label="Comparison" id="bidComparion" value="#{riskCondition.comparisonOperator}" required="true">
+                    <f:selectItems value="#{isoProfilesController.relationalOperators}" var="relationalOperator"
+                                   itemValue="#{relationalOperator}" itemLabel="#{relationalOperator.name}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu label="Target" id="bidTarget" value="#{riskCondition.target}" required="true" autoWidth="false" style="width: 150px;">
+                    <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                    <f:selectItems value="#{isoProfilesController.riskTargets}" var="bidTarget" itemValue="#{bidTarget}" itemLabel="#{bidTarget.name}"/>
+                    <p:ajax update="customField#{riskCondition.uuid}"/>
+                </p:selectOneMenu>
+
+                <h:panelGroup id="customField#{riskCondition.uuid}">
+                    <p:inputNumber label="Custom Value" value="#{riskCondition.customValue}" decimalPlaces="2" maxValue="99999"
+                                   rendered="#{riskCondition.target.name eq 'Custom' || riskCondition.target.name eq 'Custom %'}"
+                                   required="true" placeholder="Enter custom value"/>
+                    <p:column rendered="#{riskCondition.target.name ne 'Custom'}"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:commandButton action="#{isoProfilesController.removeRiskCondition(riskCondition)}" update="bidRules" process="@this"
+                                     icon="ui-icon-remove"/>
+                </h:panelGroup>
+            </c:forEach>
+
+            <p:panelGrid/>
+        </p:panelGrid>
+
+    </h:panelGroup>
+</ui:composition>

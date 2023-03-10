@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <c:set var="controller" value="#{catalogController}"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="#{catalogController.networkType.name} Catalog" url="#"/>
+            </p:breadCrumb>
+
+            <h:panelGroup rendered="#{!controller.editMode}">
+                <div class="card card-w-title">
+                    <p:commandButton value="Add" action="#{controller.add}" id="add" update="@form"/>
+                </div>
+            </h:panelGroup>
+
+            <ui:include src="WEB-INF/include/asset/CatalogForm.xhtml"/>
+            <h:panelGroup rendered="#{controller.editMode}">
+            </h:panelGroup>
+
+            <div class="card card-w-title">
+                <h:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="catalogId" value="#{controller.catalogId}"/>
+                        <p:outputLabel value="Catalog ID:" for="catalogId"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="catalogName" value="#{controller.catalogName}"/>
+                        <p:outputLabel value="Catalog Name:" for="catalogName"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="assetGroup" value="#{controller.assetGroup}"/>
+                        <p:outputLabel value="Asset Group:" for="assetGroup"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="manufacturerFilter" value="#{controller.manufacturer}"/>
+                        <p:outputLabel value="Manufacturer:" for="manufacturerFilter"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:autoComplete id="supplierFilter"
+                                        value="#{controller.supplier}" converter="contractEntityConverter"
+                                        completeMethod="#{controller.completeEntity}"
+                                        var="link" itemLabel="#{link.businessName}" itemValue="#{link}"/>
+                        <p:outputLabel value="Supplier:" for="supplierFilter"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Asset Level:" for="assetLevel"/>
+                        <p:selectOneMenu id="assetLevel" value="#{controller.assetLevel}">
+                            <f:selectItem noSelectionOption="true" itemLabel="No Assigned"/>
+                            <f:selectItem itemValue="1" itemLabel="1"/>
+                            <f:selectItem itemValue="2" itemLabel="2"/>
+                            <f:selectItem itemValue="3" itemLabel="3"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </h:panelGrid>
+
+                <p:commandButton value="Search" action="#{controller.search}" id="search" update="@form"/>
+                <p:spacer width="10"/>
+                <p:commandButton value="Clear" action="#{controller.clearFilter}" id="clear" update="@form"/>
+            </div>
+
+            <div class="ContainerIndent">
+                <div class="EmptyBox10"/>
+                <p:dataTable id="assets" value="#{controller.lazyAssetDataModel}"
+                             editable="true"
+                             widgetVar="custTableA" lazy="true" var="asset" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{asset.uuid}">
+
+                    <p:ajax event="rowEdit" listener="#{controller.onRowEdit}"/>
+                    <p:ajax event="rowEditCancel" listener="#{controller.onRowCancel}"/>
+
+                    <j:useBean id="asset" class="com.inenergis.entity.asset.Asset" scope="session"/>
+
+                    <p:column headerText="Catalog ID">
+                        <p:outputLabel value="#{asset.id}"/>
+                    </p:column>
+
+                    <p:column headerText="Catalog Item Name" filterBy="#{asset.name}" filterMatchMode="contains" width="170">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{asset.name}"/></f:facet>
+                            <f:facet name="input"><p:inputTextarea rows="5" cols="51" value="#{asset.name}" label="Device Name" maxlength="255"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Asset Group">
+                        <h:outputText value="#{asset.assetGroup.name}"/>
+                    </p:column>
+
+                    <p:column headerText="Asset Level">
+                        <h:outputText value="#{asset.assetGroup.level}"/>
+                    </p:column>
+
+                    <p:column headerText="Manufacturer" filterBy="#{asset.manufacturer.name}" filterMatchMode="contains">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{asset.manufacturer.name}"/></f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu converter="manufacturerConverter" value="#{asset.manufacturer}">
+                                    <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                                    <f:selectItems value="#{controller.manufacturers}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Supplier" filterBy="#{asset.supplier.businessName}" filterMatchMode="contains">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{asset.supplier.businessName}"/></f:facet>
+                            <f:facet name="input">
+                                <p:autoComplete id="supplierFilterTable" placeholder="Start writing..."
+                                                value="#{asset.supplier}" converter="contractEntityConverter"
+                                                completeMethod="#{controller.completeEntity}"
+                                                var="link" itemLabel="#{link.businessName}" itemValue="#{link}"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Status">
+                        <h:outputLabel value="Active" rendered="#{asset.active}"/>
+                        <h:outputLabel value="Inactive" rendered="#{!asset.active}"/>
+                    </p:column>
+
+                    <p:column style="width: 32px;" class="showOnDesktop">
+                        <p:rowEditor/>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton value="Details" actionListener="#{controller.goToAssetDetails(asset)}"/>
+                        <p:spacer width="3px"/>
+                        <p:commandButton actionListener="#{controller.remove(asset)}" icon="ui-icon-remove" update="@form"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,113 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="oneAssetForAllTypes0.xml" author="egamas">
+        <tagDatabase tag="pre-oneAssetForAllTypes.xml"/>
+    </changeSet>
+
+    <changeSet id="oneAssetForAllTypes1.xml" author="egamas">
+        <addColumn tableName="ASSET_DEVICE">
+            <column name="ASSET_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+
+        <sql>
+            update ASSET_DEVICE set ASSET_ID = BTM_ASSET_ID where BTM_ASSET_ID is not null;
+            update ASSET_DEVICE set ASSET_ID = TRANSMISSION_ASSET_ID where TRANSMISSION_ASSET_ID is not null;
+            update ASSET_DEVICE set ASSET_ID = TRANSPORTATION_ASSET_ID where TRANSPORTATION_ASSET_ID is not null;
+            update ASSET_DEVICE set ASSET_ID = DISTRIBUTION_ASSET_ID where DISTRIBUTION_ASSET_ID is not null;
+            update ASSET_DEVICE set ASSET_ID = GAS_DISTRIBUTION_ASSET_ID where GAS_DISTRIBUTION_ASSET_ID is not null;
+        </sql>
+
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                 baseColumnNames="ASSET_ID"
+                                 constraintName="FK_DEVICE_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+
+        <dropForeignKeyConstraint baseTableName="ASSET_DEVICE" constraintName="FK_ASSET_DEVICE_BTM_ASSET"/>
+
+        <dropForeignKeyConstraint baseTableName="ASSET_DEVICE" constraintName="FK_ASSET_DEVICE_ASSET"/>
+
+        <dropForeignKeyConstraint baseTableName="ASSET_DEVICE" constraintName="FK_ASSET_DEVICE_TRANSP_ASSET"/>
+
+        <dropForeignKeyConstraint baseTableName="ASSET_DEVICE" constraintName="FK_DISTRIBUTION_DEVICE_DISTRIBUTION_ASSET"/>
+
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                     constraintName="FK_DEVICE_ASSET"/>
+
+            <dropColumn tableName="ASSET_DEVICE">
+                <column name="ASSET_ID" type="BIGINT(20) UNSIGNED"/>
+            </dropColumn>
+
+            <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                     baseColumnNames="BTM_ASSET_ID"
+                                     constraintName="FK_ASSET_DEVICE_BTM_ASSET"
+                                     referencedTableName="ASSET"
+                                     referencedColumnNames="ID"/>
+
+            <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                     baseColumnNames="TRANSMISSION_ASSET_ID"
+                                     constraintName="FK_ASSET_DEVICE_ASSET"
+                                     referencedTableName="ASSET"
+                                     referencedColumnNames="ID"/>
+
+            <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                     baseColumnNames="TRANSPORTATION_ASSET_ID"
+                                     constraintName="FK_ASSET_DEVICE_TRANSP_ASSET"
+                                     referencedTableName="ASSET"
+                                     referencedColumnNames="ID"/>
+
+            <addForeignKeyConstraint baseTableName="DISTRIBUTION_DEVICE"
+                                     baseColumnNames="DISTRIBUTION_ASSET_ID"
+                                     constraintName="FK_DISTRIBUTION_DEVICE_DISTRIBUTION_ASSET"
+                                     referencedTableName="ASSET"
+                                     referencedColumnNames="ID"/>
+
+
+
+        </rollback>
+
+    </changeSet>
+
+    <changeSet id="oneAssetForAllTypes2.xml" author="egamas">
+        <addColumn tableName="NETWORK_TYPE">
+            <column name="UI_ORDER" type="int(10) unsigned"/>
+        </addColumn>
+
+        <sql>
+            SET @counter = 0;
+
+            UPDATE NETWORK_TYPE SET UI_ORDER = @counter := @counter + 1
+            ORDER BY COMMODITY_TYPE, NAME;
+        </sql>
+        <rollback>
+            <dropColumn tableName="NETWORK_TYPE">
+                <column name="UI_ORDER" type="int(10) unsigned"/>
+            </dropColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="oneAssetForAllTypes3.xml" author="egamas">
+
+        <dropForeignKeyConstraint baseTableName="ASSET_DEVICE" constraintName="FK_ASSET_DEVICE_CON_DIST_ASSET"/>
+
+        <dropColumn tableName="ASSET_DEVICE">
+            <column name="BTM_ASSET_ID" type="bigint(20) unsigned"/>
+            <column name="TRANSMISSION_ASSET_ID" type="bigint(20) unsigned"/>
+            <column name="TRANSPORTATION_ASSET_ID" type="bigint(20) unsigned"/>
+            <column name="DISTRIBUTION_ASSET_ID" type="bigint(20) unsigned"/>
+            <column name="GAS_DISTRIBUTION_ASSET_ID" type="bigint(20) unsigned"/>
+            <column name="TYPE" type="varchar(55)"/>
+        </dropColumn>
+
+        <dropColumn tableName="ASSET">
+            <column name="TYPE" type="varchar(55)"/>
+        </dropColumn>
+    </changeSet>
+
+
+</databaseChangeLog>

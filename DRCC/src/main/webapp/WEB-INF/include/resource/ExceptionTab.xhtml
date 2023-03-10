@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <p:dataTable value="#{resourceController.lazyRegistrationSubmissionExceptionDataModel}" id="exceptionsTab" widgetVar="custTable" lazy="true" var="exception"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{exception.uuid}" selectionMode="single">
+        <p:ajax event="rowSelect" listener="#{resourceController.onSelectException}" update="form"/>
+
+        <p:column headerText="Resource Name"
+                  filterBy="#{exception.registrationSubmissionStatus.isoResource.name}"
+                  field="registrationSubmissionStatus.isoResource.name" filterMatchMode="contains">
+            <h:outputText value="#{exception.registrationSubmissionStatus.isoResource.name}"/>
+        </p:column>
+
+        <p:column headerText="Registration ID"
+                  filterBy="#{exception.registrationSubmissionStatus.isoRegistrationId}"
+                  field="registrationSubmissionStatus.isoRegistrationId" filterMatchMode="contains">
+            <h:outputText value="#{exception.registrationSubmissionStatus.isoRegistrationId}"/>
+        </p:column>
+
+        <p:column headerText="Exception" filterBy="#{exception.type}" field="type" filterMatchMode="contains">
+            <h:outputText value="#{fn:replace(exception.type,'_',' ')}"/>
+        </p:column>
+
+        <p:column headerText="Effective Date" filterBy="#{exception.dateAdded}" field="dateAdded" filterable="false">
+            <h:outputText value="#{exception.dateAdded}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

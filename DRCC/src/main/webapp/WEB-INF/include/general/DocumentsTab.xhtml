@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+    <p:fileUpload fileUploadListener="#{controller.submitFile}" multiple="true"
+                  update=":#{p:component('documentsTable')}"/>
+    <p:dataTable id="documentsTable" value="#{controller.documents}" var="document" style="margin-top: 30px">
+        <p:column headerText="File name">
+            <h:outputText value="#{document.fileName}"/>
+        </p:column>
+        <p:column headerText="Author">
+            <h:outputText value="#{document.author}"/>
+        </p:column>
+        <p:column headerText="Creation Date">
+            <h:outputText value="#{document.creationDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Actions">
+            <p:commandButton value="Download" ajax="false" icon="ui-icon-arrowthick-1-s">
+                <p:fileDownload value="#{controller.download(document)}"/>
+            </p:commandButton>
+            <p:spacer width="15"/>
+            <p:commandButton value="Delete" icon="ui-icon-trash" actionListener="#{controller.delete(document)}"
+                             update=":#{p:component('documentsTable')}">
+                <p:confirm header="Deleting #{document.fileName}" message="Are you sure?" icon="ui-icon-alert"/>
+            </p:commandButton>
+        </p:column>
+    </p:dataTable>
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+    </p:confirmDialog>
+</ui:composition>

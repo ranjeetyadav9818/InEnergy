@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+
+    <changeSet author="antonio.lopez" id="sql-files-sprint-6">
+        <sqlFile path="DRCC-146.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-148" author="vm">
+        <sqlFile path="DRCC-148.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-148-2" author="vm">
+        <sqlFile path="DRCC-148-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-153">
+        <sqlFile path="DRCC-153.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-147">
+        <sqlFile path="DRCC-147.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="antonio.lopez" id="DRCC-161">
+        <sqlFile path="DRCC-161.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="antonio.lopez" id="quickfix for datetime">
+        <sql>ALTER TABLE PROGRAM_SA_ENROLLMENT MODIFY COLUMN EFFECTIVE_END_DATE DATETIME;</sql>
+    </changeSet>
+
+    <changeSet author="egamas" id="quickfix for DRCC">
+        <sql>ALTER TABLE PROGRAM_SA_ENROLLMENT ADD CONSTRAINT UNIQUE_ENROLLMENT UNIQUE ( PROGRAM_ID, SA_ID, ENROLLMENT_SOURCE, EFFECTIVE_START_DATE);</sql>
+        <sql>alter table PROGRAM_SA_ENROLLMENT CHANGE COLUMN UUID UUID varchar(55) default null;</sql>
+        <sql>UPDATE PROGRAM SET ID=1 WHERE NAME='PDP';</sql>
+        <sql>UPDATE PROGRAM SET ID=2 WHERE NAME='Smart Rate';</sql>
+    </changeSet>
+
+    <changeSet author="egamas" id="DRCM_18_20_21">
+        <sql>CREATE index `IDX_SRV_ADDRESS1`ON `PREMISE`(SERVICE_ADDRESS1);</sql>
+    </changeSet>
+
+</databaseChangeLog>

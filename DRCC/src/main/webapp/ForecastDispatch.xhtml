@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <c:set var="controller" value="#{forecastDispatchController}"/>
+
+        <h:form id="form">
+
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Forecast" url="#"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" id="idGrid">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Program" for="program"/>
+                        <p:selectOneMenu id="program" converter="programConverter" value="#{controller.program}" required="true"
+                                         style="width: 157px;"
+                                         autoWidth="false">
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{controller.programs}" var="program" itemLabel="#{program.name}" itemValue="#{program}"/>
+                            <p:ajax partialSubmit="true" process="@this"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Dispatch Format:" for="dispatchFormat"/>
+                        <p:selectOneMenu id="dispatchFormat" converter="omnifaces.GenericEnumConverter" value="#{controller.forecastFormat}"
+                                         required="true" style="width: 157px;" autoWidth="false">
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{constantsProvider.dispatchForecastFormats}" var="dispatchFormat" itemLabel="#{dispatchFormat.name}"
+                                           itemValue="#{dispatchFormat}"/>
+                            <p:ajax partialSubmit="true" process="@this"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Dispatch Level:" for="dispatchLevel"/>
+                        <p:selectOneMenu id="dispatchLevel" converter="omnifaces.GenericEnumConverter" value="#{controller.dispatchLevel}"
+                                         required="true" style="width: 157px;">
+
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{constantsProvider.dispatchForecastLevels}" var="dispatchLevel" itemLabel="#{msg[dispatchLevel.id]}"
+                                           itemValue="#{dispatchLevel}"/>
+                            <p:ajax partialSubmit="true" process="@this"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Forecast Type" for="forecastType"/>
+                        <p:selectOneMenu id="forecastType" converter="omnifaces.GenericEnumConverter" value="#{controller.dispatchForecastType}"
+                                         required="true" style="width: 157px;">
+
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{constantsProvider.dispatchForecastTypes}" var="forecastType" itemLabel="#{forecastType.name}"
+                                           itemValue="#{forecastType}"/>
+                            <p:ajax partialSubmit="true" process="@this"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:calendar id="idDateFrom" value="#{controller.dateFrom}" pattern="MM/dd/yyyy" required="true" mask="true" binding="#{startdate}">
+                            <p:ajax partialSubmit="true" process="@this" event="dateSelect"/>
+                        </p:calendar>
+                        <p:outputLabel value="Start Date" for="idDateFrom"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="# days" for="daysNumber"/>
+                        <p:selectOneMenu id="daysNumber" converter="javax.faces.Integer" value="#{controller.numberOfDays}"
+                                         required="true" style="width: 157px;">
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{constantsProvider.FORECAST_DAYS}" var="numDays" itemLabel="#{numDays} days"
+                                           itemValue="#{numDays}"/>
+                            <p:ajax partialSubmit="true" process="@this"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton value="Calculate" action="#{controller.calculate()}" update="idGrid idRes" process="idGrid" />
+                    </h:panelGroup>
+                    <p:row/>
+                </p:panelGrid>
+            </div>
+        </h:form>
+
+        <p:outputPanel id="idRes">
+            <c:set var="cont" value="#{1}"/>
+            <c:forEach var="dateSegments" items="#{controller.heRows}">
+                <div class="card card-w-title">
+                    <h1>
+                        <p:outputLabel value="Day #{cont}" rendered="#{controller.forecastFormat ne 'SUMMARIZED'}"/>
+                        <p:outputLabel value="Summarized" rendered="#{controller.forecastFormat eq 'SUMMARIZED'}"/>
+                    </h1>
+                    <p:dataTable id="currentForecastTable" value="#{dateSegments.right}" var="group" style="margin-top: 10px;">
+                        <p:column headerText="#{msg[controller.dispatchLevel.id]}" style="width:12%;text-align: left;padding-left: 10px;">
+                            <h:outputText value="#{group.hourEndObject.uiName}"/>
+                        </p:column>
+
+                        <c:forEach begin="1" end="24" var="i">
+                            <p:column headerText="HE#{i}" style="padding-left: 5px;text-align: center;">
+                                <h:outputText value="#{group.hourEndObject.getHourEnd(i)}" converter="bidCapacityInMWConverter"/>
+                                <h:outputText styleClass="icon-bat1 red"/>
+                                <h:outputText styleClass="icon-bat4 green"/>
+                            </p:column>
+                        </c:forEach>
+                    </p:dataTable>
+                    <c:set var="cont" value="#{cont + 1}"/>
+                </div>
+            </c:forEach>
+        </p:outputPanel>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,17 @@
+<div class="error-text">{{message}}</div>
+<div class="main_content">
+  <input pInputText placeholder="Username" type="text" [formControl]="username" required
+         pattern="[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*" #f="ngForm"/>
+  <div class="error-text" *ngIf="username?.dirty && username?.errors?.required">
+    User (email) is mandatory</div>
+  <div class="error-text" *ngIf="username?.dirty && username?.errors?.pattern">
+    User must be an email</div>
+  <hr/>
+  <input pInputText placeholder="Password" type="password" [formControl]="password" required/>
+  <div class="error-text" *ngIf="password?.dirty && password?.errors?.required">
+    Password is mandatory
+  </div>
+  <hr/>
+  <button pButton type="button" [disabled]="!f.valid" icon="fa fa-sign-in" (click)="login()" label="Login"></button>
+</div>
+<p-growl [value]="msgs"></p-growl>

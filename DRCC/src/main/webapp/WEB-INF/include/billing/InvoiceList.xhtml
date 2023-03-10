@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:clx="http://java.sun.com/jsf/composite/components"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <j:useBean id="bill" type="com.inenergis.controller.model.BillingModel"/>
+    <j:useBean id="controller" type="com.inenergis.controller.customerData.AgreementPointMapList"/>
+    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <h:panelGroup styleClass="md-inputfield">
+            <p:chart type="bar" model="#{controller.monthlyBillingHistoryChart}" rendered="#{controller.monthlyBillingHistoryChart ne null}"/>
+        </h:panelGroup>
+        <h:panelGroup styleClass="md-inputfield">
+            <p:chart type="bar" model="#{controller.monthlyBillingHistoryConsumptionChart}" rendered="#{controller.monthlyBillingHistoryConsumptionChart ne null}"/>
+        </h:panelGroup>
+    </p:panelGrid>
+
+    <h:panelGroup rendered="#{controller.newPayment ne null}">
+        <div class="card card-w-title">
+            <h3>Record a payment</h3>
+
+            <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Type:" for="paymentType"/>
+                    <p:selectOneMenu id="paymentTypeG" required="true" value="#{controller.newPayment.type}">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.paymentTypes}" var="paymentType"
+                                       itemValue="#{paymentType}" itemLabel="#{paymentType.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <clx:MoneyInputComponent id="amountG" value="#{controller.newPayment.value}" required="true" label="Amount:"/>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="paidByG" value="#{controller.newPayment.paidBy}" required="true"/>
+                    <p:outputLabel value="Paid by:" for="paidBy"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-calendar">
+                    <p:calendar id="paymentDateG" value="#{controller.newPayment.date}" pattern="MM/dd/yyyy HH:mm:ss"
+                                converter="localDateTimeConverter" placeholder="mm/dd/yyyy HH:mm:ss"/>
+                    <p:outputLabel value="Payment Date:" for="paymentDate"/>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="invoiceNumberG" value="#{controller.newPayment.reference}"/>
+                    <p:outputLabel value="Reference:" for="invoiceNumber"/>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="serviceAgreementNumberG" value="#{controller.newPayment.serviceAgreement.serviceAgreementId}" disabled="true"/>
+                    <p:outputLabel value="Service Agreement:" for="serviceAgreementNumber"/>
+                </h:panelGroup>
+            </h:panelGrid>
+            <p:commandButton value="Save" action="#{controller.saveNewPayment()}" process="@form" update="@form"/>
+            <p:spacer width="5"/>
+            <p:commandButton value="Cancel" action="#{controller.cancelNewPayment()}" process="@this" update="@form"/>
+        </div>
+    </h:panelGroup>
+
+    <p:dataTable value="#{controller.bills}" id="billingTabG" widgetVar="custTableInvoice" var="bill"
+                 rowKey="#{bill.uuid}" selectionMode="single" style="text-align: center">
+        <p:ajax event="rowSelect" listener="#{controller.onSelectInvoice}" update="@form"/>
+
+        <p:column headerText="Dates From/To" filterable="false" width="160">
+            <h:outputText value="#{bill.dateFrom}" converter="localDateConverter"/> -
+            <h:outputText value="#{bill.dateTo}" converter="localDateConverter"/>
+        </p:column>
+        <p:column headerText="Due/Paid Date" field="dueDate" filterMatchMode="contains" width="25%">
+            <f:facet name="filter">
+                <clx:DateRangeComponent fromLabel="From" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"
+                                        pattern="MM/dd/yyyy" toLabel="To" onvaluechanged="#{controller.filterDates()}"
+                                        value="#{controller.dueDateRange}" tableWidgetVar="custTableInvoice"/>
+            </f:facet>
+            <h:outputText value="#{bill.duePaidDate}" converter="localDateConverter"/>
+        </p:column>
+        <p:column headerText="Reference" filterBy="#{bill.reference}" field="reference">
+            <f:facet name="filter">
+                <p:inputNumber onkeyup="PF('custTableInvoice').filter();" converter="javax.faces.Long"
+                               decimalPlaces="0" maxValue="9999999999999999999" size="10"/>
+            </f:facet>
+            <h:outputText value="#{bill.reference}"/>
+        </p:column>
+        <p:column headerText="Charges" filterable="false">
+            <clx:MoneyOutputComponent value="#{bill.totalCharges}"/>
+        </p:column>
+        <p:column headerText="Total Ancillary" filterable="false">
+            <clx:MoneyOutputComponent value="#{bill.totalAncillary}"/>
+        </p:column>
+        <p:column headerText="Total TAX" filterable="false">
+            <clx:MoneyOutputComponent value="#{bill.totalVat}"/>
+        </p:column>
+        <p:column headerText="Payment Date" filterable="false">
+            <h:outputText value="#{bill.invoice.paymentDate}" converter="localDateConverter" rendered="#{bill.invoice ne null}"/>
+        </p:column>
+        <p:column headerText="Debit" filterable="false" width="10%">
+            <clx:MoneyOutputComponent value="#{bill.debit}"/>
+            <p:commandButton id="billErrorG" icon="ui-icon ui-icon-error" style="margin-left: 8px; background-color: red" rendered="#{bill.hasErrors}" action="BillingSolutionCenter.xhtml?faces-redirect=true" ajax="false"/>
+            <p:tooltip for="billError" value="This invoice contains errors, it does not count for the total" showEffect="clip" hideEffect="clip" position="bottom" rendered="#{bill.hasErrors}" />
+        </p:column>
+        <p:column headerText="Credit" filterable="false">
+            <clx:MoneyOutputComponent value="#{bill.credit}"/>
+        </p:column>
+
+        <p:columnGroup type="footer">
+            <p:row>
+                <p:column colspan="7" style="text-align: right" footerText="Total:"/>
+                <p:column>
+                    <f:facet name="footer">
+                        <clx:MoneyOutputComponent value="#{controller.debitTotal}"/>
+                    </f:facet>
+                </p:column>
+                <p:column>
+                    <f:facet name="footer">
+                        <clx:MoneyOutputComponent value="#{controller.creditTotal}"/>
+                    </f:facet>
+                </p:column>
+                <p:column/>
+            </p:row>
+            <p:row>
+                <p:column colspan="7" style="text-align:right" footerText="Net Balance:"/>
+                <p:column colspan="2">
+                    <f:facet name="footer">
+                        <clx:MoneyOutputComponent value="#{controller.invoiceBalance}"/>
+                    </f:facet>
+                </p:column>
+                <p:column/>
+            </p:row>
+            <p:row>
+                <p:column colspan="7"/>
+                <p:column colspan="3">
+                    <f:facet name="footer">
+                        <p:commandButton process="@this" update="@form" value="Record a payment" action="#{controller.startNewPayment()}"/>
+                    </f:facet>
+                </p:column>
+            </p:row>
+        </p:columnGroup>
+        <p:column style="width:16px">
+            <p:rowToggler rendered="#{bill.payment ne null}"/>
+        </p:column>
+        <p:rowExpansion>
+            <p:panelGrid columns="2" columnClasses="label,value" style="width:300px;text-align: left;">
+                <h:outputText value="Payment Type:"/>
+                <h:outputText value="#{bill.payment.type.name}"/>
+
+                <h:outputText value="Reference:"/>
+                <h:outputText value="#{bill.payment.reference}"/>
+
+                <h:outputText value="Date"/>
+                <h:outputText value="#{bill.payment.date}" converter="localDateConverter"/>
+
+                <h:outputText value="Value:"/>
+                <clx:MoneyOutputComponent value="#{bill.payment.value}"/>
+
+                <h:outputText value="Paid by:"/>
+                <h:outputText value="#{bill.payment.paidBy}"/>
+            </p:panelGrid>
+        </p:rowExpansion>
+    </p:dataTable>
+</ui:composition>

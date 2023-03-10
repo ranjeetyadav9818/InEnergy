@@ -1,0 +1,31 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+
+    <changeSet id="sublap-lse-changes-1" author="antonio">
+        <addColumn tableName="SUBLAP">
+            <column name="ISO_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addColumn tableName="LSE">
+            <column name="ISO_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addForeignKeyConstraint baseColumnNames="ISO_ID"
+                                 baseTableName="SUBLAP"
+                                 constraintName="fk_Sublap_ISO"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="MI_ISO"/>
+        <addForeignKeyConstraint baseColumnNames="ISO_ID"
+                                 baseTableName="LSE"
+                                 constraintName="fk_LSE_ISO"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="MI_ISO"/>
+    </changeSet>
+
+    <changeSet id="sublap-lse-changes-2" author="antonio">
+        <sql>UPDATE SUBLAP SET ISO_ID = (SELECT ID FROM MI_ISO ORDER BY ID LIMIT 1)</sql>
+        <sql>UPDATE LSE SET ISO_ID = (SELECT ID FROM MI_ISO ORDER BY ID LIMIT 1)</sql>
+    </changeSet>
+
+</databaseChangeLog>

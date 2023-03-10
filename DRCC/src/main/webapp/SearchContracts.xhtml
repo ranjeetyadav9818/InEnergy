@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:clx="http://java.sun.com/jsf/composite/components"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration"/>
+                <p:menuitem value="Energy Contracts"/>
+            </p:breadCrumb>
+
+            <div class="card">
+                <p:commandButton process="@this" update="@form" value="New Contract" action="#{searchContractController.forwardToNewContract()}"/>
+            </div>
+            <div class="card">
+                <p:dataTable value="#{searchContractController.contracts}" widgetVar="contractTable" lazy="true" var="contract" reflow="true" rows="25"
+                             rowsPerPageTemplate="25,50,100" id="contractTableId"
+                             editable="true" paginator="true" paginatorAlwaysVisible="false" rowKey="#{contract.uuid}" style="text-align: center" selectionMode="single"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+                    <p:ajax event="rowSelect" listener="#{searchContractController.onContractSelected}"/>
+                    <p:ajax event="filter" delay="300"/>
+                    <p:column headerText="Name" field="name" filterMatchMode="contains">
+                        <h:outputText value="#{contract.name}"/>
+                    </p:column>
+                    <p:column headerText="Type" field="type" filterMatchMode="equals">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('contractTable').filter()" converter="omnifaces.GenericEnumConverter">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.energyContractTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{contract.type.name}"/>
+                    </p:column>
+                    <p:column headerText="Start" field="agreementStartDate" filterMatchMode="contains">
+                        <f:facet name="filter">
+                            <clx:DateRangeComponent fromLabel="From" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}" pattern="MM/dd/yyyy"
+                                                    toLabel="To" onvaluechanged="#{searchContractController.filterDates()}"
+                                                    value="#{searchContractController.startDateRange}" tableWidgetVar="contractTable"/>
+                        </f:facet>
+                        <h:outputText value="#{contract.agreementStartDate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a"
+                                               timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"/></h:outputText>
+                    </p:column>
+                    <p:column headerText="End" field="agreementEndDate" filterMatchMode="contains">
+                            <f:facet name="filter">
+                                <clx:DateRangeComponent fromLabel="From" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}" pattern="MM/dd/yyyy"
+                                                        toLabel="To" onvaluechanged="#{searchContractController.filterDates()}"
+                                                        value="#{searchContractController.endDateRange}" tableWidgetVar="contractTable"/>
+                            </f:facet>
+                        <h:outputText value="#{contract.agreementEndDate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a"
+                                               timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"/></h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

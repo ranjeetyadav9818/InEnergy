@@ -1,0 +1,84 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet context="ddl" id="pre-DES-186-tag" author="egamas">
+        <tagDatabase tag="pre-DES-186-tag" />
+    </changeSet>
+    <changeSet id="DES-186-1" author="egamas">
+        <createTable tableName="DEVICE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(55)"/>
+            <column name="EQUIPMENT_ID" type="VARCHAR(55)"/>
+            <column name="POWER_SOURCE_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="ENTITY_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="DEVICE"
+                                 baseColumnNames="POWER_SOURCE_ID"
+                                 constraintName="FK_DEVICE_POWER_SOURCE"
+                                 referencedTableName="MAINTENANCE_DATA"
+                                 referencedColumnNames="ID"/>
+
+        <addForeignKeyConstraint baseTableName="DEVICE"
+                                 baseColumnNames="ENTITY_ID"
+                                 constraintName="FK_DEVICE_ENTITY"
+                                 referencedTableName="CONTRACT_ENTITY"
+                                 referencedColumnNames="ID"/>
+        <rollback>
+            <dropTable tableName="DEVICE"/>
+        </rollback>
+
+    </changeSet>
+    <changeSet context="ddl" id="pre-DES-186-2-tag" author="egamas">
+        <tagDatabase tag="pre-DES-186-2-tag" />
+    </changeSet>
+    <changeSet id="DES-186-2" author="egamas">
+        <dropForeignKeyConstraint baseTableName="DEVICE" constraintName="FK_DEVICE_POWER_SOURCE"/>
+        <dropColumn tableName="DEVICE" columnName="POWER_SOURCE_ID" />
+        <addColumn tableName="DEVICE">
+            <column name="POWER_SOURCE" type="VARCHAR(55)"/>
+        </addColumn>
+        <rollback>
+        <addColumn tableName="DEVICE">
+            <column name="POWER_SOURCE_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+
+        </rollback>
+    </changeSet>
+    
+    <changeSet id="DES-186-3" author="egamas">
+        <createTable tableName="CONTRACT_DEVICE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="DEVICE_ID" type="BIGINT(20) UNSIGNED" />
+            <column name="CONTRACT_ID" type="BIGINT(20) UNSIGNED" />
+            <column name="ESTIMATED_CAPACITY" type="BIGINT(10)" />
+            <column name="ESTIMATED_CAPACITY_UNIT" type="VARCHAR(10)" />
+            <column name="RAMP_RATE" type="BIGINT(10)" />
+            <column name="RAMP_RATE_UNIT" type="VARCHAR(10)" />
+            <column name="HOUR_END_FROM" type="VARCHAR(10)" />
+            <column name="HOUR_END_TO" type="VARCHAR(10)" />
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="CONTRACT_DEVICE"
+                                 baseColumnNames="DEVICE_ID"
+                                 constraintName="FK_DEVICE_CONTRACT_DEVICE"
+                                 referencedTableName="DEVICE"
+                                 referencedColumnNames="ID"/>
+
+        <addForeignKeyConstraint baseTableName="CONTRACT_DEVICE"
+                                 baseColumnNames="CONTRACT_ID"
+                                 constraintName="FK_DEVICE_CONTRACT_CONTRACT"
+                                 referencedTableName="ENERGY_CONTRACT"
+                                 referencedColumnNames="ID"/>
+
+    </changeSet>
+
+</databaseChangeLog>

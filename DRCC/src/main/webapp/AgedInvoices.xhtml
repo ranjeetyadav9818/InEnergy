@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:clx="http://java.sun.com/jsf/composite/components"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formCL">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Aged Invoices" outcome="AgedInvoices"/>
+            </p:breadCrumb>
+
+            <div class="ui-g dashboard">
+                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <p:panel header="Receivables by Age" styleClass="ui-shadow-content">
+                        <p:chart type="pie" model="#{agedInvoiceController.agedInvoicesPieChart}"
+                                 rendered="#{agedInvoiceController.agedInvoicesPieChart.data.size() != 0}"/>
+                        <p:panel style="text-align: center;margin: 20px;border-width: 0;"
+                                 rendered="#{agedInvoiceController.agedInvoicesPieChart.data.size() == 0}">No data</p:panel>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <p:panel header="% of invoices paid on time" styleClass="ui-shadow-content" style="text-align: center;">
+                        <p:chart type="metergauge" model="#{agedInvoiceController.paidInvoicesGauge}" style="height: 266px;"/>
+                        <div style="font-size: 20px;padding-bottom: 10px;">
+                            <h:outputLabel value="Cash Realisation Time: "/>
+                            <h:outputLabel value="#{agedInvoiceController.cashRealisationTime}" style="font-weight: bold;">
+                                <f:convertNumber pattern="#0.0"/>
+                            </h:outputLabel>
+                            <h:outputLabel value=" days" style="font-weight: bold;"/>
+                        </div>
+                    </p:panel>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                    <p:panel styleClass="ui-shadow-content">
+                        <p:dataTable value="#{agedInvoiceController.lazyUnpaidDueInvoices}" widgetVar="custTableInvoiceDetail" lazy="true"
+                                     var="invoice" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false" style="text-align: center;margin-top: 10px"
+                                     sortBy="#{invoice.dueDate}">
+
+                            <j:useBean id="invoice" type="com.inenergis.entity.billing.Invoice"/>
+
+                            <p:column headerText="Due Date" sortBy="#{invoice.dueDate}">
+                                <h:outputText value="#{invoice.dueDate}" converter="localDateConverter"/>
+                            </p:column>
+                            <p:column headerText="Overdue Days" filterBy="#{invoice.overdueDays}">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('custTableInvoiceDetail').filter()" style="margin-bottom: 0;"
+                                                     converter="omnifaces.GenericEnumConverter">
+                                        <f:selectItem noSelectionOption="true" itemLabel="Any"/>
+                                        <f:selectItems value="#{constantsProvider.agedInvoiceCategories}" var="category"
+                                                       itemValue="#{category}" itemLabel="#{category.name}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{invoice.overdueDays}" rendered="#{invoice.overdueDays gt 0}"/>
+                                <h:outputText value="Current" rendered="#{invoice.overdueDays eq 0}"/>
+                            </p:column>
+                            <p:column headerText="Generation Date">
+                                <h:outputText value="#{invoice.date}" converter="localDateConverter"/>
+                            </p:column>
+                            <p:column headerText="Reference" filterBy="#{invoice.invoiceNumber}">
+                                <h:outputText value="#{invoice.invoiceNumber}"/>
+                            </p:column>
+                            <p:column headerText="Service Agreement" filterBy="#{invoice.serviceAgreement.serviceAgreementId}">
+                                <p:link value="#{invoice.serviceAgreement.serviceAgreementId}" outcome="CustomerList.xhtml">
+                                    <f:param name="o" value="#{parameterEncoderService.encode(invoice.serviceAgreement.serviceAgreementId)}"/>
+                                </p:link>
+                            </p:column>
+                            <p:column headerText="Total">
+                                <clx:MoneyOutputComponent value="#{invoice.getTotal()}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <c:set var="controller" value="#{ratePlanController}"/>
+
+    <div class="card card-w-title">
+        <h3>Billing Terms</h3>
+
+        <p:panelGrid columns="4" id="rules" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Frequency" for="frequency"/>
+                <p:selectOneMenu id="frequency" value="#{controller.selectedProfile.billingTermFrequency}"
+                                 converter="omnifaces.GenericEnumConverter">
+                    <f:selectItems value="#{constantsProvider.billingTermFrequencies}"
+                                   var="freq" itemValue="#{freq}" itemLabel="#{freq.name}"/>
+                    <p:ajax update="rules"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{controller.selectedProfile.billingTermFrequency.toString() eq 'WEEKLY'}">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Week Day" for="weekday"/>
+                    <p:selectOneMenu id="weekday" value="#{controller.selectedProfile.billingDayOfWeek}"
+                                     converter="omnifaces.GenericEnumConverter">
+                        <f:selectItems value="#{constantsProvider.weekDays}"
+                                       var="day" itemValue="#{day}" itemLabel="#{day.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{controller.selectedProfile.billingTermFrequency.toString() eq 'MONTHLY'}">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Month Day" for="monthday"/>
+                    <p:selectOneMenu id="monthday" value="#{controller.selectedProfile.billingDayOfMonth}">
+                        <f:selectItems value="#{constantsProvider.oneToTwentyEight}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" rendered="#{controller.selectedProfile.billingTermFrequency.toString() eq 'ANNUALLY'}">
+                <p:outputLabel value="Month Day" for="yearDate"/>
+                <p:selectOneMenu id="yearDate" value="#{controller.selectedProfile.billingDayOfMonth}">
+                    <f:selectItems value="#{constantsProvider.oneToTwentyEight}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" rendered="#{controller.selectedProfile.billingTermFrequency.toString() eq 'ANNUALLY'}">
+                <p:outputLabel value="Month" for="yearDate"/>
+                <p:selectOneMenu id="monthDate" value="#{controller.selectedProfile.billingMonth}">
+                    <f:selectItems value="#{constantsProvider.months}" var="month" itemLabel="#{month.name}" itemValue="#{month.value}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+    </div>
+
+</ui:composition>

@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Credits</h3>
+
+        <h:panelGroup id="credits">
+            <p:commandButton action="#{energyContractController.addCredit()}" update="credits" process="credits"
+                             icon="ui-icon-add" rendered="#{readonly == false}">
+                <o:skipValidators/>
+            </p:commandButton>
+            <p:spacer width="10"/>
+            <p:outputLabel rendered="#{empty energyContractController.energyContract.credits}">No credits defined yet</p:outputLabel>
+
+            <ui:repeat value="#{energyContractController.energyContract.credits}" var="credit">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Credit Category" for="creditType"/>
+                        <p:selectOneMenu id="creditType" value="#{credit.creditType}" required="true" disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.energyContractCreditTypes}" var="creditType"
+                                           itemLabel="#{creditType.name}" itemValue="#{creditType}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Credit Type" for="creditAmountType"/>
+                        <p:selectOneMenu id="creditAmountType" value="#{credit.amountType}" required="true" disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.amountTypes}" var="type" itemValue="#{type}" itemLabel="#{type.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton action="#{energyContractController.removeCredit(credit)}"
+                                         rendered="#{readonly == false}" icon="ui-icon-remove"
+                                         update=":form:#{tabViewId}:credits" process=":form:#{tabViewId}:credits">
+                            <o:skipValidators/>
+                        </p:commandButton>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Amount:" for="creditAmount"/>
+                        <p:inputNumber label="Amount" decimalPlaces="5" maxValue="10000" id="creditAmount"
+                                       readonly="#{readonly}"
+                                       value="#{credit.amount}" required="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Unit of Measure" for="creditUnitOfMeasure"/>
+                        <p:selectOneMenu id="creditUnitOfMeasure" value="#{credit.unitOfMeasure}" disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.feeUnitOfMeasures}" var="unit"
+                                           itemLabel="#{unit.name}" itemValue="#{unit}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <p:column/>
+
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:outputLabel value="Date Range" for="drFrom" style="top: -30px;"/>
+                        <p:calendar value="#{credit.dateFrom}" pattern="MM/dd/yyyy" disabled="#{readonly}"
+                                    timeZone="UTC" mask="true" placeholder="mm/dd/yyyy" label="Date From" required="true" id="drFrom">
+                            <f:validator validatorId="endDateRangeValidator"/>
+                        </p:calendar>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:outputLabel value="To" for="drTo" style="top: -30px;"/>
+                        <p:calendar value="#{credit.dateTo}" pattern="MM/dd/yyyy" disabled="#{readonly}"
+                                    timeZone="UTC" mask="true" placeholder="mm/dd/yyyy" label="Date To" required="true" id="drTo">
+                            <f:validator validatorId="endDateRangeValidator"/>
+                        </p:calendar>
+                    </h:panelGroup>
+
+                </p:panelGrid>
+            </ui:repeat>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="credits" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="credits" process="credits" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

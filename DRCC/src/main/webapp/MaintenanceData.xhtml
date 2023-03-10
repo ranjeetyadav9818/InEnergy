@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="FVSM">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Maintenance Data"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <h3>Available values for #{maintenanceDataController.maintenanceClass.name}
+                    <p:commandButton value="Add" update="@form" action="#{maintenanceDataController.addValue()}"/>
+                </h3>
+                <h:panelGroup styleClass="md-inputfield" rendered="#{maintenanceDataController.addingValue}">
+                    <p:inputText value="#{maintenanceDataController.newValue}" required="true" id="newValue"/>
+                    <p:outputLabel value="New value:" for="newValue"/>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{maintenanceDataController.addingValue}">
+                    <p:commandButton id="save" value="#{msg['save']}" action="#{maintenanceDataController.save()}" process="@form" update="@form"/>
+                    <p:spacer width="5"/>
+                    <p:commandButton id="cancel" value="#{msg['cancel']}" action="#{maintenanceDataController.cancel()}" process="@this" update="@form"/>
+                </h:panelGroup>
+
+                <p:dataTable id="dmTable" value="#{maintenanceDataController.list}" var="data" style="margin-top: 30px"
+                             reflow="true" rows="25"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false">
+
+                    <p:column headerText="Value">
+                        <h:outputText value="#{data.value}"/>
+                    </p:column>
+                </p:dataTable>
+                *If you want to update or change these values please contact an administrator
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

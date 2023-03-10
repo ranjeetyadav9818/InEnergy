@@ -1,0 +1,25 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="billing-terms" author="vm">
+        <renameColumn tableName="RATE_PLAN_PROFILE"
+                      oldColumnName="DAYS_BILLING_PERIOD_FROM"
+                      newColumnName="BILLING_DAY_OF_MONTH"
+                      columnDataType="INT(3)"/>
+        <renameColumn tableName="RATE_PLAN_PROFILE"
+                      oldColumnName="DAYS_BILLING_PERIOD_TO"
+                      newColumnName="BILLING_MONTH"
+                      columnDataType="INT(3)"/>
+        <addColumn tableName="RATE_PLAN_PROFILE">
+            <column name="BILLING_DAY_OF_WEEK" type="VARCHAR(55)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="billing-terms-2" author="vm">
+        <addColumn tableName="RATE_PLAN_PROFILE">
+            <column name="LAST_PAYMENT_DATE" type="DATE"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

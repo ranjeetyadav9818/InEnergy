@@ -1,0 +1,114 @@
+DROP TABLE IF EXISTS `SEGMENT`;
+
+DROP TABLE IF EXISTS `BID`;
+
+CREATE TABLE IF NOT EXISTS `BID` (
+    `ID` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `UUID` VARCHAR(55) NULL,
+    `TRADE_DATE` DATE NULL,
+    `STATUS` VARCHAR(30) NULL,
+/*Created, Submitted, Rejected, Accepted, Invalid, Temporary Valid,
+  Conditionally Valid, Conditionally Modified, Valid, Modified,
+  Obsolete, Canceled, Clean, and STUC.*/
+    `REGISTRATION_STATUS_ID` BIGINT(20) UNSIGNED NOT NULL,
+    PRIMARY KEY (`ID`)  ,
+    CONSTRAINT `fk_SEGMENT_REGISTRATION_STATUS`
+    FOREIGN KEY (`REGISTRATION_STATUS_ID`)
+	REFERENCES `REGISTRATION_STATUS` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `SEGMENT` (
+  `ID`                     BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `UUID`                   VARCHAR(55) NULL,
+  `STATUS`                 VARCHAR(30) NULL,
+  `BID_ID`                 BIGINT(20)  UNSIGNED NOT NULL,
+  `PROGRAM_ID`             BIGINT(20)  NOT NULL,
+  `CAPACITY_HE1`           BIGINT(10)  NULL,
+  `PRICE_HE1`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE2`           BIGINT(10)  NULL,
+  `PRICE_HE2`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE3`           BIGINT(10)  NULL,
+  `PRICE_HE3`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE4`           BIGINT(10)  NULL,
+  `PRICE_HE4`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE5`           BIGINT(10)  NULL,
+  `PRICE_HE5`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE6`           BIGINT(10)  NULL,
+  `PRICE_HE6`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE7`           BIGINT(10)  NULL,
+  `PRICE_HE7`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE8`           BIGINT(10)  NULL,
+  `PRICE_HE8`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE9`           BIGINT(10)  NULL,
+  `PRICE_HE9`              BIGINT(16)  NULL,
+
+  `CAPACITY_HE10`          BIGINT(10)  NULL,
+  `PRICE_HE10`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE11`          BIGINT(10)  NULL,
+  `PRICE_HE11`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE12`          BIGINT(10)  NULL,
+  `PRICE_HE12`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE13`          BIGINT(10)  NULL,
+  `PRICE_HE13`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE14`          BIGINT(10)  NULL,
+  `PRICE_HE14`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE15`          BIGINT(10)  NULL,
+  `PRICE_HE15`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE16`          BIGINT(10)  NULL,
+  `PRICE_HE16`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE17`          BIGINT(10)  NULL,
+  `PRICE_HE17`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE18`          BIGINT(10)  NULL,
+  `PRICE_HE18`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE19`          BIGINT(10)  NULL,
+  `PRICE_HE19`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE20`          BIGINT(10)  NULL,
+  `PRICE_HE20`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE21`          BIGINT(10)  NULL,
+  `PRICE_HE21`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE22`          BIGINT(10)  NULL,
+  `PRICE_HE22`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE23`          BIGINT(10)  NULL,
+  `PRICE_HE23`             BIGINT(16)  NULL,
+
+  `CAPACITY_HE24`          BIGINT(10)  NULL,
+  `PRICE_HE24`             BIGINT(16)  NULL,
+
+  PRIMARY KEY (`ID`),
+  INDEX `fk_SEGMENT_BID_PACKAGE_idx` (`BID_ID` ASC),
+  INDEX `fk_SEGMENT_PROGRAM_idx` (`PROGRAM_ID` ASC),
+  CONSTRAINT `fk_SEGMENT_BID_PACKAGE`
+  FOREIGN KEY (`BID_ID`)
+  REFERENCES `BID` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_SEGMENT_PROGRAM`
+  FOREIGN KEY (`PROGRAM_ID`)
+  REFERENCES `PROGRAM` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+)
+  ENGINE = InnoDB;

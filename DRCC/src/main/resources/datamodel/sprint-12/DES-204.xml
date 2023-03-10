@@ -1,0 +1,28 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-204" author="vm">
+        <createTable tableName="MANUFACTURER">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="POINT_OF_CONTACT" type="VARCHAR(255)"/>
+            <column name="PHONE" type="VARCHAR(55)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="DES-204-1" author="vm">
+        <addColumn tableName="ASSET">
+            <column type="bigint(20) unsigned" name="MANUFACTURER_ID"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="ASSET"
+                                 baseColumnNames="MANUFACTURER_ID"
+                                 constraintName="FK_ASSET_MANUFACTURER"
+                                 referencedTableName="MANUFACTURER"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+</databaseChangeLog>

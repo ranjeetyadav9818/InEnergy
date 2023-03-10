@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="showCurrency0.xml" author="egamas">
+        <tagDatabase tag="pre-showCurrency.xml"/>
+    </changeSet>
+
+    <changeSet id="showCurrency1.xml" author="egamas">
+        <createTable tableName="CURRENCY_CONFIG">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+            <constraints nullable="false" primaryKey="true"/>
+        </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="NAME" type="varchar(55)"/>
+            <column name="SELECTED" type="tinyint(1)"/>
+            <column name="LOCALE" type="varchar(55)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="showCurrency2.xml" author="egamas">
+        <insert tableName="CURRENCY_CONFIG">
+            <column name="UUID" type="varchar(55)" value="542d6ebc-f7bd-11e7-856d-0898e3a8a12e"/>
+            <column name="NAME" type="varchar(55)" value="USD"/>
+            <column name="SELECTED" type="tinyint(1)" value="1"/>
+            <column name="LOCALE" type="varchar(55)" value="en_US"/>
+        </insert>
+
+        <insert tableName="CURRENCY_CONFIG">
+            <column name="UUID" type="varchar(55)" value="594db596-f7bd-11e7-856d-0898e3a8a12e"/>
+            <column name="NAME" type="varchar(55)" value="GBP"/>
+            <column name="SELECTED" type="tinyint(1)" value="0"/>
+            <column name="LOCALE" type="varchar(55)" value="en_GB"/>
+        </insert>
+
+        <insert tableName="CURRENCY_CONFIG">
+            <column name="UUID" type="varchar(55)" value="61d121b2-f7bd-11e7-856d-0898e3a8a12e"/>
+            <column name="NAME" type="varchar(55)" value="EUR"/>
+            <column name="SELECTED" type="tinyint(1)" value="0"/>
+            <column name="LOCALE" type="varchar(55)" value="de_DE"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

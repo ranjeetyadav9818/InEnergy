@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{controller.event.impactedCustomers}" var="customer" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{customer.id}" selectionMode="single">
+        <p:ajax event="rowSelect" listener="#{controller.redirectToSelectedServiceAgreement}"/>
+        <p:column headerText="DRMS Program Id" filterBy="#{customer.drmsProgramId}" filterMatchMode="contains">
+            <h:outputText value="#{customer.drmsProgramId}"/>
+        </p:column>
+        <p:column headerText="SA ID" filterBy="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}" filterMatchMode="contains">
+            <h:outputText value="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}"/>
+        </p:column>
+        <p:column headerText="DRMS Id" filterBy="#{customer.drmsId}" filterMatchMode="contains">
+            <h:outputText value="#{customer.drmsId}"/>
+        </p:column>
+        <p:column headerText="Customer name" filterBy="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}" filterMatchMode="contains">
+            <h:outputText value="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}"/>
+        </p:column>
+        <p:column headerText="Service Address" filterBy="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps.get(0).servicePoint.premise.serviceAddress1}" filterMatchMode="contains">
+            <h:outputText value="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps.get(0).servicePoint.premise.serviceAddress1}"/>
+        </p:column>
+        <p:column headerText="Service City" filterBy="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps.get(0).servicePoint.premise.serviceCityUpr}" filterMatchMode="contains">
+            <h:outputText value="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps.get(0).servicePoint.premise.serviceCityUpr}"/>
+        </p:column>
+        <p:column headerText="#{msg['data.mapping.sublap']}" filterBy="#{customer.locationSubmissionStatus.isoSublap}" filterMatchMode="contains">
+            <h:outputText value="#{customer.locationSubmissionStatus.isoSublap }"/>
+        </p:column>
+        <p:column headerText="LSE" filterBy="#{customer.locationSubmissionStatus.isoLse}" filterMatchMode="contains">
+            <h:outputText value="#{customer.locationSubmissionStatus.isoLse }"/>
+        </p:column>
+        <p:column headerText="Aggregator" filterBy="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.aggregator.name}" filterMatchMode="contains">
+            <h:outputText value="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.aggregator.name }"/>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

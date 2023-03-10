@@ -1,0 +1,3 @@
+ALTER TABLE TASK MODIFY COLUMN `BUSINESS_OWNER_ID` BIGINT(20) NULL;
+INSERT INTO TASK(UUID,TASK_TYPE,NAME,DESCRIPTION,DURATION_VALUE,DURATION_MEASURE) VALUES(UUID(),'SYS','ISO Location Registration','This task will send to the ISO all the information related to the location for its approval',1,'HOURS');
+INSERT INTO TASK(UUID,TASK_TYPE,NAME,DESCRIPTION,DURATION_VALUE,DURATION_MEASURE) VALUES(UUID(),'SYS','ISO Location end date','This task will modify the location in the ISO to end date it',1,'HOURS');

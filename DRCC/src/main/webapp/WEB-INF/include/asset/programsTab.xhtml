@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <c:set value="#{controller.asset}" var="asset"/>
+    <j:useBean id="asset" type="com.inenergis.entity.asset.Asset"/>
+    <div class="card card-w-title">
+        <h:panelGroup>
+            <h3>DR Programs</h3>
+            <p:dataTable value="#{asset.programProfileAssets}" var="programProfileAsset">
+                <p:column headerText="Program">
+                    <h:outputText value="#{programProfileAsset.profile.program.name}"/>
+                </p:column>
+                <p:column headerText="Effective Start Date">
+                    <h:outputText value="#{programProfileAsset.profile.effectiveStartDate}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Effective End Date">
+                    <h:outputText value="#{programProfileAsset.profile.effectiveEndDate}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Program Active">
+                    <h:outputText value="Yes" rendered="#{programProfileAsset.profile.program.active}"/>
+                    <h:outputText value="No" rendered="#{!programProfileAsset.profile.program.active}"/>
+                </p:column>
+            </p:dataTable>
+        </h:panelGroup>
+    </div>
+
+    <div class="card card-w-title">
+        <h:panelGroup>
+            <h3>Rate Programs</h3>
+            <p:dataTable value="#{asset.ratePlanProfileAssets}" var="ratePlanProfileAsset">
+                <p:column headerText="Program">
+                    <h:outputText value="#{ratePlanProfileAsset.ratePlanProfile.ratePlan.name}"/>
+                </p:column>
+                <p:column headerText="Effective Start Date">
+                    <h:outputText value="#{ratePlanProfileAsset.ratePlanProfile.effectiveEndDate}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Effective End Date">
+                    <h:outputText value="#{ratePlanProfileAsset.ratePlanProfile.effectiveEndDate}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Program Active">
+                    <h:outputText value="Yes" rendered="#{programProfileAsset.profile.program.active}"/>
+                    <h:outputText value="No" rendered="#{!programProfileAsset.profile.program.active}"/>
+                </p:column>
+            </p:dataTable>
+        </h:panelGroup>
+    </div>
+</ui:composition>

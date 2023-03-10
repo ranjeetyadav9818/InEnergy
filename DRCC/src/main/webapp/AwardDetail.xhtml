@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <c:set var="controller" value="#{awardDetailController}"/>
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration" url="#"/>
+                <p:menuitem value="#{awardDetailController.award.resource.isoProduct.profile.iso.name}" url="#"/>
+                <p:menuitem value="Awards" action="#{controller.onBreadCrumbClick}"/>
+                <p:menuitem value="Resource #{controller.award.resource.name} - Trade Day #{controller.getTradeDateFormatted()}" url="#"/>
+            </p:breadCrumb>
+            <div class="card card-w-title">
+                <h1>Award Detail</h1>
+                    <p:tabView id="awardDetailView" scrollable="false" rendered="#{controller.render}">
+                        <p:tab id="bidAwardComparison" title="Bid-Award Comparison">
+                            <ui:include src="WEB-INF/include/award/BidAwardComparisonTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="awardInstructions" title="#{controller.award.resource.isoProduct.profile.iso.name} Award Instructions">
+                            <ui:include src="WEB-INF/include/award/IsoAwardInstructionsTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="trajectories" title="#{controller.award.resource.isoProduct.profile.iso.name} Trajectories">
+                            <ui:include src="WEB-INF/include/award/IsoAwardTrajectoriesTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="customerDispatch" title="Customer Dispatch">
+                            <ui:include src="WEB-INF/include/award/CustomerDispatchTab.xhtml"/>
+                        </p:tab>
+                    </p:tabView>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Market Integration" url="#"/>
+            <p:menuitem value="#{locationSubmissionController.iso.name}" url="#"/>
+            <p:menuitem value="Locations" outcome="Locations">
+                <f:param name="o" value="#{parameterEncoderService.encode(locationSubmissionController.iso.id)}"/>
+            </p:menuitem>
+        </p:breadCrumb>
+
+        <h:form id="form">
+
+            <div class="card card-w-title">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="DR Program" for="drProgramSearch"/>
+                        <p:selectOneMenu id="drProgramSearch" value="#{locationSubmissionController.program}" converter="programConverter"
+                                         style="width: 190px;" autoWidth="false">
+                            <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                            <f:selectItems value="#{locationSubmissionController.programList}" var="program" itemValue="#{program}"
+                                           itemLabel="#{program.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="#{msg['data.mapping.sublap']}" for="sublapSearch"/>
+                        <p:selectOneMenu id="sublapSearch" value="#{locationSubmissionController.subLap}" converter="subLapConverter"
+                                         style="width: 190px;" autoWidth="false">
+                            <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                            <f:selectItems value="#{locationSubmissionController.subLapList}" var="subLap" itemValue="#{subLap}"
+                                           itemLabel="#{subLap.name} (#{subLap.code})"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="LSE" for="lseSearch"/>
+                        <p:selectOneMenu id="lseSearch" value="#{locationSubmissionController.lse}" converter="lseConverter"
+                                         style="width: 190px;" autoWidth="false">
+                            <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                            <f:selectItems value="#{resourceController.lseList}" var="lse"
+                                           itemValue="#{lse}" itemLabel="#{lse.name} (#{lse.code})"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <p:column/>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="false" id="locationIdSearch" value="#{locationSubmissionController.location}"/>
+                        <p:outputLabel value="Location ID" for="locationIdSearch"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="false" id="sAddress1Search" value="#{locationSubmissionController.serviceAddress}"/>
+                        <p:outputLabel value="Service Address 1" for="sAddress1Search"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="false" id="saidSearch" value="#{locationSubmissionController.programServiceAgreementId}"/>
+                        <p:outputLabel value="SAID" for="saidSearch"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="false" id="servCitySearch" value="#{locationSubmissionController.serviceCity}"/>
+                        <p:outputLabel value="Service City" for="servCitySearch"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="false" id="UUIDsearch" value="#{locationSubmissionController.uuid}"/>
+                        <p:outputLabel value="UUID" for="UUIDsearch"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="false" id="ZIPSearch" value="#{locationSubmissionController.zip}"/>
+                        <p:outputLabel value="Service ZIP" for="ZIPSearch"/>
+                    </h:panelGroup>
+
+                </p:panelGrid>
+
+                <p:commandButton value="Search" action="#{locationSubmissionController.search()}" id="search" update="@form"/>
+            </div>
+                    <p:tabView id="statusTabView" scrollable="false" rendered="#{locationSubmissionController.render}"
+                               activeIndex="#{locationSubmissionController.tabIndex}">
+                        <p:tab id="idPendingApproval" title="Pending Approval">
+                            <ui:include src="WEB-INF/include/location/PendingApprovalTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="idInactive" title="Inactive">
+                            <ui:include src="WEB-INF/include/location/InactiveTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="idActive" title="Active">
+                            <ui:include src="WEB-INF/include/location/ActiveTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="idExceptions" title="Exceptions">
+                            <ui:include src="WEB-INF/include/location/ExceptionTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="idDisputed" title="Disputed/Duplicated">
+                            <ui:include src="WEB-INF/include/location/DisputedTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="idNonRegistrable" title="Non-Registrable">
+                            <ui:include src="WEB-INF/include/location/NonRegTab.xhtml"/>
+                        </p:tab>
+                    </p:tabView>
+        </h:form>
+    </ui:define>
+</ui:composition>

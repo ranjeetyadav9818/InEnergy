@@ -1,0 +1,23 @@
+<p-dataList *ngIf="ratePlans" [value]="ratePlans" [paginator]="true" [rows]="1">
+  <p-header>
+    Rate Plans
+  </p-header>
+  <ng-template let-ratePlan pTemplate="item">
+    <div class="ui-g ui-fluid">
+      <div class="ui-g-12">
+        <div class="ui-g">
+          <div class="ui-g-4"><b>Name:</b></div>
+          <div class="ui-g-8">{{ratePlan.name}}
+            ({{ratePlan.startDate | date:"MM/dd/yy"}})
+          </div>
+          <div class="ui-g-4"><b>Sector:</b></div>
+          <div class="ui-g-8">{{ratePlan.sector}}</div>
+          <div class="ui-g-4"><b>Status:</b></div>
+          <div class="ui-g-8">{{ratePlan.status}}</div>
+          <div class="ui-g-4"><b>Tier Type:</b></div>
+          <div class="ui-g-8">{{ratePlan.tierType}}</div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-dataList>

@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Parties</h3>
+
+        <h:panelGroup id="parties">
+            <p:commandButton action="#{energyContractController.addParty()}" update="parties" process="parties"
+                             icon="ui-icon-add" rendered="#{readonly == false}">
+                <o:skipValidators/>
+            </p:commandButton>
+            <p:spacer width="10"/>
+            <p:outputLabel rendered="#{empty energyContractController.energyContract.parties}">No parties defined yet</p:outputLabel>
+
+            <ui:repeat value="#{energyContractController.energyContract.parties}" var="party">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:autoComplete id="partyEntity" value="#{party.entity}" required="true" size="26"
+                                        var="entity" itemLabel="#{entity.getBusinessName()}" itemValue="#{entity}"
+                                        converter="contractEntityConverter"
+                                        completeMethod="#{energyContractController.completeEntity}"
+                                        readonly="#{readonly}" label="Party Entity"/>
+                        <p:outputLabel value="Party Entity:" for="partyEntity"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Role" for="partyType"/>
+                        <p:selectOneMenu id="partyType" value="#{party.role}" required="true" disabled="#{readonly}" label="Party Type">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.partyRoles}" var="role" itemLabel="#{role.name}" itemValue="#{role}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton action="#{energyContractController.removeParty(party)}"
+                                         update=":form:#{tabViewId}:parties" process=":form:#{tabViewId}:parties"
+                                         icon="ui-icon-remove" rendered="#{readonly == false}">
+                            <o:skipValidators/>
+                        </p:commandButton>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </ui:repeat>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="parties" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="parties" process="parties" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

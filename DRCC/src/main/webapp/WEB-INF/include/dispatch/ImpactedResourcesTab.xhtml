@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{controller.event.impactedResources}" var="res" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{res.id}" selectionMode="single" editable="true" editMode="cell">
+        <p:ajax event="cellEdit" listener="#{controller.updateIsoOutage}"/>
+        <p:column headerText="Resource ID" filterBy="#{res.isoResource.name}">
+            <p:commandLink action="#{controller.redirectToSelectedResource(res.isoResource)}" value="#{res.isoResource.name}"/>
+        </p:column>
+        <p:column headerText="Market Product" filterBy="#{res.isoResource.isoProduct.name}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{res.isoResource.isoProduct.name}"/>
+        </p:column>
+        <p:column headerText="Total Location Impacted">
+            <h:outputText value="#{res.totalImpactedLocations}"/>
+        </p:column>
+        <p:column headerText="Impacted By">
+            <h:outputText value="#{res.impactedBy}"/>
+        </p:column>
+        <p:column headerText="Market Outage ID">
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText styleClass="ui-icon ui-icon-pencil" style="display: inline-block;margin-right:8px;"/>
+                    <h:outputText value="#{res.isoOutage.outageId}"/>
+                </f:facet>
+                <f:facet name="input"><p:inputText value="#{res.isoOutage.outageId}" style="margin: 5px"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

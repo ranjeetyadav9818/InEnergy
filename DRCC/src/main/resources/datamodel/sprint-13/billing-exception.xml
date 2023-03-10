@@ -1,0 +1,30 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="billing_exception.xml" author="antonio">
+        <createTable tableName="BILLING_EXCEPTION">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="INVOICE_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="MARKED_RETRY" type="TINYINT(1) DEFAULT 0 NOT NULL"/>
+            <column name="MESSAGE" type="VARCHAR(1000)"/>
+
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="BILLING_EXCEPTION" baseColumnNames="INVOICE_ID"
+                                 constraintName="FK_BILLING_EXCEPTION_INVOICE"
+                                 referencedTableName="INVOICE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="billing_exception-2.xml" author="antonio">
+        <dropColumn tableName="BILLING_EXCEPTION" columnName="MARKED_RETRY" />
+        <addColumn tableName="INVOICE">
+            <column name="STATUS" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

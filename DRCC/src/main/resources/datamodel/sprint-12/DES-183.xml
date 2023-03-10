@@ -1,0 +1,50 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-183-1" author="vm">
+        <createTable tableName="PROGRAM_ASSET">
+            <column name="ID" type="bigint(20) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="PROGRAM_PROFILE_ID" type="bigint(20)"/>
+            <column name="ASSET_ID" type="bigint(20) unsigned"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="PROGRAM_ASSET"
+                                 baseColumnNames="PROGRAM_PROFILE_ID"
+                                 constraintName="FK_PROGRAM_ASSET_PROGRAM_PROFILE_ID"
+                                 referencedTableName="PROGRAM_PROFILE"
+                                 referencedColumnNames="ID"/>
+        <addForeignKeyConstraint baseTableName="PROGRAM_ASSET"
+                                 baseColumnNames="ASSET_ID"
+                                 constraintName="FK_PROGRAM_ASSET_ASSET_ID"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-183-2" author="vm">
+        <createTable tableName="RATE_PLAN_PROFILE_ASSET">
+            <column name="ID" type="bigint(20) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="RATE_PLAN_PROFILE_ID" type="bigint(20)"/>
+            <column name="ASSET_ID" type="bigint(20) unsigned"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="RATE_PLAN_PROFILE_ASSET"
+                                 baseColumnNames="RATE_PLAN_PROFILE_ID"
+                                 constraintName="FK_RATE_PLAN_PROFILE_ASSET_RATE_PLAN_PROFILE_ID"
+                                 referencedTableName="RATE_PLAN_PROFILE"
+                                 referencedColumnNames="ID"/>
+
+        <addForeignKeyConstraint baseTableName="RATE_PLAN_PROFILE_ASSET"
+                                 baseColumnNames="ASSET_ID"
+                                 constraintName="FK_RATE_PLAN_PROFILE_ASSET_ASSET_ID"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-182-3" author="vm">
+        <renameTable oldTableName="PROGRAM_ASSET" newTableName="PROGRAM_PROFILE_ASSET"/>
+    </changeSet>
+</databaseChangeLog>

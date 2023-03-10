@@ -1,0 +1,26 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-194" author="vm">
+        <createTable tableName="ASSET_SERVICE_AGREEMENT">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="SERVICE_AGREEMENT_ID" type="VARCHAR(55)"/>
+            <column name="ASSET_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="ASSET_SERVICE_AGREEMENT"
+                                 baseColumnNames="SERVICE_AGREEMENT_ID"
+                                 constraintName="FK_ASSET_SERVICE_AGREEMENT_SERVICE_AGREEMENT"
+                                 referencedTableName="SERVICE_AGREEMENT"
+                                 referencedColumnNames="SERVICE_AGREEMENT_ID"/>
+        <addForeignKeyConstraint baseTableName="ASSET_SERVICE_AGREEMENT"
+                                 baseColumnNames="ASSET_ID"
+                                 constraintName="FK_ASSET_SERVICE_AGREEMENT_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+</databaseChangeLog>

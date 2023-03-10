@@ -1,0 +1,68 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="1" author="antonio">
+        <createTable tableName="SUBSTATION">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="VALUE_DATA" type="VARCHAR(255)"/>
+
+        </createTable>
+    </changeSet>
+    <changeSet id="3" author="antonio">
+        <sql>INSERT INTO SUBSTATION (`VALUE_DATA`) SELECT distinct(SUBSTATION) FROM SERVICE_POINT WHERE SUBSTATION IS NOT NULL;
+
+            UPDATE SUBSTATION set UUID = ID;</sql>
+        <rollback>DELETE FROM SUBSTATION</rollback>
+    </changeSet>
+    <changeSet id="4" author="antonio">
+        <createTable tableName="FEEDER">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="VALUE_DATA" type="VARCHAR(255)"/>
+
+        </createTable>
+    </changeSet>
+    <changeSet id="5" author="antonio">
+        <sql>INSERT INTO FEEDER (`VALUE_DATA`) SELECT distinct(FEEDER) FROM SERVICE_POINT WHERE FEEDER IS NOT NULL;
+
+            UPDATE FEEDER set UUID = ID;</sql>
+        <rollback>DELETE FROM FEEDER</rollback>
+    </changeSet>
+    <changeSet id="6" author="antonio">
+        <createTable tableName="RATE_PLAN_CONTRACT_LINK">
+            <column name="ENERGY_CONTRACT_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="RATE_PLAN_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="7" author="antonio">
+        <createTable tableName="RESOURCE_CONTRACT_LINK">
+            <column name="ENERGY_CONTRACT_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="RESOURCE_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="8" author="antonio">
+        <createTable tableName="SUBLAPS_CONTRACT_LINK">
+            <column name="ENERGY_CONTRACT_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="SUBLAP_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="9" author="antonio">
+        <createTable tableName="SUBSTATION_CONTRACT_LINK">
+            <column name="SUBSTATION_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="ENERGY_CONTRACT_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="10" author="antonio">
+        <createTable tableName="FEEDER_CONTRACT_LINK">
+            <column name="ENERGY_CONTRACT_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="FEEDER_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

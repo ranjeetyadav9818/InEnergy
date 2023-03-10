@@ -1,0 +1,80 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="billing-engine-1" author="vm">
+        <renameColumn tableName="TIME_OF_USE_HOUR" oldColumnName="HOUR" newColumnName="HOUR" columnDataType="integer(11)"/>
+    </changeSet>
+
+    <changeSet id="billing-engine-2" author="vm">
+        <createTable tableName="INVOICE_LINE">
+            <column name="ID" type="bigint(20) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="WATTS" type="bigint(20)"/>
+            <column name="RATE_TIER_ID" type="bigint(20) unsigned"/>
+            <column name="PRICE_PER_WATT" type="DECIMAL(12,6)"/>
+            <column name="TOTAL" type="DECIMAL(12,6)"/>
+            <column name="TYPE" type="varchar(55)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="billing-engine-3" author="vm">
+        <addColumn tableName="INVOICE_LINE">
+            <column name="INVOICE_ID" type="bigint(20) unsigned"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="billing-engine-4" author="vm">
+        <addColumn tableName="INVOICE">
+            <column name="DATE_FROM" type="DATE"/>
+        </addColumn>
+        <addColumn tableName="INVOICE">
+            <column name="DATE_TO" type="DATE"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="billing-engine-5" author="antonio">
+        <addColumn tableName="INVOICE_LINE">
+            <column name="CONCEPT" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="billing-engine-6" author="antonio">
+        <addColumn tableName="BASELINE_ALLOWANCE">
+            <column name="KWH_PER_DAY" type="DECIMAL(9,4)"/>
+        </addColumn>
+        <dropColumn tableName="BASELINE_ALLOWANCE">
+            <column name="WATTS"/>
+        </dropColumn>
+    </changeSet>
+    <changeSet id="billing-engine-7" author="antonio">
+        <modifyDataType tableName="TIME_OF_USE_CALENDAR" columnName="DATE_FROM" newDataType="DATE"/>
+        <modifyDataType tableName="TIME_OF_USE_CALENDAR" columnName="DATE_TO" newDataType="DATE"/>
+    </changeSet>
+    <changeSet id="billing-engine-8" author="antonio">
+        <modifyDataType tableName="INVOICE_LINE" columnName="WATTS" newDataType="DECIMAL(18,6)"/>
+        <renameColumn tableName="INVOICE_LINE" oldColumnName="WATTS" newColumnName="KWH" columnDataType="DECIMAL(18,6)"/>
+    </changeSet>
+    <changeSet id="billing-engine-9" author="antonio">
+        <createTable tableName="BILLING_CYCLE_SCHEDULE">
+            <column name="ID" type="bigint(20) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="BILLING_DATE" type="DATE"/>
+            <column name="SERIAL" type="varchar(10)"/>
+            <column name="SENT" type="TINYINT(1)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="billing-engine-10" author="antonio">
+        <createIndex indexName="SERVICE_AGREEMENT_BILL_CYCLE_IDX"
+                     tableName="SERVICE_AGREEMENT"
+                     unique="false">
+            <column name="BILL_CYCLE_CD" type="varchar(5)"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

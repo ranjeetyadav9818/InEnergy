@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formRRD">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration" url="#"/>
+                <p:menuitem value="#{resourceRegistrationDetailController.registration.isoResource.isoProduct.profile.iso.name}" url="#"/>
+                <p:menuitem value="Resource #{resourceRegistrationDetailController.registration.isoResource.name}" outcome="ResourceDetails" escape="false">
+                    <f:param name="o" value="#{parameterEncoderService.encode(resourceRegistrationDetailController.registration.isoResource.id)}"/>
+                </p:menuitem>
+                <p:menuitem value="Registration #{resourceRegistrationDetailController.registration.isoRegistrationId}"
+                            rendered="#{resourceRegistrationDetailController.registration.isoRegistrationId ne null}"/>
+            </p:breadCrumb>
+
+            <div class="card">
+                <p:carousel id="resourceCarousel" numVisible="4" circular="true" responsive="true"
+                            value="#{resourceRegistrationDetailController.resourceDetails}" var="res">
+                    <i class="material-icons #{res.icon} Fs20 hardblue TexAlCenter"/>
+                    <h:outputText class="Fs20 hardblue" value="#{res.name}"/>
+                    <h:dataTable var="db" value="#{res.dataBeans}" style="border:0;">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+            </div>
+            <div class="EmptyBox20"></div>
+
+            <div class="card">
+                <p:tabView id="locationDetail" scrollable="false" activeIndex="#{resourceRegistrationDetailController.selectedTab}">
+                    <p:tab id="idLocations" title="Locations">
+                        <ui:include src="WEB-INF/include/resource/RegistrationLocationTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="registrationExceptionsTab" title="Exceptions">
+                        <ui:include src="WEB-INF/include/resource/RegistrationExceptionsTab.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

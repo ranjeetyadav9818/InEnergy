@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{resourceRegistrationDetailController.registration.exceptions}" id="regExcTbl" widgetVar="regExctTab"  var="exception" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}" paginator="true" paginatorAlwaysVisible="false">
+        <p:column headerText="Date">
+            <h:outputText value="#{exception.dateAdded}"><f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/></h:outputText>
+        </p:column>
+        <p:column headerText="Message">
+            <h:outputText value="#{exception.type}"/>
+        </p:column>
+
+    </p:dataTable>
+
+</ui:composition>

@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+    <j:useBean id="month" type="com.inenergis.entity.genericEnum.Month"/>
+
+    <div class="card card-w-title">
+        <h:panelGroup id="productTab">
+            <h3 class="with-icon">Payment Terms</h3>
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputNumber label="Contract Term" id="conractTerm" minValue="1" maxValue="100"
+                                   readonly="#{readonly}"
+                                   value="#{energyContractController.energyContract.contractTerm}" required="true"/>
+                    <p:outputLabel value="Contract Term:" for="conractTerm"/>
+                </h:panelGroup>
+                <p:spacer/>
+                <p:spacer/>
+                <p:spacer/>
+
+                <h:panelGroup>
+                    <p:outputLabel value="Start Date" for="idStartDate"/>
+                    <p:calendar value="#{energyContractController.energyContract.agreementStartDate}" pattern="MM/dd/yyyy"
+                                disabled="#{readonly}" id="idStartDate" style="padding-left: 10px"
+                                timeZone="UTC" mask="true" placeholder="mm/dd/yyyy" label="Agreement Start Date" required="true">
+                        <f:validator validatorId="endDateRangeValidator"/>
+                    </p:calendar>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <p:outputLabel value="to" for="idEndDate"/>
+                    <p:calendar value="#{energyContractController.energyContract.agreementEndDate}" pattern="MM/dd/yyyy"
+                                disabled="#{readonly}" id="idEndDate" style="padding-left: 10px"
+                                timeZone="UTC" mask="true" placeholder="mm/dd/yyyy" label="Agreement End Date" required="true">
+                        <f:validator validatorId="endDateRangeValidator"/>
+                    </p:calendar>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Payment Frequency" for="paymentFrequency"/>
+                    <p:selectOneMenu id="paymentFrequency" value="#{energyContractController.energyContract.paymentFrequency}" required="true"
+                                     disabled="#{readonly}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.paymentFrequencies}" var="paymentFrequency"
+                                       itemLabel="#{paymentFrequency.name}" itemValue="#{paymentFrequency}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <p:spacer/>
+
+                <h:panelGroup>
+                    <p:outputLabel value="Bill Month"/>
+                    <p:pickList id="generalAvailability" value="#{energyContractController.billMonth}" var="month" itemValue="#{month}"
+                                disabled="#{readonly}"
+                                itemLabel="#{month.value} #{month}" styleClass="MarginTop10" converter="omnifaces.GenericEnumConverter">
+                        <f:facet name="sourceCaption">Available</f:facet>
+                        <f:facet name="targetCaption">Applicable</f:facet>
+                    </p:pickList>
+                </h:panelGroup>
+                <p:spacer/>
+                <p:spacer/>
+                <p:spacer/>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Bill Day of Month" for="billDayOfMonth"/>
+                    <p:selectOneMenu id="billDayOfMonth" value="#{energyContractController.energyContract.billDayOfMonth}"
+                                     disabled="#{readonly}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.days}" var="day" itemLabel="#{day}" itemValue="#{day}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="productTab" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="productTab" process="productTab" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf" xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <c:set var="mailRegexp" value="#{constantsProvider.mailListRegexp}"/>
+        <h:form id="formBO">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Configure Business Owners" outcome="BusinessOwner"/>
+            </p:breadCrumb>
+            <h:panelGroup rendered="#{not businessOwnerController.newBusinessOwner and businessOwnerController.businessOwner eq null}"
+                          style="display:block;padding: 20px 0;">
+                <div class="card">
+                    <p:commandButton id="addVSMButton" process="@this" update="@form" value="Add" action="#{businessOwnerController.add}"/>
+                </div>
+            </h:panelGroup>
+            <div class="card" jsf:rendered="#{businessOwnerController.newBusinessOwner}">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{businessOwnerController.businessOwner.name}" size="101" maxlength="255" id="ownName" required="true"/>
+                    <p:outputLabel value="Business Owner Name:" for="ownName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputTextarea rows="5" cols="100" value="#{businessOwnerController.businessOwner.emailList}" id="ownEmail" required="true" validatorMessage="#{constantsProvider.emailValidationMessage}">
+                        <f:validateRegex pattern="#{mailRegexp}"/>
+                    </p:inputTextarea>
+                    <p:outputLabel value="Email List:" for="ownEmail"/>
+                </h:panelGroup>
+
+                <p:commandButton id="save" value="#{msg['save']}" action="#{businessOwnerController.save()}" process="@form" update="@form"/>
+                <p:spacer width="10"/>
+                <p:commandButton id="cancel" value="#{msg['cancel']}" action="#{businessOwnerController.cancelBusinessOwner}" process="@this"
+                                 update="@form"/>
+            </div>
+
+            <div class="card">
+
+                <!-- Filters & Results -->
+                <p:dataTable id="dmTable" value="#{businessOwnerController.list}" widgetVar="ownerWidget" editable="true" var="bo"
+                             reflow="true" rows="25"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{bo.id}">
+
+                    <p:ajax event="rowEdit" listener="#{businessOwnerController.onRowEdit}"/>
+                    <p:ajax event="rowEditCancel" listener="#{businessOwnerController.onRowCancel}"/>
+
+                    <p:column headerText="Business Owner Name" filterBy="#{bo.name}">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{bo.name}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{bo.name}" label="Business Owner Name" size="75" maxlength="255"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Business Email Recipients" filterBy="#{bo.emailList}">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{bo.emailList}"/></f:facet>
+                            <f:facet name="input"><p:inputTextarea rows="5" cols="75" value="#{bo.emailList}" required="true" validatorMessage="#{constantsProvider.emailValidationMessage}">
+                                <f:validateRegex pattern="#{mailRegexp}" />
+                            </p:inputTextarea>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="width:32px" class="showOnDesktop">
+                        <p:rowEditor/>
+                    </p:column>
+                </p:dataTable>
+
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

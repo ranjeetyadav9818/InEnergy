@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <c:set var="controller" value="#{rateCodeLibraryController}"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Rate Programs" url="#"/>
+            <p:menuitem value="Rate Code Library" outcome="RateCodeLibrary"/>
+        </p:breadCrumb>
+
+        <h:form id="rclForm">
+
+            <div class="card card-w-title" jsf:rendered="#{controller.renderNewCode eq false}">
+                <h:panelGroup styleClass="md-inputfield-icon">
+                    <p:commandButton value="Add Code" action="#{controller.addCode()}" update="@form" process="rclForm"/>
+                </h:panelGroup>
+            </div>
+            <style>.ui-picklist .ui-picklist-list {
+                width: 300px
+            } </style>
+            <div class="card card-w-title" jsf:rendered="#{controller.renderNewCode eq true}">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{controller.rateCode.name}" id="rateCode" required="true"/>
+                    <p:outputLabel value="Rate Code" for="rateCode"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputTextarea value="#{controller.rateCode.description}" id="shortD" cols="50" required="true"/>
+                    <p:outputLabel value="Short Description" for="shortD"/>
+                </h:panelGroup>
+
+                <p:outputLabel value="Sector" for="idSectorPk"/>
+                <p:pickList value="#{controller.sectorPickList}"
+                            var="pickList" itemLabel="#{pickList.name}" itemValue="#{pickList}"
+                            showSourceFilter="false" showTargetFilter="false" id="idSectorPk" required="true">
+                    <o:converter converterId="omnifaces.ListIndexConverter" list="#{controller.sectorList}"/>
+                    <f:facet name="sourceCaption">Not Applicable</f:facet>
+                    <f:facet name="targetCaption">Applicable</f:facet>
+                </p:pickList>
+                <p:commandButton value="Cancel" action="#{controller.cancel()}" update="rclForm" process="@this"/>
+                <p:spacer width="10px"/>
+                <p:commandButton value="Save" action="#{controller.save()}" update="rclForm,tabForm" process="rclForm"/>
+            </div>
+        </h:form>
+        <h:form id="tabForm">
+            <div class="card card-w-title">
+                <p:dataTable value="#{controller.lazyRateCodeModel}" id="tbRateCodes" widgetVar="wgRateCodes" lazy="true" var="code" reflow="true" rows="25"
+                             rowsPerPageTemplate="25,50,100" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{code.uuid}">
+                    <p:ajax event="filter" delay="300"/>
+                    <p:column headerText="Rate Code" filterBy="#{code.name}" field="name" filterMatchMode="contains" style="width: 10%;">
+                        <h:outputText value="#{code.name}"/>
+                    </p:column>
+                    <p:column headerText="Sector" filterBy="#{code.sectors}" field="sector" filterMatchMode="contains">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wgRateCodes').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false" style="width: 50%;font-size: 12px">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.rateCodeSectors}" var="sector" itemLabel="#{sector.name}"
+                                               itemValue="#{sector}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <ui:repeat value="#{code.sectors}" var="sector" varStatus="sectorStatus">
+                            <h:outputText value="#{sector.sector.name}"/><br/>
+                        </ui:repeat>
+                    </p:column>
+                    <p:column headerText="Short Description" filterBy="#{code.description}" field="description" filterMatchMode="contains">
+                        <h:outputText value="#{code.description}"/>
+                    </p:column>
+                    <p:column headerText="Rate Status"
+                              filterBy="#{code.status}"
+                              field="rateStatus" filterMatchMode="equals">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wgRateCodes').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false" style="width: 50%;font-size: 12px">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.activityStatuses}" var="status" itemLabel="#{status.statusName}"
+                                               itemValue="#{status}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{code.rateStatus}" style="font-size: 12px;"/>
+                    </p:column>
+                    <p:column headerText="Last Update" filterable="false">
+                        <h:outputText value="#{code.lastUpdate}">
+                            <f:convertDateTime timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}" pattern="MM/dd/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Action" filterable="false" style="width:12%;text-align: center;padding-left: 10px;">
+                        <p:menuButton value="Modify" styleClass="smallButton">
+                            <p:menuitem action="#{controller.inactivate(code)}" process="@this" update="@form" value="Inactivate" rendered="#{code.rateStatus eq 'ACTIVE'}"/>
+                            <p:menuitem action="#{controller.activate(code)}" process="@this" update="@form" value="Activate" rendered="#{code.rateStatus eq 'INACTIVE'}"/>
+                            <p:menuitem action="#{controller.modify(code)}" process="@this" update="rclForm" value="Modify"/>
+                        </p:menuButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form id="FVSM">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Baseline Allowance"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+
+                <p:outputPanel id="vsmDiv">
+                    <h:panelGroup rendered="#{not baselineAllowanceController.newBaselineAllowance and baselineAllowanceController.baselineAllowance eq null}">
+                        <p:commandButton id="addVSMButton" process="@this" update="FVSM:vsmDiv" value="Add Baseline Allowance"
+                                         action="#{baselineAllowanceController.add}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{baselineAllowanceController.newBaselineAllowance}">
+                        <h3>Add Baseline Allowance</h3>
+
+                        <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Calendar:" for="calendar"/>
+                                <p:selectOneMenu id="calendar" required="true"
+                                                 converter="timeOfUseCalendarConverter"
+                                                 value="#{baselineAllowanceController.baselineAllowance.timeOfUseCalendar}">
+                                    <f:selectItem itemLabel="Select Calendar" noSelectionOption="false"/>
+                                    <f:selectItems value="#{baselineAllowanceController.timeOfUseCalendars}"
+                                                   var="calendar" itemLabel="#{calendar.name}" itemValue="#{calendar}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="code" value="#{baselineAllowanceController.baselineAllowance.code}" required="true"/>
+                                <p:outputLabel value="Code:" for="code"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputNumber value="#{baselineAllowanceController.baselineAllowance.kwhPerDay}"
+                                               id="kWhPerDay" maxValue="1000" minValue="0" decimalPlaces="3" required="true"/>
+                                <p:outputLabel value="kWh/Day:" for="kWhPerDay"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{baselineAllowanceController.save()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="5"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{baselineAllowanceController.cancelBaselineAllowance()}" process="@this" update="FVSM:vsmDiv"/>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </div>
+            <div class="card card-w-title">
+                <p:outputPanel id="vsmDivT">
+
+                    <!-- Filters & Results -->
+                    <p:dataTable id="baTable" value="#{baselineAllowanceController.baselineAllowanceList}" widgetVar="mappingWidget" editable="true"
+                                 var="baselineAllowance"
+                                 reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{baselineAllowance.id}"
+                                 selection="#{baselineAllowanceController.selectedBaselineAllowance}" selectionMode="single">
+
+                        <p:ajax event="rowEdit" listener="#{baselineAllowanceController.onRowEdit}"/>
+
+                        <p:column headerText="Code" filterBy="#{baselineAllowance.code}" filterable="true">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{baselineAllowance.code}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{baselineAllowance.code}" label="Code" maxlength="100"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column headerText="Calendar" filterBy="#{baselineAllowance.timeOfUseCalendar.name}" filterable="true">
+                            <h:outputLabel value="#{baselineAllowance.timeOfUseCalendar.name}"/>
+                        </p:column>
+
+                        <p:column headerText="kWh/day" filterBy="#{baselineAllowance.kwhPerDay}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{baselineAllowance.kwhPerDay}"/></f:facet>
+                                <f:facet name="input"><p:inputNumber value="#{baselineAllowance.kwhPerDay}" label="kWh/day" maxValue="1000" minValue="0"
+                                                                     decimalPlaces="3"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:contextMenu for="baTable" widgetVar="vsmMenu">
+                        <p:menuitem value="Delete" update="FVSM:vsmDivT" icon="ui-icon-trash-1"
+                                    actionListener="#{baselineAllowanceController.deleteBaselineAllowance()}"/>
+                        <p:menuitem value="Hide" icon="ui-icon-close" onclick="PF('vsmMenu').hide()"/>
+                    </p:contextMenu>
+                </p:outputPanel>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

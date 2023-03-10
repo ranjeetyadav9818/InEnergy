@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <c:set var="controller" value="#{dispatchManagementController}"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Dispatch Management" url="#"/>
+        </p:breadCrumb>
+        <style type="text/css">
+            div.timeline-frame {
+                border-color: #1976d2;
+                border-radius: 5px;
+            }
+
+            div.timeline-axis {
+                border-color: #42a5f5;
+                background-color: #1976d2;
+            }
+
+            div.timeline-groups-axis {
+                border-color: #5D99C3;
+            }
+
+            div.timeline-groups-axis-onleft {
+                border-style: none solid none none;
+            }
+
+            div.timeline-axis-text {
+                color: white;
+            }
+
+            div.timeline-event {
+                color: white !important;
+                border-radius: 5px !important;
+            }
+
+            div.timeline-event-content {
+                padding: 3px;
+                text-shadow: none;
+            }
+        </style>
+        <h:form id="form">
+            <div class="card">
+                <p:timeline id="eventsTimeLine" value="#{controller.timelineModel}" selectable="true" moveable="true" editable="true"
+                            stackEvents="true" var="task" widgetVar="timelineWb" responsive="true" zoomable="true" start="#{controller.timelineStartDate}"
+                            end="#{controller.timelineEndDate}" dropActiveStyleClass="ui-state-highlight" dropHoverStyleClass="ui-state-hover"
+                            varGroup="programName"
+                            axisOnTop="true" showCurrentTime="true" showNavigation="false" timeZone="America/Los_Angeles" rendered="#{controller.showTimeline}">
+                    <p:graphicImage name="#{task.imagePath}" rendered="#{task.imagePath ne null}" style="width: 20px;height: 20px; float: left;"/>
+
+                    <f:facet name="group">
+                        <p:commandButton action="#{controller.addNewPlan}" process="@this" update="newPlanForm form" icon="ui-icon-add">
+                            <f:param name="program" value="#{programName}"/>
+                        </p:commandButton>
+                        <p:spacer width="5px"/>
+                        <p:outputLabel value="#{programName}"/>
+                    </f:facet>
+                    <h:panelGroup columns="1" style="padding:8px" id="idTask">
+                        <h:outputText value="#{task.title}" id="taskId"/>
+                    </h:panelGroup>
+                    <p:ajax event="select" listener="#{controller.onSelectTimeline}"/>
+                </p:timeline>
+            </div>
+        </h:form>
+        <h:form id="newPlanForm">
+            <div class="card card-w-title" jsf:rendered="#{controller.showNewPlanDialog eq true}" id="newPlanId">
+                <h3>New Plan</h3>
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{controller.showNewPlanDialog eq true}">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText value="#{controller.newPlanProgramName}" disabled="true"/>
+                        <label>Program Name</label>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="idEventName" value="#{controller.newPlanName}" required="true"/>
+                        <label>Event Name</label>
+                    </h:panelGroup>
+                    <p:row/>
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:calendar id="newPlanIdStart" value="#{controller.newPlanStartDate}" pattern="MM/dd/yyyy h:mm a" showButtonPanel="true"
+                                    mask="true" required="true" placeholder="mm/dd/yyyy" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"/>
+                        <p:outputLabel value="Start Date:" for="newPlanIdStart"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:calendar id="newPlanIdEnd" value="#{controller.newPlanEndDate}" pattern="MM/dd/yyyy h:mm a" showButtonPanel="true"
+                                    mask="true" required="true" placeholder="mm/dd/yyyy" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"/>
+                        <p:outputLabel value="End Date:" for="newPlanIdEnd"/>
+                    </h:panelGroup>
+
+                    <p:commandButton action="#{controller.saveNewPlan}" update="newPlanForm form"  value="Save">
+                        <f:ajax render="newPlanForm form"/>
+                    </p:commandButton>
+
+                </p:panelGrid>
+            </div>
+        </h:form>
+
+        <h:form id="eventsForm">
+            <div class="card">
+                <p:selectOneMenu value="#{controller.eventTypeFilter}">
+                    <f:selectItems value="#{constantsProvider.eventTypes}" var="eventType" itemLabel="#{eventType.name} Events" itemValue="#{eventType}"/>
+                    <p:ajax listener="#{controller.search}" update="@form"/>
+                </p:selectOneMenu>
+                <p:spacer width="15"/>
+                <p:commandButton value="Refresh" action="#{controller.search}" process="@form" update="@form"/>
+
+                <p:dataTable value="#{controller.eventLazyModel}" lazy="true" var="event" reflow="true" rows="25"
+                             rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{event.uuid}" selectionMode="single" widgetVar="eventsWdgt">
+                    <p:ajax event="rowSelect" listener="#{controller.onSelectEvent}"/>
+                    <p:column headerText="Program" styleClass="topAligned">
+                        <h:outputText value="#{event.program.name}"/>
+                    </p:column>
+
+                    <p:column headerText="DRMS Program ID" styleClass="topAligned" style="text-align: center;">
+                        <h:outputText value="#{event.programId}"/>
+                    </p:column>
+
+                    <p:column headerText="Event Name" styleClass="topAligned">
+                        <h:outputText value="#{event.name}" rendered="#{event.name ne null and event.name ne ''}"/>
+                        <h:outputText value="#{event.dispatchLevel.name}" rendered="#{event.name eq null or event.name eq ''}"/>
+                    </p:column>
+
+                    <p:column headerText="Event ID" styleClass="topAligned">
+                        <h:outputText value="#{event.externalEventId}"/>
+                    </p:column>
+
+                    <p:column headerText="Event Date" sortBy="#{event.startDate}" styleClass="topAligned">
+                        <h:outputText value="#{event.startDate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Event Start Time" styleClass="topAligned">
+                        <h:outputText value="#{event.startDate}">
+                            <f:convertDateTime type="time" pattern="h:mm aa" timeZone="America/Los_Angeles"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Event End Time" styleClass="topAligned">
+                        <h:outputText value="#{event.endDate}">
+                            <f:convertDateTime type="time" pattern="h:mm aa" timeZone="America/Los_Angeles"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Dispatch Level" styleClass="topAligned">
+                        <h:outputText value="#{event.dispatchLevel.name}"/>
+                    </p:column>
+
+                    <p:column headerText="SA Count" styleClass="topAligned">
+                        <h:outputText value="#{event.saCount}"/>
+                    </p:column>
+
+                    <p:column headerText="Dispatch Reason" styleClass="topAligned">
+                        <h:outputText value="#{event.dispatchReason.name}"/>
+                    </p:column>
+
+                    <p:column headerText="Event Status" styleClass="topAligned">
+                        <h:outputText value="#{event.status.name}"/>
+                    </p:column>
+                    <p:column headerText="Action" styleClass="topAligned" style="width: 10%;">
+                        <p:commandButton value="Reserve" action="#{controller.addEventToReserve(event)}" process="@this" update="@form"
+                                         rendered="#{event.status eq 'PLANNED' }"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

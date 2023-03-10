@@ -1,0 +1,24 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:cc="http://java.sun.com/jsf/composite" xmlns:clx="http://xmlns.jcp.org/jsf/composite/components">
+    <!-- INTERFACE -->
+    <cc:interface componentType="moneySmallInput">
+        <cc:attribute name="label" type="java.lang.String"/>
+        <cc:attribute name="errorLabel" type="java.lang.String"/>
+        <cc:attribute name="value" type="java.lang.Number"/>
+        <cc:attribute name="id" type="java.lang.String"/>
+        <cc:attribute name="required" type="java.lang.Boolean"/>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <style type="text/css">
+            body .ui-datatable tbody tr.ui-state-highlight .ui-inputfield {
+                color: #282a32;
+                border-color: #424242;
+                font-size: 11px; padding-left: 3px;
+            }
+        </style>
+        <clx:MoneyInputComponent id="#{cc.attrs.id}" value="#{cc.attrs.value}" label="#{cc.attrs.label}" errorLabel="#{cc.attrs.errorLabel}" hideCurrencySymbol="true"/>
+    </cc:implementation>
+</ui:composition>

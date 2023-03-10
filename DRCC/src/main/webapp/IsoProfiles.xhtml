@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration for #{isoProfilesController.iso.name} (#{isoProfilesController.iso.active ? 'Active' : 'Inactive'})"
+                            url="#"/>
+            </p:breadCrumb>
+
+            <h:panelGroup rendered="#{(not isoProfilesController.newProfile and isoProfilesController.profile eq null) or isoProfilesController.newProfile}">
+                <div class="card card-w-title">
+                    <p:commandButton process="@this" update="@form" value="Create Profile" action="#{isoProfilesController.add()}"
+                                     rendered="#{not isoProfilesController.newProfile and isoProfilesController.profile eq null}"/>
+
+                    <p:outputPanel rendered="#{isoProfilesController.newProfile}">
+                        <div class="Container100" jsf:rendered="#{isoProfilesController.profile eq null}">
+                            <div class="ContainerIndent"><h:outputText value="Create Profile" styleClass="FontBold Fs18 hardblue"/></div>
+                        </div>
+                        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText required="true" id="profileName" value="#{isoProfilesController.profile.name}">
+                                    <f:validator validatorId="uniqueEntityValidator"/>
+                                    <f:attribute name="currentEntity" value="#{isoProfilesController.profile}"/>
+                                    <f:attribute name="uniqueColumns" value="name,iso_id"/>
+                                    <f:attribute name="fields" value="{newValue},iso.id"/>
+                                </p:inputText>
+                                <p:outputLabel value="Profile ID:" for="profileName" rendered="#{isoProfilesController.newProfile}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="udcId" value="#{isoProfilesController.profile.udcId}"/>
+                                <p:outputLabel value="UDC ID:" for="udcId"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="drpId" value="#{isoProfilesController.profile.drpId}"/>
+                                <p:outputLabel value="DRP ID:" for="drpId"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="scId" value="#{isoProfilesController.profile.scId}"/>
+                                <p:outputLabel value="SC ID:" for="scId"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-calendar">
+                                <p:calendar id="effectiveStartNew" value="#{isoProfilesController.profile.effectiveStartDate}"
+                                            pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy" mask="true"
+                                            binding="${profileStartDateNew}" required="true"/>
+                                <p:outputLabel value="Effective Start Date:" for="effectiveStartNew"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-calendar">
+                                <p:calendar id="effectiveEndNew" value="#{isoProfilesController.profile.effectiveEndDate}"
+                                            pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy" mask="true"
+                                            mindate="#{profileStartDateNew.value}">
+                                    <f:attribute name="startDate" value="#{profileStartDateNew}"/>
+                                    <f:validator validatorId="endDateRangeValidator"/>
+                                </p:calendar>
+                                <p:outputLabel value="Effective End Date:" for="effectiveEndNew"/>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield-calendar">
+                                <p:outputLabel value="Commodity:" for="commodity"/>
+                                <p:selectOneMenu id="commodity" value="#{isoProfilesController.profile.commodityType}" required="true">
+                                    <f:selectItem noSelectionOption="false"/>
+                                    <f:selectItems value="#{constantsProvider.comodityTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <p:commandButton id="save" value="Save" action="#{isoProfilesController.saveProfile()}" process="@form"
+                                         update="@form"/>
+                        <p:spacer width="10"/>
+                        <p:commandButton id="cancel" value="Cancel" action="#{isoProfilesController.cancelProfile()}" process="@this"
+                                         update="@form"/>
+
+                    </p:outputPanel>
+                </div>
+            </h:panelGroup>
+
+            <div class="ContainerIndent">
+
+                <div class="EmptyBox10"></div>
+                <p:dataTable value="#{isoProfilesController.iso.profiles}" var="profile" reflow="true">
+                    <p:column headerText="Name">
+                        <h:outputText value="#{profile.name}"/>
+                    </p:column>
+                    <p:column headerText="Last Date Updated">
+                        <h:outputText value="#{profile.lastUpdate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm a" timeZone="America/Los_Angeles"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Effective Start Date">
+                        <h:outputText value="#{profile.effectiveStartDate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Effective End Date">
+                        <h:outputText value="#{profile.effectiveEndDate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Commodity">
+                        <h:outputText value="#{profile.commodityType}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Action">
+                        <p:commandButton rendered="#{not isoProfilesController.newProfile}" value="Edit" action="#{isoProfilesController.editProfile(profile)}"
+                                         update="@form"/>
+                    </p:column>
+                </p:dataTable>
+                <div class="EmptyBox20"></div>
+                <div class="ContainerIndent" jsf:rendered="#{not isoProfilesController.newProfile and isoProfilesController.profile ne null}">
+                    <h3>Profile #{isoProfilesController.profile.name} details</h3>
+                </div>
+
+                <p:tabView id="profileTabView" rendered="#{not isoProfilesController.newProfile and isoProfilesController.profile ne null}">
+                    <p:tab id="GeneralTab" title="General">
+                        <ui:include src="WEB-INF/include/isoProfile/GeneralTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="ProductsTab" title="Products">
+                        <ui:include src="WEB-INF/include/isoProfile/ProductsTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="BidTab" title="Bid">
+                        <ui:include src="WEB-INF/include/isoProfile/BidTab.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+            <h:panelGroup rendered="#{not isoProfilesController.newProfile and isoProfilesController.profile ne null}"
+                          style="display:block;margin: 20px 0 40px 0;">
+                <p:commandButton process="@this" update="@form" value="Cancel" action="#{isoProfilesController.cancelProfile()}"/>
+                <p:commandButton update="@form" value="Save all" action="#{isoProfilesController.saveWholeProfile()}" style="margin-left: 10px"/>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

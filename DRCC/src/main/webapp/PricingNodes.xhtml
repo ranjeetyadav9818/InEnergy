@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form>
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="PNodes"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+
+                <p:outputPanel id="vsmDiv">
+                    <h:panelGroup rendered="#{not pricingNodeController.creatingPricingNode}">
+                        <p:commandButton id="addButton" process="@this" update="@form" value="Add PNode" action="#{pricingNodeController.add}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{pricingNodeController.creatingPricingNode}">
+                        <h3>Add PNode</h3>
+                        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="name" value="#{pricingNodeController.pricingNode.name}" required="true"/>
+                                <p:outputLabel value="Name:" for="name"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="#{msg['data.mapping.sublap']}:" for="sublap"/>
+                                <p:selectOneMenu id="sublap" required="true" label="#{msg['data.mapping.sublap']}" converter="subLapConverter" value="#{pricingNodeController.pricingNode.sublap}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{pricingNodeController.subLapList}" var="sublap" itemValue="#{sublap}" itemLabel="#{sublap.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{pricingNodeController.save()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="5"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{pricingNodeController.cancel()}" process="@this" update="@form"/>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </div>
+            <div class="card">
+                <p:outputPanel id="vsmDivT">
+                    <!-- Filters & Results -->
+                    <p:dataTable id="dmTable" value="#{pricingNodeController.pricingNodeList}" widgetVar="mappingWidget" editable="true" var="pricingNode"
+                                 reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{pricingNode.id}"
+                                 selection="#{pricingNodeController.selectedPricingNode}" selectionMode="single">
+
+                        <p:ajax event="rowEdit" listener="#{pricingNodeController.onRowEdit}"/>
+                        <p:ajax event="rowEditCancel" listener="#{pricingNodeController.onRowCancel}"/>
+
+                        <p:column headerText="Name" filterBy="#{pricingNode.name}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{pricingNode.name}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{pricingNode.name}" label="Name" maxlength="250"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="#{msg['data.mapping.sublap']}" filterBy="#{pricingNode.sublap.name}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{pricingNode.sublap.name}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu converter="subLapConverter" value="#{pricingNode.sublap}">
+                                        <f:selectItems value="#{pricingNodeController.subLapList}" var="sublap" itemLabel="#{sublap.name}" itemValue="#{sublap}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

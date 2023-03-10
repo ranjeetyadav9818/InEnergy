@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <h:panelGroup id="allLinkageCard">
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Linkage</h3>
+
+        <h:panelGroup styleClass="md-inputfield-select">
+            <p:outputLabel value="Link Type" for="linkType"/>
+            <p:selectOneMenu id="linkType" value="#{energyContractController.linkType}" disabled="#{readonly}">
+                <p:ajax update="allLinkageCard" listener="#{energyContractController.updateLinkage()}"/>
+                <f:selectItem noSelectionOption="true"/>
+                <f:selectItems value="#{constantsProvider.linkTypes}" var="type" itemLabel="#{msg[type.id]}" itemValue="#{type}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+            <h3 jsf:rendered="#{energyContractController.linkType ne null}">Available</h3>
+            <p:dataTable id="availableLinks" var="link" value="#{energyContractController.availableLinks}" rendered="#{energyContractController.showDragDrop()}">
+                <p:column style="width:20px;">
+                    <h:outputText id="dragIcon" styleClass="ui-icon ui-icon-zoom-out-map"/>
+                    <p:draggable for="dragIcon" revert="true" helper="clone"/>
+                </p:column>
+
+                <p:column headerText="ID">
+                    <h:outputText value="#{link.id}"/>
+                </p:column>
+
+                <p:column headerText="Name" filterBy="#{link.name}">
+                    <h:outputText value="#{link.name}"/>
+                </p:column>
+            </p:dataTable>
+            <p:autoComplete placeholder="Start typying..." id="nameSearch" rendered="#{not energyContractController.showDragDrop() and energyContractController.linkType ne null}"
+                            value="#{energyContractController.selectedLink}"
+                            completeMethod="#{energyContractController.completeLink}"
+                            var="link" itemLabel="#{link}" itemValue="#{link}">
+                <p:ajax event="itemSelect" listener="#{energyContractController.updateSearchForm}" update="allLinkageCard"/>
+            </p:autoComplete>
+
+            <p:fieldset id="selectedLinks" styleClass="ui-fieldset-legend" style="border: 0px !important; background-color: transparent; margin-top: 20px" >
+                <!--The fieldset set is needed to make the drop work. With div the id is not visible on bakedBean.ondrop at dropId var-->
+                    <h3>Linked</h3>
+                    <p:dataTable var="link" value="#{energyContractController.selectedLinks}" id="selectedLinksTable">
+
+                        <p:column headerText="ID">
+                            <h:outputText value="#{link.id}"/>
+                        </p:column>
+
+                        <p:column headerText="Type">
+                            <h:outputText value="#{link.class.simpleName}"/>
+                        </p:column>
+
+                        <p:column headerText="Name">
+                            <h:outputText value="#{link.name}"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandButton icon="ui-icon-remove"  action="#{energyContractController.undo(link)}" process="@this" update="form:#{tabViewId}:allLinkageCard" rendered="#{not readonly}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:droppable tolerance="touch" activeStyleClass="ui-state-highlight" datasource="availableLinks" onDrop="handleDrop">
+                        <p:ajax listener="#{energyContractController.onLinkDrop}" update="allLinkageCard"/>
+                    </p:droppable>
+            </p:fieldset>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="allLinkageCard" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="allLinkageCard" process="allLinkageCard" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </div>
+    </h:panelGroup>
+    <script type="text/javascript">
+        function handleDrop(event, ui) {
+            var droppedLocation = ui.draggable;
+
+            droppedLocation.fadeOut('fast');
+        }
+    </script>
+</ui:composition>

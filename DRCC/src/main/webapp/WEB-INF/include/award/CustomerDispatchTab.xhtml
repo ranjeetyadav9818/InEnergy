@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <p:dataTable value="#{controller.oneEventList}" id="awardTab" widgetVar="custTableEv" lazy="false" var="event"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{event.uuid}" selectionMode="single" style="text-align: center">
+        <p:ajax event="rowSelect" listener="#{controller.onSelect}"/>
+
+        <p:column headerText="Event Date" filterable="false">
+            <h:outputText value="#{event.startDate}"><f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy"/></h:outputText>
+        </p:column>
+
+        <p:column headerText="Program" filterable="false">
+            <h:outputText value="#{event.program.name}"/>
+        </p:column>
+
+        <p:column headerText="Event ID" filterable="false">
+            <h:outputText value="#{event.externalEventId}"/>
+        </p:column>
+
+        <p:column headerText="Start Time" filterable="false">
+            <h:outputText value="#{event.startDate}"><f:convertDateTime timeZone="America/Los_Angeles" pattern="hh:mm a"/></h:outputText>
+        </p:column>
+
+        <p:column headerText="End Time" filterable="false">
+            <h:outputText value="#{event.endDate}"><f:convertDateTime timeZone="America/Los_Angeles" pattern="hh:mm a"/></h:outputText>
+        </p:column>
+
+        <p:column headerText="Dispatch Level" filterable="false">
+            <h:outputText value="#{event.dispatchLevel.name}"/>
+        </p:column>
+
+        <p:column headerText="SA Count" filterable="false">
+            <h:outputText value="#{event.saCount}"/>
+        </p:column>
+
+        <p:column headerText="Dispatch Reason" filterable="false">
+            <h:outputText value="#{event.dispatchReason.name}"/>
+        </p:column>
+
+        <p:column headerText="Dispatch Status" filterable="false">
+            <h:outputText value="#{event.status.name}"/>
+        </p:column>
+
+    </p:dataTable>
+
+
+</ui:composition>

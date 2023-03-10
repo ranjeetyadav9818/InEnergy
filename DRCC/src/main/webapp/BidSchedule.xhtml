@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:clx="http://java.sun.com/jsf/composite/components"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <script type="text/javascript">
+            function handleDrop(event, ui) {
+                var droppedSegment = ui.draggable;
+                droppedSegment.fadeOut('fast');
+            }
+        </script>
+            <h:form id="ResBidForm">
+                <p:breadCrumb>
+                    <p:menuitem value="Dashboard" outcome="dashboard"/>
+                    <p:menuitem value="Market Integration" url="#"/>
+                    <p:menuitem value="Bid Package" url="#"/>
+                    <p:menuitem value="Trade Day #{bidResourceDetailController.getTradeDateFormatted()}" action="#{bidResourceDetailController.onBreadCrumbClick}" />
+                    <p:menuitem value="Resource #{bidResourceDetailController.bid.isoResource.name}" url="#"/>
+                </p:breadCrumb>
+                    <div class="ContainerIndent">
+                        <h3 class="hardblue TexAlLeft">
+                            Current Day Bid
+                            <p:commandButton value="Reset Bid" action="#{bidResourceDetailController.resetBid()}" style="margin-left: 20px" update="@form" process="@this"
+                                             rendered="#{bidResourceDetailController.isBidResettable()}"/>
+                        </h3>
+                        <h:outputText rendered="#{bidResourceDetailController.bid.lastReset != null}" value="Last reset: "/>
+                        <h:outputText rendered="#{bidResourceDetailController.bid.lastReset != null}" value="#{bidResourceDetailController.bid.lastReset}">
+                            <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                        </h:outputText>
+                        <h4 class="hardblue TexAlLeft">Pmin-Pmax: #{bidResourceDetailController.bid.isoResource.activePmaxPmin.pmin} - #{bidResourceDetailController.bid.isoResource.activePmaxPmin.pmax}</h4>
+                    </div>
+                <p:outputPanel id="dailyBid" >
+                    <p:outputPanel id="dropArea">
+                        <p:dataTable id="currentDayBidTable" value="#{bidResourceDetailController.currentDayRows}" var="cdRow" editable="true">
+                            <p:ajax event="rowEdit" listener="#{bidResourceDetailController.onRowEdit}" />
+                            <p:ajax event="rowEditCancel" listener="#{bidResourceDetailController.onRowCancel}"/>
+                            <p:column><p:rowEditor /></p:column>
+                            <p:column headerText="Schedule" style="width:12%"><h:outputText value="#{cdRow.schedule}"/></p:column>
+
+                            <c:forEach begin="1" end="24" var="i">
+                                <p:column headerText="HE#{i}" style="#{cdRow.getStyle(i)}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{cdRow.hourEnds[i-1]}" converter="#{cdRow.converter}" rendered="#{cdRow.type ne 'PRICE'}"/>
+                                        <clx:MoneyOutputComponent value="#{cdRow.hourEnds[i-1]}" rendered="#{cdRow.type eq 'PRICE'}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{cdRow.hourEnds[i-1]}"  converter="#{cdRow.converterForEdit}" decimalPlaces="#{cdRow.numDecimals}" rendered="#{cdRow.editableType and cdRow.heIsBiddable(i) and cdRow.type ne 'PRICE'}" />
+                                        <clx:MoneySmallInputComponent value="#{cdRow.hourEnds[i-1]}" errorLabel="Row #{cdRow.mappedSegment.name} price #{i} " rendered="#{cdRow.type eq 'PRICE'}" required="false"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                                </p:column>
+                            </c:forEach>
+
+                        </p:dataTable>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                    <div class="ContainerIndent">
+
+                        <h3 class="hardblue TexAlLeft">Recent Bid <p:calendar value="#{bidResourceDetailController.recentBidDate}" pattern="MM/dd/yyyy">
+                            <p:ajax event="dateSelect" listener="#{bidResourceDetailController.handleDateSelect}" update="dragArea" />
+                        </p:calendar></h3>
+                    </div>
+                    <p:outputPanel id="dragArea">
+                        <p:dataTable id="recentBidTable" var="rBid" value="#{bidResourceDetailController.recentBidRows}">
+                            <p:column>
+                                <h:outputText id="dragIcon" styleClass="ui-icon ui-icon-arrow-4"/>
+                                <p:draggable for="dragIcon" revert="true" helper="clone"/>
+                            </p:column>
+                            <p:column headerText="Schedule" style="width:12%"><h:outputText value="#{rBid.schedule}"/></p:column>
+                            <p:column headerText="HE1" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[0]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE2" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[1]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE3" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[2]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE4" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[3]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE5" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[4]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE6" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[5]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE7" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[6]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE8" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[7]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE9" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[8]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE10" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[9]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE11" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[10]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE12" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[11]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE13" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[12]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE14" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[13]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE15" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[14]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE16" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[15]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE17" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[16]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE18" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[17]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE19" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[18]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE20" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[19]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE21" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[20]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE22" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[21]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE23" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[22]}" converter="#{rBid.converter}"/></p:column>
+                            <p:column headerText="HE24" style="#{rBid.getDefaultStyle()}"><h:outputText value="#{rBid.hourEnds[23]}" converter="#{rBid.converter}"/></p:column>
+                        </p:dataTable>
+                    </p:outputPanel>
+
+                <p:droppable for="dailyBid" tolerance="touch" activeStyleClass="ui-state-highlight" datasource="recentBidTable" onDrop="handleDrop">
+                    <p:ajax listener="#{bidResourceDetailController.onSegmentDrop}" update="dragArea dropArea" />
+                </p:droppable>
+                <div class="EmptyBox20"></div>
+                <h3 class="hardblue TexAlLeft">Bid Status: #{bidResourceDetailController.bid.detailedStatus}</h3>
+                <h3 class="hardblue TexAlLeft">Status by HE</h3>
+                <p:dataTable value="#{bidResourceDetailController.getTransposedStatuses()}" var="s" paginator="false">
+                    <p:column headerText="Segment">#{s.getSegment()}</p:column>
+                    <p:column headerText="HE">#{s.he}</p:column>
+                    <p:column headerText="Status">#{s.status}</p:column>
+                    <p:column headerText="Description">#{s.description}</p:column>
+                </p:dataTable>
+            </h:form>
+    </ui:define>
+</ui:composition>

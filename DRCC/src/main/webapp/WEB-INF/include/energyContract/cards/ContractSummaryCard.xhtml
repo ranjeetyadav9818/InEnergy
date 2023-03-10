@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Contract Summary</h3>
+
+        <h:panelGroup id="summary">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="contractName" value="#{energyContractController.energyContract.name}" required="true"
+                                 readonly="#{readonly}"/>
+                    <p:outputLabel value="Contract Name:" for="contractName"/>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Type" for="contractType"/>
+                    <p:selectOneMenu id="contractType" value="#{energyContractController.energyContract.type}" required="true"
+                                     disabled="#{readonly}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.energyContractTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="summary" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="summary" process="summary" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+
+</ui:composition>

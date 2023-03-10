@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Asset Groups" url="#"/>
+            </p:breadCrumb>
+            <p:treeTable value="#{assetGroupsController.root}" var="group" rendered="#{assetGroupsController.root ne null}">
+                <f:facet name="header">
+                    Asset Groups
+                </f:facet>
+                <p:column headerText="Name">
+                    <h:outputText value="#{group.name} (#{group.id})" />
+                    <p:spacer width="10px"/>
+                    <p:commandButton icon="ui-icon-edit" action="#{assetGroupsController.selectGroup(group)}" update="@form"/>
+                </p:column>
+                <p:column headerText="Level" style="text-align: center">
+                    <h:outputText value="#{group.level}" />
+                </p:column>
+                <p:column >
+                    <p:commandButton action="#{assetGroupsController.add(group)}" update="@form" icon="ui-icon-add" />
+                    <p:spacer width="10px" rendered="#{group.level gt 0}"/>
+                    <p:commandButton action="#{assetGroupsController.delete(group)}" update="@form" icon="ui-icon-delete" rendered="#{group.level gt 0}"/>
+                </p:column>
+            </p:treeTable>
+
+            <p:dialog id="dialog" header="Name" showEffect="fade" widgetVar="editDialog" modal="true" resizable="false" rendered="#{assetGroupsController.selectedGroup ne null}"
+                      visible="#{assetGroupsController.selectedGroup ne null}">
+                <p:outputPanel id="editPanel" style="text-align: center">
+                    <p>
+                        <p:inputText value="#{assetGroupsController.selectedGroup.name}" style="margin: 10px" />
+                    </p>
+                    <p:defaultCommand target="submitButton" />
+                    <p:commandButton id="submitButton" value="Update" update="@form" action="#{assetGroupsController.update()}" style="margin-bottom: 10px" onclick="PF('editDialog').hide();" onkeydown="PF('editDialog').hide();"/>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

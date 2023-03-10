@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <div class="ui-g-12 ui-md-6 ui-lg-6">
+        <o:importFunctions type="com.inenergis.controller.general.Functions" var="ine"/>
+
+        <p:dataTable value="#{controller.elasticAgreementPointMaps}" widgetVar="saSearch" lazy="true" id="saSearchTable"
+                     var="apm" reflow="true" rows="10" rowsPerPageTemplate="10,25,50,100" selectionMode="single" rowKey="#{apm.apmId}"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="true" style="text-align: center;margin-top: 10px;font-size: 14px">
+            <p:ajax event="rowSelect" listener="#{controller.onSelectSA}"/>
+            <f:facet name="header">Service Agreements</f:facet>
+            <p:column headerText="SA ID" width="15%"> <h:outputText value="#{ine:highlighter(controller.querySearch,apm.serviceAgreementId)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Status" width="10%"> <h:outputText value="#{ine:highlighter(controller.querySearch,apm.status)}" escape="false"/> </p:column>
+            <p:column headerText="Phone" width="17%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,apm.phone)}" converter="phoneConverter" escape="false"/>
+            </p:column>
+
+            <p:column headerText="Customer" width="27%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,apm.computedName)}" escape="false"/>
+            </p:column>
+
+            <p:column headerText="Address">
+                <h:outputText value="#{ine:highlighter(controller.querySearch, apm.street)}, #{ine:highlighter(controller.querySearch, apm.city)}
+                                (#{ine:highlighter(controller.querySearch,apm.state)}), #{ine:highlighter(controller.querySearch,apm.postalCode)}"
+                              escape="false"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+</ui:composition>

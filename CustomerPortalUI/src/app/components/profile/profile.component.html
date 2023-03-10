@@ -1,0 +1,39 @@
+<div class="ui-g">
+  <div class="ui-g-6" >
+    <p-panel header="Personal data">
+      <div class="ui-inputgroup">
+        <span class="ui-inputgroup-addon">Name</span>
+        <input pInputText placeholder="Name" type="text" [formControl]="name"/>
+      </div>
+      <hr/>
+      <div class="ui-inputgroup">
+        <span class="ui-inputgroup-addon">Phone</span>
+        <input pInputText placeholder="Phone" type="text" [formControl]="phone"/>
+      </div>
+      <hr/>
+      <button pButton (click)="update()" label="Update"></button>
+    </p-panel>
+  </div>
+
+  <div class="ui-g-6" >
+    <p-panel header="Security">
+      <div class="ui-inputgroup">
+        <span class="ui-inputgroup-addon">Old password</span>
+        <input pPassword type="password" [formControl]="oldPassword" feedback="false"/>
+      </div>
+      <hr/>
+      <div class="ui-inputgroup">
+        <span class="ui-inputgroup-addon">New password</span>
+        <input pPassword type="password" [formControl]="newPassword" feedback="true"/>
+      </div>
+      <hr/>
+      <div class="ui-inputgroup">
+        <span class="ui-inputgroup-addon">Repeat password</span>
+        <input pPassword type="password" [formControl]="repeatPassword" feedback="false"/>
+      </div>
+      <hr/><hr/>
+      <button pButton (click)="updatePassword()" label="Change Password"></button>
+    </p-panel>
+  </div>
+</div>
+<p-growl [value]="msgs"></p-growl>

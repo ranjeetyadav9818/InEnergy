@@ -1,0 +1,106 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+    <div class="card card-w-title">
+        <h3 class="with-icon">General</h3>
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="profileNameEdit" value="#{isoProfilesController.profile.name}"/>
+                <p:outputLabel value="Profile Name:" for="profileNameEdit"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="udcId" value="#{isoProfilesController.profile.udcId}"/>
+                <p:outputLabel value="UDC ID:" for="udcId"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="drpId" value="#{isoProfilesController.profile.drpId}"/>
+                <p:outputLabel value="DRP ID:" for="drpId"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="scId" value="#{isoProfilesController.profile.scId}"/>
+                <p:outputLabel value="SC ID:" for="scId"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:calendar id="effectiveStartEdit" value="#{isoProfilesController.profile.effectiveStartDate}" pattern="MM/dd/yyyy" mask="true"
+                            placeholder="mm/dd/yyyy" binding="${profileStartDate}"/>
+                <p:outputLabel value="Effective Start Date:" for="effectiveStartEdit"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:calendar id="effectiveEndEdit" value="#{isoProfilesController.profile.effectiveEndDate}" pattern="MM/dd/yyyy" mask="true"
+                            placeholder="mm/dd/yyyy"
+                            mindate="#{profileStartDate.value}">
+                    <f:attribute name="startDate" value="#{profileStartDate}"/>
+                    <f:validator validatorId="endDateRangeValidator"/>
+                </p:calendar>
+                <p:outputLabel value="Effective End Date:" for="effectiveEndEdit"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Applicable Contract"/>
+                <p:selectOneMenu id="applicableContract" value="#{isoProfilesController.profile.isoApplicableContractEnum}" disabled="#{controller.viewModeOn}">
+                    <f:selectItems value="#{isoProfilesController.isoApplicableContractEnums}" var="isoApplicableContractEnum" itemValue="#{isoApplicableContractEnum}"  itemLabel="#{isoApplicableContractEnum.name}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+<br/>
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Market Eligible:" for="marketEligible"/>
+                <p:inputSwitch id="marketEligible" value="#{isoProfilesController.profile.marketEligible}"/>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Market active:" for="isoActive"/>
+                <p:inputSwitch id="isoActive" value="#{isoProfilesController.iso.active}"/>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:outputLabel value="Comodity:" />
+                <p:selectOneMenu value="#{isoProfilesController.profile.commodityType}" >
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{constantsProvider.comodityTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <p:column/>
+            <p:column/>
+
+            <p:outputLabel value="Eligible since " rendered="#{isoProfilesController.profile.marketEligible}">
+                <h:outputText value="#{isoProfilesController.profile.marketEligibleDate}">
+                    <f:convertDateTime pattern="MM/dd/yyyy"/>
+                </h:outputText>
+            </p:outputLabel>
+        </p:panelGrid>
+    </div>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Holiday Exclusions</h3>
+        <p:commandButton action="#{isoProfilesController.addHoliday()}" update="@form" icon="ui-icon-add"/>
+
+        <p:outputLabel rendered="#{empty isoProfilesController.profile.holidays}">No holiday exclusions defined yet</p:outputLabel>
+        <ui:repeat value="#{isoProfilesController.profile.holidays}" var="holiday">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="holidayName" value="#{holiday.name}" required="true"/>
+                    <p:outputLabel value="Holiday Name:" for="holidayName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-calendar">
+                    <p:calendar id="holidayDate" value="#{holiday.date}" required="true" pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy" mask="true"/>
+                    <p:outputLabel value="Observance Date:" for="holidayDate"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-checkbox">
+                    <p:selectBooleanCheckbox value="#{holiday.nerc}" id="nercHoliday"/>
+                    <p:outputLabel value="NERC" for="nercHoliday"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-icon">
+                    <p:commandButton action="#{isoProfilesController.removeHoliday(holiday)}" update="@form" process="@this" icon="ui-icon-remove"/>
+                </h:panelGroup>
+            </p:panelGrid>
+        </ui:repeat>
+    </div>
+</ui:composition>

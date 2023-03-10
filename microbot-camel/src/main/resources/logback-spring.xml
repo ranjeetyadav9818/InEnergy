@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <springProperty scope="context" name="environment" source="RUNNING.ENVIRONMENT" />
+    <appender name="STASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>50463f3b-b439-47d5-a28e-f4ae2c773626-ls.logit.io:16815</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"appName":"MicroBots - Camel"}</customFields>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <springProfile name="iat,prod,duke,duketest">
+            <appender-ref ref="STASH" />
+        </springProfile>
+    </root>
+</configuration>

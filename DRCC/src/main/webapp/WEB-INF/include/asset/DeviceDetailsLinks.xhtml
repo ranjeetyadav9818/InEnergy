@@ -1,0 +1,180 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui">
+    <style type="text/css">
+        .ui-diagram-element {
+            width: 15em;
+            height: 4em;
+            line-height: 4em;
+            text-align: center;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+            border: 1px solid #646D7E;
+            background-color: #646D7E;
+            color: #ffffff;
+        }
+
+        .ui-diagram-element:hover {
+            background-color: #828B9C;
+        }
+
+        .diagram-main-rectangle {
+            background-color: #646DDD;
+        }
+
+        .diagram-main-rectangle:hover {
+            background-color: #828BFF;
+        }
+
+        .flow-label {
+            color: #464F60;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).on('click',
+            '.ui-diagram > .ui-diagram-element',
+            function (info) {
+                elementClicked([{name: "elementId", value: info.target.id}]);
+            });
+    </script>
+    <j:useBean id="controller" type="com.inenergis.controller.asset.DeviceDetailsController"/>
+    <p:outputPanel id="linksContent">
+        <p:commandButton value="Add" action="#{controller.addLink}" id="add" update="@parent" rendered="#{controller.link eq null}" style="margin-bottom: 30px"/>
+
+        <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10" rendered="#{controller.link ne null}">
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText required="true" id="linkName" value="#{controller.link.name}" label="Name"/>
+                <p:outputLabel value="Name:" for="linkName"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Direction:" for="linkDirection"/>
+                <p:selectOneMenu id="linkDirection" converter="omnifaces.GenericEnumConverter" value="#{controller.link.type}" required="true" label="Direction">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{constantsProvider.deviceLinkTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Asset Type Profile:" for="assetProfile"/>
+                <p:selectOneMenu id="assetProfile" converter="assetProfileConverter" value="#{controller.link.assetProfile}" required="true" label="Asset Type Profile">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{controller.linkAssetProfile}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                    <p:ajax listener="#{controller.link.buildConnectionAttributesFromProfile(controller.link.assetProfile.connectionProfileAttributes)}"
+                            update=":form:#{tabViewId}:connectionAttributes"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+        </h:panelGrid>
+        <h4 jsf:rendered="#{controller.link ne null}">Sources
+            <p:commandButton rendered="#{controller.link ne null}" action="#{controller.addSource()}" update="@form" icon="ui-icon-plus" process="@form">
+                <o:skipValidators/>
+            </p:commandButton>
+        </h4>
+        <ui:repeat value="#{controller.link.sources}" var="source" varStatus="status">
+            <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10" rendered="#{controller.link ne null}" style="margin-left: 30px">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:autoComplete id="linkSource#{status.index}" placeholder="Source#{status.index} Start writing..." label="Source #{status.index}"
+                                    value="#{controller.link.sources[status.index]}" converter="assetDeviceConverter" required="true"
+                                    completeMethod="#{controller.completeAssetDevice}" disabled="#{controller.link.sources[status.index] eq controller.device}"
+                                    var="assetDevice" itemLabel="#{assetDevice.name}" itemValue="#{assetDevice}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:commandButton action="#{controller.removeSource(source)}" process="@this" icon="ui-icon-remove" update=":form:#{tabViewId}:linksContent" disabled="#{controller.link.sources[status.index] eq controller.device}"/>
+                </h:panelGroup>
+            </h:panelGrid>
+        </ui:repeat>
+
+        <h4 jsf:rendered="#{controller.link ne null}">Targets
+            <p:commandButton rendered="#{controller.link ne null}" action="#{controller.addTarget()}" update="@form" icon="ui-icon-plus" process="@form">
+                <o:skipValidators/>
+            </p:commandButton>
+        </h4>
+        <ui:repeat value="#{controller.link.targets}" var="target" varStatus="status">
+            <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10" rendered="#{controller.link ne null}" style="margin-left: 30px">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:autoComplete id="linkSource#{status.index}" placeholder="Target#{status.index}. Start writing..." label="Target #{status.index}"
+                                    value="#{controller.link.targets[status.index]}" converter="assetDeviceConverter" required="true"
+                                    completeMethod="#{controller.completeAssetDevice}"
+                                    var="assetDevice" itemLabel="#{assetDevice.name}" itemValue="#{assetDevice}"/>
+                </h:panelGroup>
+                <h:panelGroup styleClass="buttons">
+                    <p:commandButton action="#{controller.removeTarget(target)}" process="@this" icon="ui-icon-remove" update=":form:#{tabViewId}:linksContent"/>
+                </h:panelGroup>
+            </h:panelGrid>
+        </ui:repeat>
+
+        <h3 jsf:rendered="#{controller.link ne null and not empty controller.link.linkAttributes}">Attributes</h3>
+        <h:panelGrid id="connectionAttributes" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10">
+            <ui:repeat value="#{controller.link.linkAttributes}" var="catalogAttruibute" rendered="#{not empty controller.link.linkAttributes}" varStatus="status">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{catalogAttruibute.stringValue}"
+                                 required="#{catalogAttruibute.profileAttribute.mandatory}" size="30" maxlength="255" label="#{catalogAttruibute.profileAttribute.name}"
+                                 rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'TEXT'}"/>
+                    <p:inputNumber value="#{catalogAttruibute.numberValue}" required="#{catalogAttruibute.profileAttribute.mandatory}"
+                                   rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'NUMBER'}"
+                                   decimalPlaces="5" maxValue="999999.99999" label="#{catalogAttruibute.profileAttribute.name}"/>
+                    <p:calendar value="#{catalogAttruibute.dateValue}" pattern="MM/dd/yyyy" mask="true" placeholder="mm/dd/yyyy"
+                                converter="localDateConverter"
+                                required="#{catalogAttruibute.profileAttribute.mandatory}"
+                                label="#{catalogAttruibute.profileAttribute.name}" rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'DATE'}"/>
+                    <p:outputLabel value="#{catalogAttruibute.profileAttribute.name}:"/>
+                </h:panelGroup>
+            </ui:repeat>
+        </h:panelGrid>
+
+        <p:commandButton value="Save" action="#{controller.saveLink}" update="@parent" rendered="#{controller.link ne null}" style="margin-bottom: 30px"/>
+        <p:spacer width="15"/>
+        <p:commandButton value="Cancel" action="#{controller.cancelLink}" update="@parent" rendered="#{controller.link ne null}" process="@this"/>
+
+
+        <p:diagram value="#{controller.model}" style="height:450px" styleClass="ui-widget-content" id="diagram"/>
+        <p:remoteCommand name="elementClicked" actionListener="#{controller.onElementClicked}" update="panel12"/>
+        <p:outputPanel id="panel12" style="padding: 1em">
+            <p><p:commandButton value="Go to #{controller.selectedItem.name} details" action="#{controller.forwardToSelectedItem(controller.selectedItem)}"
+                                rendered="#{controller.selectedItem ne null}"/></p>
+        </p:outputPanel>
+        <p:dataTable value="#{controller.device.links}" id="linksTable" var="link" reflow="true" rows="25" rowsPerPageTemplate="25,50,100" paginator="true"
+                     paginatorAlwaysVisible="false"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+            <p:column width="5%">
+                <p:rowToggler/>
+            </p:column>
+            <p:column headerText="Link">
+                <h:outputText value="#{link.name}"/>
+            </p:column>
+            <p:column headerText="Type">
+                <h:outputText value="#{link.type.name}"/>
+            </p:column>
+            <p:column headerText="Source">
+                <ui:repeat value="#{link.sources}" var="source">
+                    <p:commandLink process="@this" action="#{controller.forwardToSelectedItem(source)}" value="#{source.name}"/><br/>
+                </ui:repeat>
+            </p:column>
+            <p:column headerText="Target">
+                <ui:repeat value="#{link.targets}" var="target">
+                    <p:commandLink process="@this" action="#{controller.forwardToSelectedItem(target)}" value="#{target.name}"/><br/>
+                </ui:repeat>
+            </p:column>
+            <p:column width="5%">
+                <p:commandButton action="#{controller.removeLink(link)}" update="@form" icon="ui-icon-remove"/>
+            </p:column>
+            <p:rowExpansion>
+                <p:spacer/>
+                <c:set var="attributeslist" value="#{link.linkAttributes}"/>
+                <c:set var="editable" value="#{true}"/>
+                <c:set var="tabIndex" value="#{1}"/>
+                <ui:include src="../general/UnfilteredAttributeInstancesTab.xhtml"/>
+                <p:spacer/>
+            </p:rowExpansion>
+        </p:dataTable>
+    </p:outputPanel>
+</ui:composition>

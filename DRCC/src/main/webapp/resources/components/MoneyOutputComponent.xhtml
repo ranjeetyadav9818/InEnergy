@@ -1,0 +1,22 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:cc="http://java.sun.com/jsf/composite">
+    <!-- INTERFACE -->
+    <cc:interface componentType="moneyOutput">
+        <cc:attribute name="value" type="java.lang.Number"/>
+        <cc:attribute name="rendered" type="java.lang.Boolean"/>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <c:set var="controller" value="#{currencyConfigController}"/>
+        <p:outputLabel value="#{cc.attrs.value}" converter="moneyConverter"
+                       style="#{controller.isNegative(cc.attrs.value) ? 'color : red;': 'color : inherit'}"
+                       rendered="#{(empty cc.attrs.rendered or cc.attrs.rendered eq true) and not empty cc.attrs.value and 'java.lang.Long' ne cc.attrs.value.class.getCanonicalName()}"/>
+        <p:outputLabel value="#{cc.attrs.value}" converter="moneyCentsConverter"
+                       style="#{controller.isNegative(cc.attrs.value) ? 'color : red;': 'color : inherit'}"
+                       rendered="#{(empty cc.attrs.rendered or cc.attrs.rendered eq true) and not empty cc.attrs.value and 'java.lang.Long' eq cc.attrs.value.class.getCanonicalName()}"/>
+    </cc:implementation>
+</ui:composition>

@@ -1,0 +1,205 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:o="http://omnifaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="#{eligibilityEnrollment.program.name} program" outcome="ProgramManagement">
+                    <f:param name="o" value="#{parameterEncoderService.encode(eligibilityEnrollment.program.id)}"/>
+                </p:menuitem>
+                <p:menuitem value="Eligibility &amp; Enrollment"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <p:panel rendered="#{!eligibilityEnrollment.program.active}" styleClass="red">
+                    Can't enroll while program status is inactive.
+                </p:panel>
+
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputTextarea id="sa_ids" value="#{eligibilityEnrollment.filterSAIDs}" cols="80"
+                                         validator="commaSeparatedNumberValidator" required="true"/>
+                        <p:outputLabel for="sa_ids" value="SA IDS:"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:commandButton action="#{eligibilityEnrollment.verify}" value="Verify Eligibility" update="@form"/>
+            </div>
+            <div class="card" jsf:rendered="#{not empty eligibilityEnrollment.potentialServiceAgreements}">
+                <p:dataTable value="#{eligibilityEnrollment.potentialServiceAgreements}" var="potentialSA" reflow="true" rows="25"
+                             rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+                    <p:column headerText="Acc ID" filterBy="#{potentialSA.agreementPointMap.serviceAgreement.account.accountId}">
+                        <h:outputText value="#{potentialSA.agreementPointMap.serviceAgreement.account.accountId}"/>
+                    </p:column>
+                    <p:column headerText="SA ID" filterBy="#{potentialSA.agreementPointMap.serviceAgreement.serviceAgreementId}">
+                        <p:link href="CustomerList.xhtml?o=#{parameterEncoderService.encode(potentialSA.agreementPointMap.serviceAgreement.serviceAgreementId)}"
+                                value="#{potentialSA.agreementPointMap.serviceAgreement.serviceAgreementId}"/>
+                    </p:column>
+                    <p:column headerText="Customer Name"
+                              filterBy="#{potentialSA.agreementPointMap.serviceAgreement.account.person.customerName}#{potentialSA.agreementPointMap.serviceAgreement.account.person.businessName}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{potentialSA.agreementPointMap.serviceAgreement.account.person.businessName}"
+                                      rendered="#{potentialSA.agreementPointMap.serviceAgreement.account.person.customerName eq null}"/>
+                        <h:outputText value="#{potentialSA.agreementPointMap.serviceAgreement.account.person.customerName}"
+                                      rendered="#{potentialSA.agreementPointMap.serviceAgreement.account.person.businessName eq null}"/>
+                        <h:outputText
+                                value="#{potentialSA.agreementPointMap.serviceAgreement.account.person.customerName}(#{potentialSA.agreementPointMap.serviceAgreement.account.person.businessName})"
+                                rendered="#{potentialSA.agreementPointMap.serviceAgreement.account.person.businessName ne null and potentialSA.agreementPointMap.serviceAgreement.account.person.customerName ne null}"/>
+                    </p:column>
+                    <p:column headerText="Service Address 1" filterBy="#{potentialSA.agreementPointMap.servicePoint.premise.serviceAddress1}">
+                        <h:outputText value="#{potentialSA.agreementPointMap.servicePoint.premise.serviceAddress1}"/>
+                    </p:column>
+                    <p:column headerText="Service City" filterBy="#{potentialSA.agreementPointMap.servicePoint.premise.serviceCityUpr}">
+                        <h:outputText value="#{potentialSA.agreementPointMap.servicePoint.premise.serviceCityUpr}"/>
+                    </p:column>
+                    <p:column headerText="Eligibility Status">
+                        <h:outputText value="Eligible" rendered="#{potentialSA.eligibile}"/>
+                        <h:outputText value="Ineligible" rendered="#{not potentialSA.eligibile}" styleClass="red"/>
+                    </p:column>
+                    <p:column headerText="Ineligible reason" filterBy="#{potentialSA.ineligibleReason}">
+                        <h:outputText value="#{potentialSA.ineligibleReason}"/>
+                    </p:column>
+                    <p:column headerText="Enroll/Unenroll">
+                        <p:commandLink action="#{eligibilityEnrollment.viewEnroll(potentialSA)}" process="@this" value="Enroll" update="@form"
+                                       rendered="#{potentialSA.eligibile and eligibilityEnrollment.program.active and potentialSA.currentProgramEnrolled eq null}"/>
+                        <p:commandLink action="#{eligibilityEnrollment.viewEnroll(potentialSA)}" process="@this" value="Enroll (Overriding)" update="@form"
+                                       rendered="#{not potentialSA.eligibile and eligibilityEnrollment.program.active and potentialSA.currentProgramEnrolled eq null}"/>
+                        <p:commandLink action="#{eligibilityEnrollment.viewUnenroll(potentialSA)}" process="@this" value="Unenroll" update="@form"
+                                       rendered="#{potentialSA.currentProgramEnrolled ne null and potentialSA.currentProgramEnrolled.enrollmentStatus eq 'Enrolled'}"/>
+                        <h:outputText value="#{potentialSA.currentProgramEnrolled.enrollmentStatus}"
+                                      rendered="#{potentialSA.currentProgramEnrolled ne null and potentialSA.currentProgramEnrolled.enrollmentStatus ne 'Enrolled'}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+            <div class="card card-w-title" jsf:rendered="#{eligibilityEnrollment.saEligibilityToEnroll ne null}">
+                <h1>Enrollment Application</h1>
+                    <p:panelGrid columns="3" style="background-color:white !important;">
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SAID')}">SAID</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SAID')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.serviceAgreement.serviceAgreementId}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SAID')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('UUID')}">UUID</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('UUID')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.serviceAgreement.saUuid}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('UUID')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('CUSTOMER_NAME')}">Customer Name</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('CUSTOMER_NAME')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.serviceAgreement.account.person.customerName}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('CUSTOMER_NAME')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('BUSINESS_NAME')}">Business Name</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('BUSINESS_NAME')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.serviceAgreement.account.person.businessName}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('BUSINESS_NAME')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SERVICE_ADDRESS_1')}">Service Address 1</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SERVICE_ADDRESS_1')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.servicePoint.premise.serviceAddress1}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SERVICE_ADDRESS_1')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SERVICE_ADDRESS_2')}">Service Address 2</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SERVICE_ADDRESS_2')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.servicePoint.premise.serviceAddress2}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('SERVICE_ADDRESS_2')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('CITY')}">City</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('CITY')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.servicePoint.premise.serviceCityUpr}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('CITY')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('STATE')}">State</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('STATE')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.servicePoint.premise.serviceState}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('STATE')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('ZIP')}">Zip</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('ZIP')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.servicePoint.premise.servicePostal}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('ZIP')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('METER_BADGE_NUMBER')}">Meter Badge Number</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('METER_BADGE_NUMBER')}">#{eligibilityEnrollment.saEligibilityToEnroll.agreementPointMap.servicePoint.meter.badgeNumber}</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('METER_BADGE_NUMBER')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('AGGREGATOR_NAME')}">Aggregator Name</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('AGGREGATOR_NAME')}">
+                            <p:selectOneMenu value="#{eligibilityEnrollment.saEligibilityToEnroll.aggregator}" converter="aggregatorConverter">
+                                <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{eligibilityEnrollment.getActiveAggregators()}" var="aggregator" itemLabel="#{aggregator.name}"
+                                               itemValue="#{aggregator}"/>
+                            </p:selectOneMenu>
+                        </p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('AGGREGATOR_NAME')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('THIRD_PARTY_NAME')}">3rd party name</p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('THIRD_PARTY_NAME')}"><p:inputText
+                                value="#{eligibilityEnrollment.saEligibilityToEnroll.thirdPartyName}"/></p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('THIRD_PARTY_NAME')}"/>
+
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('FSL')}">
+                            <p:outputLabel for="fsl" value="FSL (kW):"/>
+                        </p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('FSL')}">
+                            <p:inputNumber id="fsl" value="#{eligibilityEnrollment.saEligibilityToEnroll.firmServiceLevel}" converter="javax.faces.Integer"
+                                           decimalPlaces="0" required="true">
+                                <p:ajax event="keyup" listener="#{eligibilityEnrollment.hideFslOutOfRangeMessage()}" process="@this" update="fslOutOfRangeMessage"/>
+                                <o:skipValidators/>
+                            </p:inputNumber>
+                        </p:row>
+                        <p:row rendered="#{eligibilityEnrollment.isAttributeRendered('FSL')}">
+                            (acceptable range: #{eligibilityEnrollment.fslRange.getMinKw()} kW - #{eligibilityEnrollment.fslRange.getMaxKw()} kW, based on #{eligibilityEnrollment.fslRange.dataAvailabilityAllMonths} months)
+                        </p:row>
+
+                        <p:row rendered="#{eligibilityEnrollment.fslRange.noDataWarning}"/>
+                        <p:row rendered="#{eligibilityEnrollment.fslRange.noDataWarning}"/>
+                        <p:row rendered="#{eligibilityEnrollment.fslRange.noDataWarning}">
+                            <h:outputText value="Warning: there is not enough data to evaluate all rules" styleClass="red"/>
+                        </p:row>
+
+                    </p:panelGrid>
+
+                    <p:panel rendered="#{not eligibilityEnrollment.saEligibilityToEnroll.eligibile}" styleClass="panel-in-card">
+                        <h4 class="orange">This is an Ineligible SA, if you want to enroll it, please provide an overriding reason:</h4>
+                        <p:panelGrid columns="2" style="background-color:white !important;">
+                            <p:outputLabel for="overridingReason" value="Overriding Reason:"/>
+                            <p:inputText required="true" value="#{eligibilityEnrollment.overridingReason}" id="overridingReason"/>
+                        </p:panelGrid>
+                    </p:panel>
+
+                    <p:outputPanel id="fslOutOfRangeMessage">
+                        <p:panel rendered="#{eligibilityEnrollment.saEligibilityToEnroll.eligibile and eligibilityEnrollment.showFslOutOfRangeMessage}" styleClass="panel-in-card">
+                            <h4 class="orange">FSL is out of range, if you want to continue, please provide an overriding reason:</h4>
+                            <p:panelGrid columns="2" style="background-color:white !important;">
+                                <p:outputLabel for="overridingReasonFsl" value="Overriding Reason:"/>
+                                <p:inputText required="true" value="#{eligibilityEnrollment.overridingReason}" id="overridingReasonFsl"/>
+                            </p:panelGrid>
+                        </p:panel>
+                    </p:outputPanel>
+                    <p:commandButton id="cancel" value="Cancel" action="#{eligibilityEnrollment.cancel()}" process="@this" update="@form"/>
+                    <p:commandButton id="save" value="Save" action="#{eligibilityEnrollment.enroll()}" process="@form" update="@form"
+                                     style="margin-left: 10px"/>
+            </div>
+            <div class="card card-w-title" jsf:rendered="#{eligibilityEnrollment.saEligibilityToUnenroll ne null}">
+                <h1>Unenrollment Application</h1>
+                <p:panelGrid columns="2" style="background-color:white !important;">
+                    <p:row>SAID</p:row>
+                    <p:row>#{eligibilityEnrollment.saEligibilityToUnenroll.agreementPointMap.serviceAgreement.serviceAgreementId}</p:row>
+                    <p:row>Customer Name</p:row>
+                    <p:row>#{eligibilityEnrollment.saEligibilityToUnenroll.agreementPointMap.serviceAgreement.account.person.customerName}</p:row>
+                    <p:row>Business Name</p:row>
+                    <p:row>#{eligibilityEnrollment.saEligibilityToUnenroll.agreementPointMap.serviceAgreement.account.person.businessName}</p:row>
+                    <p:row>Unenrollment reason</p:row>
+                    <p:row>
+                        <p:selectOneMenu value="#{eligibilityEnrollment.unenrollmentReason}">
+                            <f:selectItems value="#{constantsProvider.unenrollmentReasons}" var="reason" itemLabel="#{reason}" itemValue="#{reason}"/>
+                        </p:selectOneMenu>
+                    </p:row>
+                </p:panelGrid>
+                <p:commandButton value="Unenroll" action="#{eligibilityEnrollment.unenroll()}" process="@form" update="@form" />
+                <p:spacer width="15"/>
+                <p:commandButton value="Cancel" action="#{eligibilityEnrollment.cancel()}" process="@this" update="@form"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

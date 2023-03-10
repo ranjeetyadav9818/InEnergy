@@ -1,0 +1,22 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="aged-invoices" author="vm">
+        <createIndex tableName="INVOICE" indexName="IDX_DUE_DATE">
+            <column name="DUE_DATE"/>
+        </createIndex>
+        <createIndex tableName="INVOICE" indexName="IDX_PAID_DATE">
+            <column name="PAID_DATE"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="aged-invoices-2" author="vm">
+        <renameColumn tableName="INVOICE" oldColumnName="INVOICE_NUMBER" newColumnName="INVOICE_NUMBER" columnDataType="VARCHAR(55)"/>
+    </changeSet>
+
+    <changeSet id="aged-invoices-3" author="vm">
+        <renameColumn tableName="PAYMENT" oldColumnName="REFERENCE" newColumnName="REFERENCE" columnDataType="VARCHAR(55)"/>
+    </changeSet>
+</databaseChangeLog>

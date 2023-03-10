@@ -1,0 +1,56 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet context="ddl" id="PRE-DES-191" author="egamas">
+        <tagDatabase tag="PRE-DES-191"/>
+    </changeSet>
+
+    <changeSet id="DES-191-1" author="egamas">
+        <addColumn tableName="PROGRAM">
+            <column type="varchar(55)" name="PROGRAM_TYPE" defaultValue="DEMAND_RESPONSE"/>
+        </addColumn>
+        <dropNotNullConstraint tableName="CREDIT_DISCOUNT" columnName="RATE_PLAN_PROFILE_ID" columnDataType="bigint(20)"/>
+        <addColumn tableName="CREDIT_DISCOUNT">
+            <column name="PROGRAM_PROFILE_ID" type="bigint(20)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="CREDIT_DISCOUNT"
+                                 baseColumnNames="PROGRAM_PROFILE_ID"
+                                 constraintName="FK_CREDIT_DISCOUNT_PROGRAM_PROFILE"
+                                 referencedTableName="PROGRAM_PROFILE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="DES-191-2" author="egamas">
+        <addColumn tableName="PROGRAM_SEASON">
+            <column type="int(11) not null" name="MONTH_FROM"/>
+            <column type="int(11) not null" name="MONTH_TO"/>
+            <column type="int(11) not null" name="DAY_FROM"/>
+            <column type="int(11) not null" name="DAY_TO"/>
+            <column type="int(11) not null" name="OPERATING_HOUR_FROM" defaultValue="0"/>
+            <column type="int(11) not null" name="OPERATING_HOUR_TO" defaultValue="0"/>
+            <column type="int(11) not null" name="OPERATING_MINUTE_FROM" defaultValue="0"/>
+            <column type="int(11) not null" name="OPERATING_MINUTE_TO" defaultValue="0"/>
+        </addColumn>
+
+        <addColumn tableName="PROGRAM_PROFILE">
+            <column type="tinyint(1) not null" name="USE_COMPANY_LEVEL_SEASONS" defaultValue="0"/>
+            <column type="tinyint(1) not null" name="USE_COMPANY_LEVEL_HOLIDAYS" defaultValue="0"/>
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet id="DES-191-3" author="egamas">
+        <addColumn tableName="CREDIT_DISCOUNT">
+            <column name="PROGRAM_SEASON_ID" type="bigint(20)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="CREDIT_DISCOUNT"
+                                 baseColumnNames="PROGRAM_SEASON_ID"
+                                 constraintName="FK_DISCOUNT_PROGRAM_SEASON"
+                                 referencedTableName="PROGRAM_SEASON"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+
+</databaseChangeLog>

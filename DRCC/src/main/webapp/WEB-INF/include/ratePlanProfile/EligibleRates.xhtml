@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{controller.ratePlans}"  var="plan" reflow="true">
+        <p:column headerText="Rate plan">
+            <h:outputText value="#{plan.ratePlan.name}"/>
+        </p:column>
+        <p:column headerText="Code Id">
+            <h:outputText value="#{plan.ratePlan.activeProfile.buildRateCodeId()}"/>
+        </p:column>
+        <p:column headerText="Rate profile title">
+            <h:outputText value="#{plan.ratePlan.activeProfile.rateScheduleTitle}"/>
+        </p:column>
+        <p:column headerText="Average Rate">
+            <h:outputText value="#{plan.ratePlan.activeProfile.calculateAverageRate()}"/>
+        </p:column>
+        <p:column headerText="Related Rate Plans">
+            <h:outputText value="#{plan.ratePlan.activeProfile.printRelatedRatePlansCodeIds()}"/>
+        </p:column>
+        <p:column headerText="Action">
+            <p:commandLink value="Enroll" action="#{controller.enroll(plan)}" rendered="#{plan.enrollable}" update="@form"/>
+            <p:commandLink value="Unenroll" action="#{controller.unenroll(plan)}" rendered="#{plan.unenrollable}" update="@form"/>
+            <p:outputLabel value="Ineligible" rendered="#{not plan.eligible}"/>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

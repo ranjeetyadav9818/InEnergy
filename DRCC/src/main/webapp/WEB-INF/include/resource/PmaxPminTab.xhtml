@@ -1,0 +1,58 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dataTable value="#{resourceDetailController.lazyPmaxPminDataModel}" id="TbPmaxPminHist" widgetVar="custTableP" editable="true" lazy="true" var="pHistory"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{pHistory.id}" sortBy="effectiveStartDate" sortOrder="DESCENDING">
+        <p:ajax event="rowEdit" listener="#{resourceDetailController.onPmaxPminRowEdit}" oncomplete="if (args &amp;&amp; !args.validationFailed) PF('custTableP').filter();"/>
+        <p:ajax event="filter" delay="300"  />
+        <p:column headerText="Pmin (MW)"  filterBy="#{pHistory.pmin}" field="pmin">
+            <f:facet name="filter">
+                <p:inputNumber onkeyup="PF('custTableP').filter();" converter="javax.faces.Integer" decimalPlaces="0" maxValue="10000" />
+            </f:facet>
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{pHistory.pmin}" /></f:facet>
+                <f:facet name="input"><p:inputNumber decimalPlaces="0" maxValue="10000" value="#{pHistory.pmin}" style="width:45%" required="true" label="Pmin"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Pmax (MW)" filterBy="#{pHistory.pmax}">
+            <f:facet name="filter">
+                <p:inputNumber onkeyup="PF('custTableP').filter();" converter="javax.faces.Integer" decimalPlaces="0" maxValue="10000" />
+            </f:facet>
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{pHistory.pmax}" /></f:facet>
+                <f:facet name="input"><p:inputNumber decimalPlaces="0" maxValue="10000" value="#{pHistory.pmax}" style="width:45%" required="true" label="Pmax"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Effective Start Date" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{pHistory.effectiveStartDate}" style="width:20%"><f:convertDateTime pattern="MM/dd/yyyy"/></h:outputText>
+        </p:column>
+        <p:column headerText="Effective End Date" filterable="false" styleClass="topAligned">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{pHistory.effectiveEndDate}"><f:convertDateTime pattern="MM/dd/yyyy"/></h:outputText>
+                </f:facet>
+                <f:facet name="input">
+                    <p:calendar value="#{pHistory.effectiveEndDate}" pattern="MM/dd/yyyy" timeZone="UTC" mask="true" placeholder="mm/dd/yyyy" mindate="#{pHistory.effectiveStartDate}"
+                            label="Effective End Date">
+                        <f:validator validatorId="endDateRangeValidator" />
+                    </p:calendar>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Last Update" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{pHistory.lastUpdateDate}"><f:convertDateTime pattern="MM/dd/yyyy"/></h:outputText>
+        </p:column>
+        <p:column headerText="Last Updated By" filterBy="#{pHistory.lastUpdateBy}">
+            <h:outputText value="#{pHistory.lastUpdateBy}"/>
+        </p:column>
+        <p:column style="width:32px" class="showOnDesktop">
+            <p:rowEditor rendered="#{pHistory.effectiveEndDate eq null}"/>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

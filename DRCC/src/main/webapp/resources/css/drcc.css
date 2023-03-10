@@ -1,0 +1,372 @@
+.MarginTop10 {
+    margin-top: 10px
+}
+
+.MarginTop20 {
+    margin-top: 20px
+}
+
+.MarginTopBottom10 {
+    margin-top: 10px;
+    margin-bottom: 10px
+}
+
+.MarginBottom10 {
+    margin-bottom: 10px
+}
+
+.MarginBottom40 {
+    margin-bottom: 40px;
+}
+
+.ui-breadcrumb {
+    margin-bottom: 10px !important;
+}
+
+.md-inputfield {
+    margin-bottom: 25px;
+    margin-top: 8px;
+}
+
+.selectfield {
+    margin: 0 0 25px 5px
+}
+
+.FontTitilliumSemiBoldItalic {
+    font-family: 'titillium_websemibold_italic';
+}
+
+.Fs14 {
+    font-size: 14px
+}
+
+.Fs16 {
+    font-size: 16px
+}
+
+.Fs20 {
+    font-size: 20px
+}
+
+.Fs24 {
+    font-size: 24px
+}
+
+.Fs42 {
+    font-size: 42px
+}
+
+.FontBold {
+    font-weight: bold;
+}
+
+.ui-widget-content {
+    padding: 0 !important;
+}
+
+.ui-dashboard-column {
+    width: 50%;
+}
+
+.green {
+    color: green !important;
+}
+
+.red {
+    color: red !important;
+}
+
+.ui-carousel-item {
+    margin: 1px;
+    padding: 0;
+    float: left;
+    border: 0 !important;
+}
+
+.ui-carousel-header-title {
+    font-size: 16px;
+    font-weight: bolder;
+}
+
+.login-body {
+    background-color: #f5f5f5;
+    background: url("#{resource['barcelona-layout:images/login/login2.jpg']}") no-repeat center;
+    background-size: 100% !important;
+    background-position: 0 -100px;
+    padding-top: 10%;
+}
+
+.ui-tabs-panels {
+    padding: 10px;
+}
+
+.ui-panelgrid .ui-panelgrid-cell {
+    border: 0px !important;
+}
+
+.ui-panelgrid tbody tr.ui-widget-content {
+    border: 0px !important;
+}
+
+.ui-panelgrid.form-group .ui-panelgrid-cell {
+    padding-left: 0 !important;
+}
+
+.ui-selectonemenu {
+    margin-bottom: 23px;
+}
+
+.md-inputfield-select > label {
+    font-size: 12px;
+    color: #1976d2 !important;
+    padding-left: 5px;
+    padding-bottom: 10px;
+    display: block;
+    margin-top: -20px;
+}
+
+.card .ui-selectonemenu {
+    padding-bottom: 4px;
+}
+
+.ui-tabs-panel .buttons {
+    display: block;
+    margin: 10px 0;
+}
+
+.md-inputfield-checkbox > label {
+    font-size: 12px;
+    color: #1976d2 !important;
+    padding-left: 5px;
+    margin-top: -38px;
+    padding-bottom: 20px;
+    display: block;
+}
+
+.md-inputfield-switch > label {
+    font-size: 12px;
+    color: #1976d2 !important;
+    padding-left: 5px;
+    padding-bottom: 10px;
+    display: block;
+    margin-top: -10px;
+}
+
+.md-inputfield-calendar, .md-inputfield-static {
+    display: block;
+    position: relative;
+    margin-bottom: 28px;
+    margin-top: 10px;
+}
+
+.md-inputfield-calendar > label, .md-inputfield-static > label {
+    position: absolute;
+    left: 5px;
+    top: -20px;
+    font-size: 12px;
+    color: #1976d2;
+}
+
+.md-inputfield-icon {
+    display: block;
+    margin-top: -10px;
+}
+
+.with-icon {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 35px;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.card hr {
+    margin-bottom: 30px;
+    border-bottom-width: 0;
+}
+
+.card .ui-picklist {
+    margin-bottom: 20px;
+}
+
+.hardblue {
+    color: #2196F3 !important;
+}
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+    /*font-size: 20px !important;*/
+    /*width: 1em;*/
+    /*margin-right: 0.2em;*/
+    /*margin-top: 0.5em;*/
+    /*margin-bottom: 0.5em;*/
+    font-style: normal;
+    font-weight: normal;
+    speak: none;
+}
+
+.icon-account_box:before {
+    content: 'web';
+}
+
+.icon-account_box2:before {
+    content: 'account_box';
+}
+
+.icon-sort:before {
+    content: 'sort';
+}
+
+.icon-location_on:before {
+    content: 'location_on';
+}
+
+.icon-link:before {
+    content: 'link';
+}
+
+.icon-mail_outline:before {
+    content: 'mail_outline';
+}
+
+.icon-attach_money:before {
+    content: 'attach_money';
+}
+
+.icon-flag:before {
+    content: 'flag';
+}
+
+.icon-account_balance:before {
+    content: 'account_balance';
+}
+
+.icon-business:before {
+    content: 'business';
+}
+
+.icon-more:before {
+    content: 'more';
+}
+
+.icon-list-alt:before {
+    content: 'event_note';
+}
+
+.icon-data-science-inv:before {
+    content: 'memory';
+}
+
+.icon-at-1:before {
+    content: '@';
+}
+
+.ui-tabs {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+    -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+    -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+    -moz-border-radius: 2px !important;
+    -webkit-border-radius: 2px !important;
+    border-radius: 2px !important;
+    border: 0px !important;
+    background: #ffffff;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
+.orange {
+    color: orange;
+}
+
+.panel-in-card {
+    padding-left: 8px !important;
+    margin-bottom: 16px;
+    margin-top: 8px;
+}
+
+/*https://github.com/google/material-design-icons/blob/master/iconfont/codepoints*/
+.event-timeline-submitted {
+    background: #FFA500 none !important; /* orange */
+    border-color: #cc8100 !important;
+}
+
+.event-timeline-error {
+    background: #BECEFE none !important;
+    border-color: #97B0F8 !important;
+}
+
+.event-timeline-cancelled {
+    background: #F03030 none !important; /* red */
+    border-color: #bd2828 !important;
+}
+
+.event-timeline-terminated {
+    background: #1AA11A none !important; /* green */
+    border-color: #136e13 !important; /* green */
+}
+
+.event-timeline-planned {
+    background: #1AA11A none !important; /* green */
+    border-color: #1e88e5 !important; /* green */
+}
+
+.event-timeline-reserved {
+    background: #1AA11A none !important; /* green */
+    border-color: #ffeb38 !important; /* green */
+}
+.greenLabel{
+    background-color: lightgreen;
+}
+body .ui-inputfield.ui-state-disabled {
+    border-bottom: 0px !important;
+}
+body .ui-datatable tbody tr.ui-datatable-even.ui-state-highlight {
+    background-color: #BECEFE;
+    color: #000000;
+}
+body .ui-state-active, body .ui-state-highlight {
+    background-color: #BECEFE;
+    color: #000000;
+}
+body .ui-datatable tbody tr.ui-state-highlight td {
+    border-right-color: #97B0F8;
+}
+.layout-wrapper.layout-wrapper-menu-active .layout-sidebar {
+    width: 330px;
+}
+.layout-wrapper .layout-sidebar .layout-tabmenu .layout-tabmenu-contents {
+    min-width: 270px;
+}
+.search-box {
+    float: left;
+}
+.search-box-input {
+    padding: 13px 30px 13px 40px !important;
+    background-color: #0D47A1 !important;
+    width: 350px !important;
+}
+.search-box-li {
+    margin-top: -10px !important;
+    width: 470px !important;
+    margin-left: 100px !important;
+}
+*::-webkit-input-placeholder {
+    color: lightgrey;
+}
+*:-moz-placeholder {
+    /* FF 4-18 */
+    color: lightgrey;
+}
+*::-moz-placeholder {
+    /* FF 19+ */
+    color: lightgrey;
+}
+*:-ms-input-placeholder {
+    /* IE 10+ */
+    color: lightgrey;
+}
+.layout-wrapper .topbar .logo img{
+    margin-top: 3px
+}

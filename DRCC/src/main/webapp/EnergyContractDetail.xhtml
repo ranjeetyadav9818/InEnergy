@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Energy Contracts" outcome="SearchContracts"/>
+                <p:menuitem value="Contract #{energyContractDetailController.contract.name}" outcome="SearchContracts"/>
+
+            </p:breadCrumb>
+            <div class="card">
+                <p:carousel numVisible="4" circular="true" responsive="true" value="#{energyContractDetailController.contractDetails}"
+                            headerText="#{energyContractDetailController.contract.name}" var="details" style="border: 0;">
+                    <i class="material-icons #{details.icon} Fs20 hardblue"/>
+                    <h:outputText value="#{details.name}" styleClass="Fs20 hardblue"/>
+                    <h:dataTable var="db" value="#{details.dataBeans}" style="border:0;" styleClass="ui-panelgrid-blank">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                    <p:commandButton action="#{energyContractDetailController.editEntity(details.object)}" value="Edit Entity"
+                                     rendered="#{details.object ne null}"/>
+                </p:carousel>
+            </div>
+            <c:set var="controller" value="#{energyContractDetailController}"/>
+            <p:tabView id="contractDetailTabView">
+                <p:tab title="Agreement Details">
+                    <c:set var="tabViewId" value="contractDetailTabView"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/ContractSummaryCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/PartiesCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/CommoditiesCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/RelatedContractsCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/PaymentTermsCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/FeesCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/CreditsCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/LinkageCard.xhtml"/>
+                    <ui:include src="WEB-INF/include/energyContract/cards/ServiceAgreementsCard.xhtml"/>
+                </p:tab>
+                <p:tab title="Transactions">
+                    <p:dataTable id="transactionsTable" value="#{energyContractDetailController.transactions}" var="transaction" selectionMode="single"
+                                 rowKey="#{transaction.transactionId}">
+                        <p:ajax event="rowSelect" listener="#{energyContractDetailController.forwardTransactionDetails(transaction)}"/>
+                        <p:column headerText="Transaction Id">
+                            <h:outputText value="#{transaction.transactionId}"/>
+                        </p:column>
+                        <p:column headerText="Date">
+                            <h:outputText value="#{transaction.date}">
+                                <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Status">
+                            <h:outputText value="#{transaction.status}"/>
+                        </p:column>
+                        <p:column headerText="Value">
+                            <h:outputText value="#{transaction.value}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Documents">
+                    <ui:include src="WEB-INF/include/general/DocumentsTab.xhtml"/>
+                </p:tab>
+                <p:tab title="Locations">
+                    <ui:include src="WEB-INF/include/general/ContractLocations.xhtml"/>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+    </ui:define>
+</ui:composition>

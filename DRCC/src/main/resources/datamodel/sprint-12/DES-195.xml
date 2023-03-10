@@ -1,0 +1,26 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-195" author="vm">
+        <createTable tableName="SECONDARY_CONTACT">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="SERVICE_AGREEMENT_ID" type="VARCHAR(55)"/>
+            <column name="TITLE" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(55)"/>
+            <column name="SURNAME" type="VARCHAR(55)"/>
+            <column name="PHONE" type="VARCHAR(55)"/>
+            <column name="MOBILE" type="VARCHAR(55)"/>
+            <column name="EMAIL" type="VARCHAR(55)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="SECONDARY_CONTACT"
+                                 baseColumnNames="SERVICE_AGREEMENT_ID"
+                                 constraintName="FK_SECONDARY_CONTACT_AGREEMENT_SERVICE_AGREEMENT"
+                                 referencedTableName="SERVICE_AGREEMENT"
+                                 referencedColumnNames="SERVICE_AGREEMENT_ID"/>
+    </changeSet>
+</databaseChangeLog>

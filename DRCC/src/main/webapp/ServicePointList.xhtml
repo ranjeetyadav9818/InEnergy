@@ -1,0 +1,280 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formPL">
+
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Service Points" outcome="ServicePointList"/>
+                <p:menuitem value="Search" action="#{servicePointList.onPremiseClear()}" update="@form"
+                            rendered="#{servicePointList.selectedAgreementPointMap ne null}"/>
+                <p:menuitem value="Premise ID #{servicePointList.selectedAgreementPointMap.servicePoint.premise.premiseId}"
+                            rendered="#{servicePointList.selectedAgreementPointMap ne null}"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{servicePointList.showSearch}">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="address" value="#{servicePointList.address}"/>
+                        <label>Address</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="spId" size="12" maxlength="10" value="#{servicePointList.servicePointId}"/>
+                        <label>SP ID</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="city" value="#{servicePointList.city}"/>
+                        <label>City</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="premId" size="12" maxlength="10" value="#{servicePointList.premisesId}"/>
+                        <label>Premises ID</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="postCode" value="#{servicePointList.postCode}"/>
+                        <label>Post Code</label>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <p:commandButton value="Search" id="search" update="@form" action="#{servicePointList.searchPremises()}"
+                                 rendered="#{servicePointList.showSearch}"/>
+
+                <p:carousel id="apmCarousel" rendered="#{servicePointList.showCarousel}" numVisible="4" circular="true" responsive="true"
+                            value="#{servicePointList.premiseDetails}" var="prem">
+                    <i class=" #{prem.icon} Fs20 hardblue TexAlCenter"/>
+                    <h:outputText class="Fs20 hardblue" value="#{prem.name}"/>
+                    <h:dataTable var="db" value="#{prem.dataBeans}" style="border:0;">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+
+
+            </div>
+
+            <div class="card" jsf:rendered="#{servicePointList.showData and servicePointList.selectedAgreementPointMap eq null}">
+
+                <p:dataTable id="TBPrem" widgetVar="premTable"
+                             value="#{servicePointList.agreementPointMapLazyModel}" lazy="true" var="apm" reflow="true" rows="25"
+                             rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" selectionMode="single"
+                             selection="#{servicePointList.selectedAgreementPointMap}" rowKey="#{apm.rowKey}">
+                    <p:ajax event="rowSelect" listener="#{servicePointList.selectAgreementPointMap}" update="formPL"/>
+                    <p:column headerText="SA ID" filterBy="#{apm.serviceAgreement.serviceAgreementId}" field="saId">
+                        <h:outputText value="#{apm.serviceAgreement.serviceAgreementId}"/>
+                    </p:column>
+                    <p:column headerText="Account ID" filterBy="#{apm.serviceAgreement.account.accountId}" field="acctId">
+                        <h:outputText value="#{apm.serviceAgreement.account.accountId}"/>
+                    </p:column>
+                    <p:column headerText="SP ID" filterBy="#{apm.servicePoint.servicePointId}" field="spId">
+                        <h:outputText value="#{apm.servicePoint.servicePointId}"/>
+                    </p:column>
+                    <p:column headerText="Name" filterBy="#{apm.serviceAgreement.account.person.businessName}" field="busName">
+                        <h:outputText value="#{apm.serviceAgreement.account.person.customerName}"/>
+                        <h:outputText value="#{apm.serviceAgreement.account.person.businessName}"/>
+                    </p:column>
+                    <p:column headerText="Service Address" filterBy="#{apm.servicePoint.premise.serviceAddress1}" field="address">
+                        <h:outputText value="#{apm.servicePoint.premise.serviceAddress1}"/>
+                    </p:column>
+                    <p:column headerText="City" filterBy="#{apm.servicePoint.premise.serviceCityUpr}" field="serviceCityUpr">
+                        <h:outputText value="#{apm.servicePoint.premise.serviceCityUpr}"/>
+                    </p:column>
+                    <p:column headerText="Zip Code" filterBy="#{apm.servicePoint.premise.servicePostal}" field="postCode">
+                        <h:outputText value="#{apm.servicePoint.premise.servicePostal}"/>
+                    </p:column>
+                    <p:column headerText="Commodity">
+                        <h:outputText value="#{apm.commodity}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+            <p:tabView id="TEvDet" dynamic="true" scrollable="true"
+                       rendered="#{servicePointList.showData and servicePointList.selectedAgreementPointMap ne null}">
+                <p:tab title="Customer">
+                    <p:dataTable id="TBCust" widgetVar="custTable" value="#{servicePointList.agreementPointMapLazyModel}" lazy="true" var="apm"
+                                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single"
+                                 selection="#{agreementPointMapList.selectedAgreementPointMap}" rowKey="#{apm.rowKey}">
+                        <p:ajax event="rowSelect" listener="#{servicePointList.onServiceAgreementSelect}"/>
+                        <p:column headerText="Acc ID" filterBy="#{apm.serviceAgreement.account.accountId}" field="accId">
+                            <h:outputText value="#{apm.serviceAgreement.account.accountId}"/>
+                        </p:column>
+                        <p:column headerText="SA ID" filterBy="#{apm.serviceAgreement.serviceAgreementId}" field="saId">
+                            <h:outputText value="#{apm.serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="Customer Name" filterBy="#{apm.serviceAgreement.account.person.businessName}" field="busName">
+                            <h:outputText value="#{apm.serviceAgreement.account.person.customerName}"/>
+                            <h:outputText value="#{apm.serviceAgreement.account.person.businessName}"/>
+                        </p:column>
+                        <p:column headerText="Start Date" filterBy="#{apm.startDate}" field="apmStart">
+                            <h:outputText value="#{apm.startDate}">
+                                <f:convertDateTime timeZone="UTC" pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="End Date" filterBy="#{apm.endDate}" field="apmEnd">
+                            <h:outputText value="#{apm.endDate}">
+                                <f:convertDateTime timeZone="UTC" pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:rowExpansion>
+                        </p:rowExpansion>
+
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Program" rendered="false">
+
+                </p:tab>
+                <p:tab title="Devices" rendered="false">
+                    <p:dataTable id="TBDevice" widgetVar="deviceTable" value="#{agreementPointMapList.agreementPointMapLazyModel}" lazy="true" var="dev"
+                                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+
+                        <p:column headerText="Account">
+                        </p:column>
+                        <p:column headerText="SA ID">
+                        </p:column>
+                        <p:column headerText="Premise Address">
+                        </p:column>
+                        <p:column headerText="MFG">
+                        </p:column>
+                        <p:column headerText="Model">
+                        </p:column>
+                        <p:column headerText="Seriel">
+                        </p:column>
+                        <p:column headerText="Install Date">
+                        </p:column>
+                        <p:column headerText="Uninstall Date">
+                        </p:column>
+
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="History">
+                    <p:dataTable value="#{servicePointList.history}" var="history" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+                        <p:column headerText="Entity" filterBy="#{history.entity}" filterMatchMode="contains" sortBy="#{history.entity}">
+                            <h:outputText value="#{history.entity}"/>
+                        </p:column>
+                        <p:column headerText="Id" filterBy="#{history.entityId}" filterMatchMode="contains" sortBy="#{history.entityId}">
+                            <h:outputText value="#{history.entityId}"/>
+                        </p:column>
+                        <p:column headerText="Field" filterBy="#{history.field}" filterMatchMode="contains" sortBy="#{history.field}">
+                            <h:outputText value="#{history.field}"/>
+                        </p:column>
+                        <p:column headerText="Old Value" filterBy="#{history.oldValue}" filterMatchMode="contains" sortBy="#{history.oldValue}">
+                            <h:outputText value="#{history.oldValue}"/>
+                        </p:column>
+                        <p:column headerText="New Value" filterBy="#{history.newValue}" filterMatchMode="contains" sortBy="#{history.newValue}">
+                            <h:outputText value="#{history.newValue}"/>
+                        </p:column>
+                        <p:column headerText="Last Modification Date" sortBy="#{history.creationDate}" styleClass="topAligned">
+                            <h:outputText value="#{history.creationDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Author" filterBy="#{history.author}" filterMatchMode="contains" sortBy="#{history.author}">
+                            <h:outputText value="#{history.author}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Download Meter Data">
+                    <p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" value="Meter Data" icon="ui-icon-file-download">
+                        <p:fileDownload value="#{servicePointList.getServicePointMeterDataFile(servicePointList.selectedAgreementPointMap.servicePoint.servicePointId)}"/>
+                    </p:commandButton>
+                    <p:spacer width="10px"/>
+                    <p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" value="Peak Demand Meter Data" icon="ui-icon-file-download">
+                        <p:fileDownload value="#{servicePointList.getServicePointPeKDemandDataFile(servicePointList.selectedAgreementPointMap.servicePoint.servicePointId)}"/>
+                    </p:commandButton>
+                </p:tab>
+                <p:tab title="Energy Usage">
+                    <div class="card card-w-title">
+                        <div style="padding-bottom: 20px;">
+                            <p:selectOneRadio id="console" value="#{servicePointList.energyUsageViewType}">
+                                <f:selectItem itemLabel="Hourly view" itemValue="hourly"/>
+                                <f:selectItem itemLabel="Period view" itemValue="period"/>
+                                <p:ajax event="valueChange" listener="#{servicePointList.changeEnergyUsageViewType()}" update="@form"/>
+                            </p:selectOneRadio>
+                        </div>
+
+                        <h:panelGroup id="hourlyViewFilter" rendered="#{servicePointList.energyUsageViewType eq 'hourly'}">
+                            <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup styleClass="md-inputfield-calendar">
+                                    <p:calendar id="energyUsageDate" value="#{servicePointList.energyUsageDate}"
+                                                pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                                mask="true"
+                                                mindate="01/01/2000" required="true">
+                                        <p:ajax event="dateSelect" process="@this" update="energyUsageChart"
+                                                listener="#{servicePointList.createEnergyUsageModel}"/>
+                                    </p:calendar>
+                                    <p:outputLabel value="Selected Date"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <div style="margin-top:-20px;">
+                                        <p:spacer width="10"/>
+                                        <p:commandButton update="energyUsageChart,energyUsageDate" action="#{servicePointList.showPreviousDay()}"
+                                                         icon="ui-icon-arrow-1-w"/>
+                                        <p:spacer width="5"/>
+                                        <p:commandButton update="energyUsageChart,energyUsageDate" action="#{servicePointList.showNextDay()}"
+                                                         icon="ui-icon-arrow-1-e"/>
+                                    </div>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="periodViewFilter" rendered="#{servicePointList.energyUsageViewType eq 'period'}">
+                            <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup styleClass="md-inputfield-calendar">
+                                    <p:calendar id="energyUsageDateFrom" value="#{servicePointList.energyUsageDateFrom}"
+                                                pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                                mask="true"
+                                                mindate="01/01/2000" required="true">
+                                        <p:ajax event="dateSelect" process="@this" update="energyUsageChart,energyUsageDateTo"
+                                                listener="#{servicePointList.createEnergyUsageModel('energyUsageDateFrom')}"/>
+                                    </p:calendar>
+                                    <p:outputLabel value="From"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="md-inputfield-calendar">
+                                    <p:calendar id="energyUsageDateTo" value="#{servicePointList.energyUsageDateTo}"
+                                                pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                                mask="true"
+                                                mindate="01/01/2000" required="true">
+                                        <p:ajax event="dateSelect" process="@this" update="energyUsageChart,energyUsageDateFrom"
+                                                listener="#{servicePointList.createEnergyUsageModel('energyUsageDateTo')}"/>
+                                    </p:calendar>
+                                    <p:outputLabel value="To"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:panelGroup>
+
+                        <div style="min-height:300px;">
+                            <h:panelGroup id="energyUsageChart">
+                                <p:chart type="bar" model="#{servicePointList.energyUsageModel}"
+                                         rendered="#{servicePointList.energyUsageModel.series.size() > 0}"
+                                         style="height:300px"/>
+                                <h:outputLabel value="No data" rendered="#{servicePointList.energyUsageModel.series.size() eq 0}"/>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+    </ui:define>
+</ui:composition>

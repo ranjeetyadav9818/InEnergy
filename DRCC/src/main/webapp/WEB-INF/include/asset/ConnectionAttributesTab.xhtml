@@ -1,0 +1,119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+>
+    <c:set var="controller" value="#{assetProfileDetailController}"/>
+    <c:set var="idPrefix" value="#{'conn_'}"/>
+
+    <div class="card card-w-title" jsf:rendered="#{controller.newConnectionProfileAttribute ne null}" jsf:id="#{idPrefix}newAttrCard">
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" id="#{idPrefix}newConnectionAttr">
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText value="#{controller.newConnectionProfileAttribute.name}" label="Attribute" size="40" maxlength="255" id="#{idPrefix}idConnAttr" required="true"/>
+                <p:outputLabel for="#{idPrefix}idConnAttr" value="Attribute"/>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel for="#{idPrefix}idMandatoryConn" value="Mandatory"/>
+                <p:selectOneMenu id="#{idPrefix}idMandatoryConn" value="#{controller.newConnectionProfileAttribute.mandatory}" required="true" label="Mandatory">
+                    <f:converter converterId="javax.faces.Boolean"/>
+                    <f:selectItem itemLabel="Yes" itemValue="true"/>
+                    <f:selectItem itemLabel="Not" itemValue="false"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel for="#{idPrefix}idAttrValidationAdd" value="Validation"/>
+                <p:selectOneMenu id="#{idPrefix}idAttrValidationAdd" value="#{controller.newConnectionProfileAttribute.attributeValidation}" required="true" label="Validation">
+                    <f:converter converterId="omnifaces.GenericEnumConverter"/>
+                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.attributeValidations}"  var="attr" itemValue="#{attr}" itemLabel="#{attr.label}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield">
+                <p:commandButton action="#{controller.addNewConnectionProfileAttribute()}" update="@form" value="Add"/>
+                <p:spacer width="5px"/>
+                <p:commandButton action="#{controller.cancelNewConnectionProfileAttribute()}" process="@this" update="@form" value="Cancel"/>
+            </h:panelGroup>
+        </p:panelGrid>
+    </div>
+
+    <p:dataTable id="#{idPrefix}catalogProfiles" value="#{controller.profile.connectionProfileAttributes}" lazy="false" var="profileAttribute" widgetVar="wgbAttribute"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100" rowIndexVar="ind"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{profileAttribute.uuid}" editable="true" style="text-align: center">
+        <p:ajax event="rowEdit" listener="#{controller.saveProfile}"/>
+        <p:ajax event="rowEditCancel"/>
+        <p:column width="5%">
+            <p:rowEditor/>
+        </p:column>
+        <p:column headerText="Attribute" styleClass="topAligned" filterBy="#{profileAttribute.name}" filterMatchMode="contains">
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText value="#{profileAttribute.name}"/>
+                </f:facet>
+                <f:facet name="input"><p:inputText value="#{profileAttribute.name}" label="Attribute" size="20" maxlength="255" required="true"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+
+        <p:column headerText="Validation" styleClass="topAligned" filterBy="#{profileAttribute.attributeValidation.label}" filterMatchMode="contains">
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText value="#{profileAttribute.attributeValidation.label}"/>
+                </f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu id="idAttrValidationTable" value="#{profileAttribute.attributeValidation}" required="true" label="Validation">
+                        <f:converter converterId="omnifaces.GenericEnumConverter"/>
+                        <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.attributeValidations}" var="attr" itemValue="#{attr}" itemLabel="#{attr.label}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Mandatory on Create" styleClass="topAligned" filterBy="#{profileAttribute.mandatory}" filterMatchMode="equals">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('wgbAttribute').filter()">
+                    <f:converter converterId="javax.faces.Boolean"/>
+                    <f:selectItem itemLabel="All" itemValue=""/>
+                    <f:selectItem itemLabel="Yes" itemValue="true"/>
+                    <f:selectItem itemLabel="Not" itemValue="false"/>
+                </p:selectOneMenu>
+            </f:facet>
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText value="Y" rendered="#{profileAttribute.mandatory}"/>
+                    <h:outputText value="N" rendered="#{not profileAttribute.mandatory}"/>
+                </f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu id="idMandatoryEdit" value="#{profileAttribute.mandatory}" required="true" label="Mandatory">
+                        <f:converter converterId="javax.faces.Boolean"/>
+                        <f:selectItem itemLabel="Yes" itemValue="true"/>
+                        <f:selectItem itemLabel="Not" itemValue="false"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Order" styleClass="topAligned" filterBy="#{profileAttribute.order}" filterMatchMode="contains">
+            <h:outputText value="#{profileAttribute.order}"/>
+        </p:column>
+        <p:column width="12%">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <p:commandButton action="#{controller.remove(profileAttribute)}" update="@form" icon="ui-icon-remove"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:commandButton action="#{controller.move(profileAttribute,controller.profile.connectionProfileAttributes,false)}"
+                                     update="@form" icon="ui-icon-arrow-1-s" rendered="#{ind ne controller.profile.connectionProfileAttributes.size() -1}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:commandButton action="#{controller.move(profileAttribute,controller.profile.connectionProfileAttributes,true)}"
+                                     update="@form" icon="ui-icon-arrow-1-n" rendered="#{ind ne 0}"/>
+                </h:panelGroup>
+                <h:panelGroup/>
+            </p:panelGrid>
+        </p:column>
+    </p:dataTable>
+    <br/>
+    <p:commandButton id="#{idPrefix}idAdd" value="Add" action="#{controller.editNewConnectionProfileAttribute()}" process="@this" update="@form"/>
+</ui:composition>

@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+
+    <div class="ui-g ui-fluid">
+        <div class="ui-g-12 ui-lg-6">
+            <p:timeline id="eventTimeLine" value="#{summary.timelineModel}" height="200px" selectable="true" zoomable="false"
+                        moveable="true" stackEvents="true"
+                        axisOnTop="false" showCurrentTime="false" showNavigation="false"/>
+        </div>
+        <div class="ui-g-12 ui-lg-6">
+            <p:chart type="bar" model="#{summary.horizontalBarModel}" style="height:200px;margin-left: 10px" styleClass="leaden"/>
+        </div>
+
+        <c:forEach items="#{summary.vendorsGraphs}" var="vendorGraph">
+            <div class="ui-g-12 ui-lg-6">
+                <p:chart type="metergauge" model="#{vendorGraph.value.meterGaugeModel}" style="width:400px;height:250px;margin:auto"
+                         styleClass="metergaugeClass leaden"/>
+            </div>
+            <div class="ui-g-12 ui-lg-6">
+                <p:chart type="bar" model="#{vendorGraph.value.barModel}" style="height:200px;margin-left: 10px" styleClass="leaden"/>
+            </div>
+
+        </c:forEach>
+    </div>
+
+    <p:dataTable value="#{summary.eventStatistics}" var="event" reflow="true" rows="50">
+        <p:column headerText="VENDOR" sortBy="#{event.vendor}">
+            <h:outputText value="#{event.vendor}"/>
+        </p:column>
+        <p:column headerText="CHANNEL" sortBy="#{event.channel}" filterable="true">
+            <h:outputText value="#{event.channel}"/>
+        </p:column>
+        <p:column headerText="LANGUAGE" sortBy="#{event.language}" filterable="true">
+            <h:outputText value="#{event.language}"/>
+        </p:column>
+        <p:column headerText="NOTIFICATIONS IN" class="TexAlRight">
+            <h:outputText value="#{event.received}">
+                <f:convertNumber pattern="###,###,###"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="DUPLICATE" class="TexAlRight">
+            <h:outputText value="#{event.duplicates}">
+                <f:convertNumber pattern="###,###,###"/>
+            </h:outputText>
+            <h:outputText value=" (#{event.duplicatePercent} %)">
+                <f:convertNumber pattern="###.##"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="DISPATCHED" class="TexAlRight">
+            <h:outputText value="#{event.dispatched}">
+                <f:convertNumber pattern="###,###,###"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="IN PROGRESS" class="TexAlRight">
+            <h:outputText value="#{event.inProgress}">
+                <f:convertNumber pattern="###,###,###"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="DELIVERED" class="TexAlRight">
+            <h:outputText value="#{event.delivered}">
+                <f:convertNumber pattern="###,###,###"/>
+            </h:outputText>
+            <h:outputText value=" (#{event.deliveredPercent} %)">
+                <f:convertNumber pattern="###.##"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="ATTEMPTED" class="TexAlRight">
+            <h:outputText value="#{event.attempted}">
+                <f:convertNumber pattern="###,###,###"/>
+            </h:outputText>
+            <h:outputText value=" (#{event.attemptedPercent} %)">
+                <f:convertNumber pattern="###.##"/>
+            </h:outputText>
+        </p:column>
+        <p:columnGroup type="footer">
+            <p:row>
+                <p:column colspan="3" footerText="Totals:" style="text-align:right"/>
+                <p:column style="text-align:right">
+                    <f:facet name="footer">
+                        <h:outputText value="#{summary.totals.notificationsTotal}">
+                            <f:convertNumber pattern="###,###,###"/>
+                        </h:outputText>
+                    </f:facet>
+                </p:column>
+                <p:column style="text-align:right">
+                    <f:facet name="footer">
+                        <h:outputText value="#{summary.totals.duplicatesTotal}">
+                            <f:convertNumber pattern="###,###,###"/>
+                        </h:outputText>
+                        <h:outputText value=" (#{summary.totals.duplicatesTotalPercent} %)">
+                            <f:convertNumber pattern="###.##"/>
+                        </h:outputText>
+                    </f:facet>
+                </p:column>
+                <p:column style="text-align:right">
+                    <f:facet name="footer">
+                        <h:outputText value="#{summary.totals.dispatchedTotal}">
+                            <f:convertNumber pattern="###,###,###"/>
+                        </h:outputText>
+                    </f:facet>
+                </p:column>
+                <p:column style="text-align:right">
+                    <f:facet name="footer">
+                        <h:outputText value="#{summary.totals.inProgressTotal}">
+                            <f:convertNumber pattern="###,###,###"/>
+                        </h:outputText>
+                    </f:facet>
+                </p:column>
+                <p:column style="text-align:right">
+                    <f:facet name="footer">
+                        <h:outputText value="#{summary.totals.deliveredTotal}">
+                            <f:convertNumber pattern="###,###,###"/>
+                        </h:outputText>
+                        <h:outputText value=" (#{summary.totals.deliveredTotalPercent} %)">
+                            <f:convertNumber pattern="###.##"/>
+                        </h:outputText>
+                    </f:facet>
+                </p:column>
+                <p:column style="text-align:right">
+                    <f:facet name="footer">
+                        <h:outputText value="#{summary.totals.attemptedTotal}">
+                            <f:convertNumber pattern="###,###,###"/>
+                        </h:outputText>
+
+                        <h:outputText value=" (#{summary.totals.attemptedTotalPercent} %)">
+                            <f:convertNumber pattern="###.##"/>
+                        </h:outputText>
+                    </f:facet>
+                </p:column>
+            </p:row>
+        </p:columnGroup>
+    </p:dataTable>
+</ui:composition>

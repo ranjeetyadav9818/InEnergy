@@ -1,0 +1,48 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="inventory-start-1" author="vm">
+        <createTable tableName="DISTRIBUTION_DEVICE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
+            <column name="DISTRIBUTION_ASSET_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="DISTRIBUTION_DEVICE"
+                                 baseColumnNames="DISTRIBUTION_ASSET_ID"
+                                 constraintName="FK_DISTRIBUTION_DEVICE_DISTRIBUTION_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="inventory-start-2.xml" author="vm">
+        <renameTable oldTableName="DISTRIBUTION_DEVICE" newTableName="ASSET_DEVICE"/>
+        <addColumn tableName="ASSET_DEVICE">
+            <column name="TYPE" type="VARCHAR(55)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="inventory-start-3.xml" author="vm">
+        <addColumn tableName="ASSET_DEVICE">
+            <column name="TRANSMISSION_ASSET_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                 baseColumnNames="TRANSMISSION_ASSET_ID"
+                                 constraintName="FK_ASSET_DEVICE_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="inventory-start-4.xml" author="vm">
+        <addColumn tableName="ASSET_DEVICE">
+            <column name="BTM_ASSET_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                 baseColumnNames="BTM_ASSET_ID"
+                                 constraintName="FK_ASSET_DEVICE_BTM_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,208 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <div class="card card-w-title">
+        <h:panelGroup id="productTab">
+            <h3 class="with-icon">Product Summary</h3>
+            <p:commandButton action="#{isoProfilesController.addProduct()}" update="@form" icon="ui-icon-add"/>
+
+            <p:outputLabel rendered="#{empty isoProfilesController.profile.products}">No product summaries defined yet</p:outputLabel>
+
+            <c:forEach items="#{isoProfilesController.profile.products}" var="product">
+                <p:separator style="margin-bottom: 40px;"/>
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText label="Product Name" id="productNameEdit" value="#{product.name}" required="true"/>
+                        <p:outputLabel value="Product Name:" for="productNameEdit"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Product Type:" for="productTypeEdit"/>
+                        <p:selectOneMenu id="productTypeEdit" value="#{product.type}" required="true" autoWidth="false" style="width: 109px;">
+                            <f:selectItems value="#{isoProfilesController.productTypes}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Market Type:" for="marketTypeEdit"/>
+                        <p:selectOneMenu id="marketTypeEdit" value="#{product.marketType}" required="true" autoWidth="false" style="width: 109px;">
+                            <f:selectItems value="#{isoProfilesController.marketTypes}" var="marketType" itemValue="#{marketType}"
+                                           itemLabel="#{marketType.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton action="#{isoProfilesController.removeProduct(product)}" update="@form" process="@this" icon="ui-icon-remove"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <h3>Resource</h3>
+
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Resource Min Capacity:" for="resourceMinCapacityEdit"/>
+                        <p:inputNumber label="Resource Min Capacity" decimalPlaces="2" maxValue="10000" id="resourceMinCapacityEdit"
+                                       value="#{product.resourceMinCapacity}" required="true"/>
+                        <p:selectOneMenu id="resourceMinUnitEdit" value="#{product.resourceMinCapacityUnit}" required="true">
+                            <f:selectItems value="#{isoProfilesController.electricalUnits}" var="electricalUnit" itemValue="#{electricalUnit}"
+                                           itemLabel="#{electricalUnit.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Telemetry Min. Threshold:" for="telemetryMinThresholdEdit"/>
+                        <p:inputNumber label="Telemetry Min. Threshold" decimalPlaces="2" maxValue="10000" id="telemetryMinThresholdEdit"
+                                       value="#{product.telemetryMinThreshold}" required="true"/>
+                        <p:selectOneMenu id="telemetryMinUnitEdit" value="#{product.telemetryMinThresholdUnit}" required="true">
+                            <f:selectItems value="#{isoProfilesController.electricalUnits}" var="electricalUnit" itemValue="#{electricalUnit}"
+                                           itemLabel="#{electricalUnit.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Meter Interval Type:" for="meterIntervalTypeEdit"/>
+                        <p:selectOneMenu id="meterIntervalTypeEdit" value="#{product.meterIntervalType}" required="true" autoWidth="false"
+                                         style="width: 109px;">
+                            <f:selectItems value="#{isoProfilesController.meterIntervalTypes}" var="meterIntervalType" itemValue="#{meterIntervalType}"
+                                           itemLabel="#{meterIntervalType.name}"/>
+                        </p:selectOneMenu>
+                        <p:panelGrid/>
+                    </h:panelGroup>
+
+                    <h:column/>
+                </p:panelGrid>
+
+                <h3 style="margin-bottom: 0;">Bid</h3>
+
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="1">
+                        <p:outputLabel value="Trade Days of the Week" for="bidDays"/>
+                        <p:selectManyCheckbox id="bidDays" value="#{product.selectedDays}">
+                            <f:selectItem itemLabel="Mon" itemValue="Mon"/>
+                            <f:selectItem itemLabel="Tue" itemValue="Tue"/>
+                            <f:selectItem itemLabel="Wed" itemValue="Wed"/>
+                            <f:selectItem itemLabel="Thu" itemValue="Thu"/>
+                            <f:selectItem itemLabel="Fri" itemValue="Fri"/>
+                            <f:selectItem itemLabel="Sat" itemValue="Sat"/>
+                            <f:selectItem itemLabel="Sun" itemValue="Sun"/>
+                        </p:selectManyCheckbox>
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="5">
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Bid Submission Due to SC" for="bidSubmSc"/>
+                            <p:selectOneMenu id="bidSubmSc" value="#{product.bidSubmissionSc}" required="true" converter="localTimeConverter">
+                                <f:selectItem itemLabel=""/>
+                                <f:selectItems value="#{constantsProvider.hourOfDayAndHalves}" var="he1" itemValue="#{he1.hour}"
+                                               itemLabel="#{he1.getString()}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="on" for="bidSubmScOn"/>
+                            <p:selectOneMenu id="bidSubmScOn" value="#{product.bidSubmissionScOn}" required="true">
+                                <f:selectItem itemLabel=""/>
+                                <f:selectItems value="#{constantsProvider.bidSubmissionTradeTimes}" var="he2" itemValue="#{he2}" itemLabel="#{he2.name}"
+                                               converter="omnifaces.GenericEnumConverter"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <p:spacer width="50"/>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Bid Submission Due to Market" for="bidSubmIso"/>
+                            <p:selectOneMenu id="bidSubmIso" value="#{product.bidSubmissionIso}" required="true" converter="localTimeConverter">
+                                <f:selectItem itemLabel=""/>
+                                <f:selectItems value="#{constantsProvider.bidSubmissionIsoInterval}" var="he3" itemValue="#{he3.hour}"
+                                               itemLabel="#{he3.getString()}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="on" for="bidSubmIsoOn"/>
+                            <p:selectOneMenu id="bidSubmIsoOn" value="#{product.bidSubmissionIsoOn}" required="true">
+                                <f:selectItem itemLabel=""/>
+                                <f:selectItems value="#{constantsProvider.bidSubmissionTradeTimeHours}" var="he4" itemValue="#{he4}" itemLabel="#{he4.name}"
+                                               converter="omnifaces.GenericEnumConverter"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Auto Bid Low Risk" for="autoBidLsrSw"/>
+                            <p:inputSwitch id="autoBidLsrSw" value="#{product.autoBidLowRisk}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="at" for="autoBidLsr"/>
+                            <p:selectOneMenu id="autoBidLsr" value="#{product.autoBidLowRiskLT}" converter="localTimeConverter">
+                                <f:selectItem itemLabel=""/>
+                                <f:selectItems value="#{constantsProvider.hourOfDayAndHalves}" var="he5" itemValue="#{he5.hour}"
+                                               itemLabel="#{he5.getString()}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="on" for="autoBidLsrOn"/>
+                            <p:selectOneMenu id="autoBidLsrOn" value="#{product.autoBidLowRiskOn}">
+                                <f:selectItem itemLabel=""/>
+                                <f:selectItems value="#{constantsProvider.bidSubmissionTradeTimes}" var="he6" itemValue="#{he6}" itemLabel="#{he6.name}"
+                                               converter="omnifaces.GenericEnumConverter"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                </p:panelGrid>
+                <h3>Award</h3>
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Dispatch Type:" for="dispatchType"/>
+                        <p:selectOneMenu id="dispatchType" value="#{product.dispatchType}" autoWidth="false" style="width: 109px;">
+                            <f:selectItem itemLabel=""/>
+                            <f:selectItems value="#{constantsProvider.dispatchTypes}"/>
+                        </p:selectOneMenu>
+                        <p:column/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Max Resource Size:" for="maxResourceSize"/>
+                        <p:inputNumber decimalPlaces="2" maxValue="10000" value="#{product.maxResourceSizeValue}" id="maxResourceSize"/>
+                        <p:selectOneMenu value="#{product.maxResourceSizeUnit}">
+                            <f:selectItems value="#{isoProfilesController.electricalUnits}" var="electricalUnit" itemValue="#{electricalUnit}"
+                                           itemLabel="#{electricalUnit.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Curtailment Response Time:" for="curtailmentResponseTime"/>
+                        <p:inputNumber decimalPlaces="0" maxValue="1000" value="#{product.curtailmentResponseTimeValue}" id="curtailmentResponseTime"/>
+                        <p:selectOneMenu value="#{product.curtailmentResponseTimeUnit}">
+                            <f:selectItems value="#{constantsProvider.minutesOrHoursOrDays}" var="minutesOrHoursOrDays" itemValue="#{minutesOrHoursOrDays}"
+                                           itemLabel="#{minutesOrHoursOrDays.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:column/>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Auto Dispatch" for="autoAutoDispatch"/>
+                        <p:inputSwitch id="autoAutoDispatch" value="#{product.autoDispatch}" disabled="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Award Instructions" for="awardInstructions"/>
+                        <p:selectOneMenu id="awardInstructions" value="#{product.awardInstruction}">
+                            <f:selectItem itemLabel=""/>
+                            <f:selectItems value="#{constantsProvider.awardInstructions}" var="awardInstruction" itemValue="#{awardInstruction}"
+                                           itemLabel="#{awardInstruction.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </c:forEach>
+        </h:panelGroup>
+    </div>
+</ui:composition>

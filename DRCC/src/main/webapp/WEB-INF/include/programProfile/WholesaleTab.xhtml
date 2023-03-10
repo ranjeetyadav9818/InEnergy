@@ -1,0 +1,188 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:clx="http://java.sun.com/jsf/composite/components">
+
+    <div class="card card-w-title">
+        <h3>General</h3>
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Market Eligible" for="marketEligible"/>
+                <p:inputSwitch value="#{programProfileController.profile.wholesaleMarketEligible}" id="marketEligible"/>
+                <p:row>
+                    <h:outputText value="#{programProfileController.profile.wholesaleMarketEligibleTs}">
+                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                    </h:outputText>
+                </p:row>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Participation Active" for="particActive"/>
+                <p:inputSwitch value="#{programProfileController.profile.wholesaleParticipationActive}" id="particActive"/>
+                <p:row>
+                    <h:outputText value="#{programProfileController.profile.wholesaleParticipationActiveTs}">
+                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                    </h:outputText>
+                </p:row>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Market Product Mapping:" for="isoProductMapping"/>
+                <p:selectOneMenu id="isoProductMapping" value="#{programProfileController.profile.wholesaleIsoProduct}" converter="isoProductConverter">
+                    <f:selectItem itemLabel="Select One" noSelectionOption="false"/>
+                    <f:selectItems value="#{programProfileController.isoProducts}" var="product"
+                                   itemValue="#{product}"
+                                   itemLabel="#{product.name} - #{product.type} - #{product.marketType.name}"
+                    />
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="DR Option:" for="drOption"/>
+                <p:selectOneMenu id="drOption" value="#{programProfileController.profile.drOption}">
+                    <f:selectItem itemValue="1" itemLabel="Entire Program"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+    </div>
+
+    <div class="card card-w-title">
+        <h3>Resource Management</h3>
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Auto Resource Maintenance:" for="arMaintenance"/>
+                <p:inputSwitch value="#{programProfileController.profile.wholesaleAutoresourceMaintenance}" id="arMaintenance"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Statistical Sampling Method:" for="statSamplMethod"/>
+                <p:inputSwitch value="#{programProfileController.profile.wholesaleStatisticalSamplingMethod}" id="statSamplMethod"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Cross Program Aggregation:" for="cpAggregation"/>
+                <p:inputSwitch value="#{programProfileController.profile.wholesaleCrossProgramAggregation}" id="cpAggregation"/>
+            </h:panelGroup>
+        </p:panelGrid>
+
+        <p:pickList converter="programPickListConverter" value="#{programProfileController.programPickListModelForWholesale}" var="programPickList"
+                    itemLabel="#{programPickList.name}" itemValue="#{programPickList}">
+            <f:facet name="sourceCaption">Non-Eligible Programs</f:facet>
+            <f:facet name="targetCaption">Eligible in Priority Order</f:facet>
+        </p:pickList>
+    </div>
+
+    <div class="card card-w-title">
+        <h3>Bidding Management</h3>
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Default Bid Hours:" for="defaultBidHoursFrom"/>
+                <p:selectOneMenu id="defaultBidHoursFrom" value="#{programProfileController.profile.defaultBidHoursFrom}">
+                    <f:selectItem itemLabel=""/>
+                    <f:selectItems value="#{constantsProvider.hourEnds}" var="he" itemValue="#{he}" itemLabel="#{he.name()}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value=" to " for="defaultBidHoursTo"/>
+                <p:selectOneMenu id="defaultBidHoursTo" value="#{programProfileController.profile.defaultBidHoursTo}">
+                    <f:selectItem itemLabel=""/>
+                    <f:selectItems value="#{constantsProvider.hourEnds}" var="he" itemValue="#{he}" itemLabel="#{he.name()}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <p:spacer/>
+            <p:spacer/>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{programProfileController.program.commodity eq 'Electricity' }">
+                <clx:MoneyInputComponent id="defultBidPrice" value="#{programProfileController.profile.defaultBidPrice}" required="true" label="Default Bid Price (#{currencyConfigController.symbol}/MWH):"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{programProfileController.program.commodity eq 'Gas' }">
+                <clx:MoneyInputComponent id="defultBidPriceg" value="#{programProfileController.profile.defaultBidPrice}" required="true" label="Default Bid Price (#{currencyConfigController.symbol}/THERMS):"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{programProfileController.program.commodity eq 'Electricity' }">
+                <clx:MoneyInputComponent id="dualEventBidPrice" value="#{programProfileController.profile.dualEventBidPrice}" required="true" label="Dual Event Bid Price (#{currencyConfigController.symbol}/MWH):"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{programProfileController.program.commodity eq 'Gas' }">
+                <clx:MoneyInputComponent id="dualEventBidPriceg" value="#{programProfileController.profile.dualEventBidPrice}" required="true" label="Dual Event Bid Price (#{currencyConfigController.symbol}/THERMS):"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Customer Fatigue Threshold:"/>
+                <p:selectOneMenu id="consecutiveDispatchDays" value="#{programProfileController.profile.consecutiveDispatchDays}">
+                    <f:selectItem itemLabel=""/>
+                    <f:selectItems value="#{programProfileController.profile.getValuesForConsecutiveDispatchDays()}" var="day" itemValue="#{day.getDayNumber()}"
+                                   itemLabel="#{day.getDayNumber()}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <p:outputLabel value="Consecutive Dispatch Days"/>
+            <p:column/>
+        </p:panelGrid>
+
+        <p:outputPanel id="dropArea">
+            <h3>Safety Reduction Factor</h3>
+            <p:dataTable id="safetyRfTable" value="#{programProfileController.profile.safetyReductionFactors}" var="srRow" editable="true">
+                <p:ajax event="rowEdit" listener="#{programProfileController.onRowEdit}"/>
+                <p:ajax event="rowEditCancel" listener="#{programProfileController.onRowCancel}"/>
+                <p:column><p:rowEditor/></p:column>
+                <p:column headerText="HE">
+                    <h:outputText value="#{srRow.hourEnd.hourNumber}"/>
+                </p:column>
+                <p:column headerText="MON">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.monday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.monday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="TUE">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.tuesday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.tuesday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="WED">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.wednesday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.wednesday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="THUR">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.thursday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.thursday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="FRI">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.friday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.friday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="SAT">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.saturday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.saturday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="SUN">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.sunday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.sunday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Program Holiday">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{srRow.programHoliday}" converter="percentageConverter"/></f:facet>
+                        <f:facet name="input"><p:inputNumber value="#{srRow.programHoliday}" converter="longBigDecimalConverter" decimalPlaces="2"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+            </p:dataTable>
+        </p:outputPanel>
+    </div>
+</ui:composition>

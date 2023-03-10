@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form>
+        <p:dataTable value="#{bidHistoryModel}" id="bidHistoryTable" widgetVar="custTableBidHistory" lazy="true" var="bidHistory"
+                     reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="false" rowKey="#{bidHistory.uuid}" selectionMode="single"
+                     sortBy="tradeDate" sortOrder="DESCENDING">
+
+            <p:column headerText="Trade Date" styleClass="topAligned" width="88">
+                <p:outputLabel value="#{bidHistory.tradeDate}">
+                    <f:convertDateTime pattern="MM/dd/yyyy"/>
+                </p:outputLabel>
+            </p:column>
+
+            <p:column headerText="Bid Submit Time" styleClass="topAligned">
+                <h:outputText value="#{bidHistory.submittedTime}">
+                    <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Submit Type" filterBy="#{bidHistory.status}" field="status" filterMatchMode="exact" width="15%">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('custTableBidHistory').filter()" autoWidth="false" style="width: 100px;"
+                                     converter="omnifaces.GenericEnumConverter">
+                        <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.bidStatuses}" var="bidStatus" itemValue="#{bidStatus}"
+                                       itemLabel="#{bidStatus.name}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{bidHistory.status.getName()}"/>
+            </p:column>
+
+            <p:column headerText="Submited By" styleClass="topAligned">
+                <h:outputText value="#{bidHistory.submittedBy}"/>
+            </p:column>
+
+            <p:column headerText="Total Bid Capacity (MW)" styleClass="topAligned" width="90">
+                <h:outputText value="#{bidHistory.getTotalBid()}" converter="bidCapacityInMWConverter"/>
+            </p:column>
+
+            <p:column headerText="Default or Custom" styleClass="topAligned" width="60">
+                <h:outputText value="Default" rendered="#{bidHistory.defaultSchedule}"/>
+                <h:outputText value="Custom" rendered="#{not bidHistory.defaultSchedule}"/>
+            </p:column>
+
+            <p:column headerText="Total Bid Segment" styleClass="topAligned" width="80">
+                <h:outputText value="#{bidHistory.segments.size()}"/>
+            </p:column>
+
+            <p:column headerText="HE Schedule" styleClass="topAligned" style="width: 8%">
+                <h:button value="View" outcome="BidSchedule">
+                    <f:param name="o" value="#{parameterEncoderService.encode(bidHistory.isoResource.id)}"/>
+                    <f:param name="d" value="#{parameterEncoderService.encodeDate(bidHistory.tradeDate)}"/>
+                </h:button>
+            </p:column>
+        </p:dataTable>
+    </h:form>
+
+</ui:composition>

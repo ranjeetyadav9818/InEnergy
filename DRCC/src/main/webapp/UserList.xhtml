@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+            <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="User Management" outcome="UserList"/>
+            </p:breadCrumb>
+            <h:form id="securityForm">
+                <div class="card card-w-title" jsf:rendered="#{userManagement.selectedUser ne null}">
+                    <h3>#{userManagement.selectedUser.firstName} #{userManagement.selectedUser.lastName} roles</h3>
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-g-12 ui-lg-6">
+                            <p:pickList id="pickList" value="#{userManagement.roles}" var="role" itemLabel="#{role.roleName}" itemValue="#{role}" converter="omnifaces.GenericEnumConverter">
+                                <f:facet name="sourceCaption">Available</f:facet>
+                                <f:facet name="targetCaption">Assigned</f:facet>
+                                <p:ajax event="transfer" listener="#{userManagement.onTransfer}" update="securityForm"/>
+                            </p:pickList>
+                        </div>
+                        <div class="ui-g-12 ui-lg-6">
+                            Permissions granted with assigned role(s):
+                            <ul class="permissionList">
+                                <ui:repeat value="#{userManagement.permissionsForRole()}" var="permission">
+                                    <li>#{permission}</li>
+                                </ui:repeat>
+                            </ul>
+                        </div>
+                    </div>
+                    <p:commandButton id="saveRoles" value="Save" action="#{userManagement.assignRoles()}" update=":securityForm"/>
+                </div>
+            </h:form>
+            <h:form id="form">
+                <div class="card card-w-title">
+                    <p:commandButton id="addUserButton" process="@this" update="@form" value="#{msg['user.add']}" action="#{userManagement.add()}"
+                                     rendered="#{userManagement.user eq null}"/>
+                    <p:outputPanel rendered="#{userManagement.user ne null}" id="userModalDiv">
+
+                        <h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText required="true" id="userName" value="#{userManagement.email}"/>
+                                <p:outputLabel value="#{msg['user.loginName']}:" for="userName"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="firstName" required="true" value="#{userManagement.user.firstName}"/>
+                                <p:outputLabel value="#{msg['user.firstName']}:" for="firstName"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="lastName" required="true" value="#{userManagement.user.lastName}"/>
+                                <p:outputLabel value="#{msg['user.lastName']}:" for="lastName"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:password id="pass1" required="true" match="pass2" value="#{userManagement.password}" label="#{msg['password']}"
+                                            feedback="true"/>
+                                <p:outputLabel value="#{msg['password']}:" for="pass1"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:password id="pass2" required="true" value="#{userManagement.password}" label="#{msg['repeatPass']}"/>
+                                <p:outputLabel value="#{msg['repeatPass']}:" for="pass2"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{userManagement.saveUser()}" process="@form"
+                                         update="@form"/>
+                        <p:spacer width="10"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}" action="#{userManagement.cancelSaveUser()}"
+                                         process="@this"
+                                         update="@form"/>
+                    </p:outputPanel>
+                </div>
+
+
+                <div class="EmptyBox10"></div>
+
+                <p:contextMenu for="UsTB" widgetVar="uMenu">
+                    <p:menuitem value="Delete" update="form:UsTB" icon="ui-icon-trash-1" actionListener="#{userManagement.deleteUser()}"/>
+                    <p:menuitem value="Hide" icon="ui-icon-close" onclick="PF('uMenu').hide()"/>
+                </p:contextMenu>
+
+                <div class="card card-w-title">
+                    <p:dataTable id="UsTB" value="#{userManagement.users}" editable="true" widgetVar="userWidget" var="user" reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{user.id}">
+                        <p:ajax event="rowEdit" listener="#{userManagement.onRowEdit}"/>
+                        <p:ajax event="rowEditCancel" listener="#{userManagement.onRowCancel}"/>
+
+                        <p:column headerText="#{msg['user.firstName']}" filterBy="#{user.firstName}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{user.firstName}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{user.firstName}" style="width:45%"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="#{msg['user.lastName']}" filterBy="#{user.lastName}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{user.lastName}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{user.lastName}" style="width:45%"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="#{msg['user.loginName']}" filterBy="#{user.email}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{user.email}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{user.email}" style="width:95%"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Password">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="**********"/></f:facet>
+                                <f:facet name="input">
+                                    <p:password value="#{userManagement.password}" label="#{msg['password']}" feedback="true"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="#{msg['enabled']}" style="width:75px">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <div jsf:rendered="#{user.enabled}"><i class="icon-ok"/></div>
+                                    <div jsf:rendered="#{not user.enabled}"><i class="icon-block"/></div>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:selectBooleanCheckbox value="#{user.enabled}"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+                        <p:column style="width:86px" class="showOnDesktop">
+                            <p:commandButton update=":securityForm" value="Roles" styleClass="PrimBlueButton">
+                                <f:setPropertyActionListener value="#{user}" target="#{userManagement.selectedUser}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+
+            </h:form>
+
+
+    </ui:define>
+
+</ui:composition>

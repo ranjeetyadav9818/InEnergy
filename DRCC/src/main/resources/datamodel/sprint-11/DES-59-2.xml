@@ -1,0 +1,89 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="DES-59-2-1" author="egamas">
+        <createTable tableName="ENERGY_CONTRACT_FEE_DETAIL">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="FEE_ID" type="BIGINT(20) UNSIGNED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="AMOUNT" type="Decimal(20,6)"/>
+            <column name="FEE_INDEX" type="VARCHAR(255)"/>
+            <column name="UNIT_OF_MEASURE" type="VARCHAR(255)"/>
+            <column name="FEE_UNIT" type="VARCHAR(55)"/>
+            <column name="FROM" type="BIGINT(10)"/>
+            <column name="TO" type="BIGINT(10)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="FEE_ID"
+                                 baseTableName="ENERGY_CONTRACT_FEE_DETAIL"
+                                 constraintName="FK_DETAIL_ENERGY_CONTRACT_FEE"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="ENERGY_CONTRACT_FEE"/>
+
+        <dropColumn columnName="AMOUNT" tableName="ENERGY_CONTRACT_FEE"/>
+        <dropColumn columnName="FEE_INDEX" tableName="ENERGY_CONTRACT_FEE"/>
+        <dropColumn columnName="UNIT_OF_MEASURE" tableName="ENERGY_CONTRACT_FEE"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="ENERGY_CONTRACT_FEE_DETAIL" constraintName="FK_DETAIL_ENERGY_CONTRACT_FEE"/>
+
+            <dropTable cascadeConstraints="false"
+                       tableName="ENERGY_CONTRACT_FEE_DETAIL"/>
+
+            <addColumn tableName="ENERGY_CONTRACT_FEE">
+                <column name="AMOUNT" type="Decimal(20,6)"/>
+                <column name="FEE_INDEX" type="VARCHAR(255)"/>
+                <column name="UNIT_OF_MEASURE" type="VARCHAR(255)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="DES-59-2-2" author="egamas">
+        <renameColumn
+                columnDataType="VARCHAR(255)"
+                newColumnName="AMOUNT_TYPE"
+                oldColumnName="AMOUN_TYPE"
+                tableName="ENERGY_CONTRACT_FEE"/>
+        <rollback>
+            <renameColumn
+                    columnDataType="VARCHAR(255)"
+                    newColumnName="AMOUN_TYPE"
+                    oldColumnName="AMOUNT_TYPE"
+                    tableName="ENERGY_CONTRACT_FEE"/>
+
+        </rollback>
+    </changeSet>
+
+    <changeSet id="DES-59-2-3" author="egamas">
+        <renameColumn
+                columnDataType="BIGINT(10)"
+                newColumnName="CAP_FROM"
+                oldColumnName="FROM"
+                tableName="ENERGY_CONTRACT_FEE_DETAIL"/>
+
+        <renameColumn
+                columnDataType="BIGINT(10)"
+                newColumnName="CAP_TO"
+                oldColumnName="TO"
+                tableName="ENERGY_CONTRACT_FEE_DETAIL"/>
+        <rollback>
+            <renameColumn
+                    columnDataType="VARCHAR(255)"
+                    newColumnName="TO"
+                    oldColumnName="CAP_TO"
+                    tableName="ENERGY_CONTRACT_FEE_DETAIL"/>
+            <renameColumn
+                    columnDataType="VARCHAR(255)"
+                    newColumnName="FROM"
+                    oldColumnName="CAP_FROM"
+                    tableName="ENERGY_CONTRACT_FEE_DETAIL"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,335 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <div class="card card-w-title">
+        <h3>General</h3>
+
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText readonly="true" id="programName" value="#{programProfileController.program.name}"/>
+                <p:outputLabel value="Program Name:" for="programName"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Program Type" for="programType"/>
+                <p:selectOneMenu id="programType" value="#{programProfileController.program.programType}" required="true"
+                                 style="width: 220px;"
+                                 autoWidth="false">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{constantsProvider.programTypes}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:calendar id="effectiveStartEdit" value="#{programProfileController.profile.effectiveStartDate}" pattern="MM/dd/yyyy" mask="true"
+                            placeholder="mm/dd/yyyy"
+                            binding="${profileStartDate}" mindate="01/01/2000"/>
+                <p:outputLabel value="Effective Start Date:" for="effectiveStartEdit"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:calendar id="effectiveEndEdit" value="#{programProfileController.profile.effectiveEndDate}" pattern="MM/dd/yyyy" mask="true"
+                            placeholder="mm/dd/yyyy"
+                            mindate="#{profileStartDate.value}">
+                    <f:attribute name="startDate" value="#{profileStartDate}"/>
+                    <f:validator validatorId="endDateRangeValidator"/>
+                </p:calendar>
+                <p:outputLabel value="Effective End Date:" for="effectiveEndEdit"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" >
+                <p:outputLabel value="Commodity Type" />
+                <p:selectOneMenu value="#{programProfileController.program.commodity}" required="true"
+                                 autoWidth="false">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{constantsProvider.comodityTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                    <p:ajax update="form"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Program Active:" for="active"/>
+                <p:inputSwitch id="active" value="#{programProfileController.program.active}"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Program Cap:" for="capActive"/>
+                <p:inputSwitch id="capActive" value="#{programProfileController.program.capActive}" style="display: block">
+                    <p:ajax update="capNumGroup capUnitGroup"/>
+                </p:inputSwitch>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield" id="capNumGroup">
+                <p:inputNumber id="capNumber" value="#{programProfileController.program.capNumber}"
+                               rendered="#{programProfileController.program.capActive}" maxValue="99999.99"
+                               required="#{programProfileController.program.capActive}"/>
+                <p:outputLabel value="Value" for="capNumber" rendered="#{programProfileController.program.capActive}"/>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield-select" id="capUnitGroup">
+                <p:outputLabel value="Units" for="capUnit" rendered="#{programProfileController.program.capActive}"/>
+                <p:selectOneMenu id="capUnit" value="#{programProfileController.program.capUnit}"
+                                 rendered="#{programProfileController.program.capActive   and programProfileController.program.commodity eq 'Electricity'}"
+                                 required="#{programProfileController.program.capActive}">
+                    <f:selectItems value="#{constantsProvider.capUnits}" var="unit" itemLabel="#{unit.getLabel()}" itemValue="#{unit}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="capUnitg" value="#{programProfileController.program.gasCapUnit}"
+                                 rendered="#{programProfileController.program.capActive  and programProfileController.program.commodity eq 'Gas' }"
+                                 required="#{programProfileController.program.capActive}">
+                    <f:selectItems value="#{constantsProvider.gasCapUnits}" var="unit" itemLabel="#{unit.getName()}" itemValue="#{unit}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+
+        </p:panelGrid>
+    </div>
+
+    <div class="card card-w-title" jsf:id="optionsAndProducts">
+
+        <h3>Options &amp; Products</h3>
+        <h3 class="with-icon">Options</h3>
+
+        <p:commandButton action="#{programProfileController.addOption()}" process="@form" update=":form:#{tabViewId}:optionsAndProducts" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <p:outputLabel rendered="#{empty programProfileController.profile.options}">No options defined yet</p:outputLabel>
+        <ui:repeat value="#{programProfileController.profile.options}" var="option" varStatus="optionStatusRepeat">
+            <p:separator rendered="#{not optionStatusRepeat.first}"/>
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="optionName" value="#{option.name}" required="true" requiredMessage="Option name is mandatory">
+                        <f:validator validatorId="uniqueEntityLocalValidator"/>
+                        <f:validator validatorId="uniqueEntityValidator"/>
+                        <f:attribute name="currentEntity" value="#{option}"/>
+                        <f:attribute name="uniqueColumns" value="name,program_profile_id"/>
+                        <f:attribute name="fields" value="{newValue},profile.id"/>
+                    </p:inputText>
+                    <p:outputLabel value="Option Name:" for="optionName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Option Type:" for="optionType"/>
+                    <p:selectOneMenu id="optionType" value="#{option.type}">
+                        <f:selectItems value="#{constantsProvider.eventDurationOptions}" var="opt" itemValue="#{opt}" itemLabel="#{opt.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-icon">
+                    <p:commandButton action="#{programProfileController.removeOption(option)}" update="@form" process="@this" icon="ui-icon-remove"/>
+                </h:panelGroup>
+            </p:panelGrid>
+
+            <h3 class="with-icon">Products</h3>
+            <p:commandButton action="#{programProfileController.addProduct(option)}" update=":form:#{tabViewId}:optionsAndProducts" process="@form" icon="ui-icon-add">
+                            <o:skipValidators/>
+            </p:commandButton>
+
+            <ui:repeat value="#{option.products}" var="product">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText value="#{product.name}"/>
+                        <p:outputLabel value="Product Name:"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton action="#{programProfileController.removeProduct(option, product)}" update="@form" process="@form"
+                                         icon="ui-icon-remove"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </ui:repeat>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title" jsf:id="idSeasons">
+        <h3 class="with-icon">Seasons</h3>
+
+        <p:commandButton action="#{programProfileController.addSeason()}" update=":form:#{tabViewId}:idSeasons" process="@form" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-icon">
+                <p:outputLabel value="Use Company Level Seasons" for="usePGSe"/>
+                <p:inputSwitch id="usePGSe" value="#{programProfileController.profile.useCompanyLevelSeasons}"/>
+            </h:panelGroup>
+            <p:column/>
+        </p:panelGrid>
+
+        <p:outputLabel rendered="#{empty programProfileController.profile.seasons}">No seasons defined yet</p:outputLabel>
+
+        <ui:repeat value="#{programProfileController.profile.seasons}" var="season" varStatus="seasonStatus">
+            <p:separator rendered="#{not seasonStatus.first}"/>
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="seasonName" value="#{season.name}" label="Season Name" required="true" maxlength="255"/>
+                    <p:outputLabel value="Season Name:" for="seasonName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Season Dates From:" for="monthFrom"/>
+                    <p:selectOneMenu id="monthFrom" value="#{season.monthFrom}" label="Month From" required="true">
+                        <f:selectItem itemLabel="Month" noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.months}" var="month"
+                                       itemLabel="#{month.value} - #{month.name}" itemValue="#{month.value}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="dayFrom" value="#{season.dayFrom}" label="Day From" required="true">
+                        <f:selectItem itemLabel="Day" noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.days}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Season Dates From:" for="monthTo"/>
+                    <p:selectOneMenu id="monthTo" value="#{season.monthTo}" label="Month To" required="true">
+                        <f:selectItem itemLabel="Month" noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.months}" var="month"
+                                       itemLabel="#{month.value} - #{month.name}" itemValue="#{month.value}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="dayTo" value="#{season.dayTo}" label="Day To" required="true">
+                        <f:selectItem itemLabel="Day" noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.days}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <p:commandButton action="#{programProfileController.removeSeason(season)}" update="@form" process="@this" icon="ui-icon-remove"/>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Operating Hours" for="opHoursFr"/>
+                    <p:selectOneMenu id="opHoursFr" value="#{season.operatingTimeFrom}" required="true" converter="localTimeConverter">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItems value="#{constantsProvider.hourOfDayAndHalves}" var="he1" itemValue="#{he1.hour}"
+                                       itemLabel="#{he1.getString()}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="to" for="opHoursTo"/>
+                    <p:selectOneMenu id="opHoursTo" value="#{season.operatingTimeTo}" required="true" converter="localTimeConverter">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItems value="#{constantsProvider.hourOfDayAndHalves}" var="he2" itemValue="#{he2.hour}"
+                                       itemLabel="#{he2.getString()}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <p:column/>
+                <p:column/>
+
+            </p:panelGrid>
+
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:outputLabel value="Dispatch days of the week:" for="dispatchDays"/>
+                <p:selectManyCheckbox id="dispatchDays" value="#{season.selectedDays}" required="true">
+                    <f:selectItem itemLabel="Mon" itemValue="Mon"/>
+                    <f:selectItem itemLabel="Tue" itemValue="Tue"/>
+                    <f:selectItem itemLabel="Wed" itemValue="Wed"/>
+                    <f:selectItem itemLabel="Thu" itemValue="Thu"/>
+                    <f:selectItem itemLabel="Fri" itemValue="Fri"/>
+                    <f:selectItem itemLabel="Sat" itemValue="Sat"/>
+                    <f:selectItem itemLabel="Sun" itemValue="Sun"/>
+                </p:selectManyCheckbox>
+            </p:panelGrid>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title" jsf:id="holidayEx">
+        <h3 class="with-icon">Holiday Exclusions</h3>
+
+        <p:commandButton action="#{programProfileController.addHoliday()}" process="@form" update=":form:#{tabViewId}:holidayEx" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-icon">
+                <p:outputLabel value="Use Company Level Holidays" for="useCLHol"/>
+                <p:inputSwitch id="useCLHol" value="#{programProfileController.profile.useCompanyLevelHolidays}"/>
+            </h:panelGroup>
+            <p:column/>
+        </p:panelGrid>
+        <p:outputLabel rendered="#{empty programProfileController.profile.holidays}">No holiday exclusions defined yet</p:outputLabel>
+        <ui:repeat value="#{programProfileController.profile.holidays}" var="holiday">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="holidayName" value="#{holiday.name}"/>
+                    <p:outputLabel value="Holiday Name:" for="holidayName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-calendar">
+                    <p:calendar id="holidayDate" value="#{holiday.date}" pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy" mask="true"/>
+                    <p:outputLabel value="Observance Date:" for="holidayDate"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-checkbox">
+                    <p:selectBooleanCheckbox value="#{holiday.nerc}" id="nercHoliday"/>
+                    <p:outputLabel value="NERC" for="nercHoliday"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-icon">
+                    <p:commandButton action="#{programProfileController.removeHoliday(holiday)}"
+                                     update="@form" process="@this" icon="ui-icon-remove"/>
+                </h:panelGroup>
+            </p:panelGrid>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title">
+
+        <h3 class="with-icon">Enrollment Dating</h3>
+
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:column>Application Back Dating:</p:column>
+
+            <h:panelGroup styleClass="md-inputfield-checkbox">
+                <p:column>
+                    <p:selectBooleanCheckbox id="backNewEnrollment" value="#{programProfileController.profile.appBackDatingNewEnroll}"/>
+                    <p:outputLabel value="New enrollments " for="backNewEnrollment"/>
+                </p:column>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-checkbox">
+                <p:column>
+                    <p:selectBooleanCheckbox value="#{programProfileController.profile.appBackDatingUnenroll}" id="backUnenrollemnt"/>
+                    <p:outputLabel value="Unenrollments" for="backUnenrollemnt"/>
+                </p:column>
+            </h:panelGroup>
+
+            <h:column/>
+
+            <p:column>Application Future Dating:</p:column>
+
+            <h:panelGroup styleClass="md-inputfield-checkbox">
+                <p:column>
+                    <p:selectBooleanCheckbox id="futureNewEnrollment" value="#{programProfileController.profile.appFutureDatingNewEnroll}"/>
+                    <p:outputLabel value="New enrollments " for="futureNewEnrollment"/>
+                </p:column>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-checkbox">
+                <p:column>
+                    <p:selectBooleanCheckbox value="#{programProfileController.profile.appFutureDatingUnenroll}" id="futureUnenrollemnt"/>
+                    <p:outputLabel value="Unenrollments " for="futureUnenrollemnt"/>
+                </p:column>
+            </h:panelGroup>
+
+            <p:column/>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:selectOneMenu id="enrollmentEffectiveDate" value="#{programProfileController.profile.enrollmentEffectiveDate}">
+                    <f:selectItem itemLabel="Billing defined" itemValue="BILLING_DEFINED"/>
+                    <f:selectItem itemLabel="Device installed" itemValue="DEVICE_INSTALLED"/>
+                </p:selectOneMenu>
+                <p:outputLabel value="Enrollment Effective Date" for="enrollmentEffectiveDate"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:selectOneMenu id="earliestEffectiveDate" value="#{programProfileController.profile.earliestEffectiveDate}">
+                    <f:selectItem itemLabel="1st of Month" itemValue="FIRST_OF_MONTH"/>
+                    <f:selectItem itemLabel="Any day of Month" itemValue="ANYDAY_OF_MONTH"/>
+                </p:selectOneMenu>
+                <p:outputLabel value="Earliest Effective Date" for="earliestEffectiveDate"/>
+            </h:panelGroup>
+        </p:panelGrid>
+    </div>
+</ui:composition>

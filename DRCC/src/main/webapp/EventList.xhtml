@@ -1,0 +1,452 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style type="text/css">
+            .panelHover {
+                color: purple;
+                width: 400px;
+                background-color: #d8da3d
+            }
+
+            td.ui-panelgrid-cell.noLRPadding {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            td.ui-panelgrid-cell.lrPadding {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        </style>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <c:set var="controller" value="#{eventList}"/>
+
+        <h:form id="formEL">
+
+
+            <p:fragment id="FEvList" rendered="#{eventList.pdpSrEvent==null}">
+                <p:breadCrumb>
+                    <p:menuitem value="Dashboard" outcome="dashboard"/>
+                    <p:menuitem value="Event Notifications" outcome="EventList"/>
+                </p:breadCrumb>
+                <div class="card">
+
+                    <p:dataTable value="#{eventList.pdpSrEvents}" var="event" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single" selection="#{eventList.pdpSrEvent}"
+                                 rowKey="#{event.eventId}">
+                        <p:ajax event="rowSelect" listener="#{eventList.onRowSelectEvent}" update="formEL"/>
+                        <p:column headerText="Event Name" sortBy="#{event.eventName}">
+                            <h:outputText value="#{event.eventName}"/>
+                        </p:column>
+                        <p:column headerText="Program" sortBy="#{event.eventProgram}">
+                            <h:outputText value="#{event.eventProgram}"/>
+                        </p:column>
+                        <p:column headerText="Event Start" sortBy="#{event.eventStart}">
+                            <h:outputText value="#{event.eventStart}">
+                                <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Event End" sortBy="#{event.eventEnd}">
+                            <h:outputText value="#{event.eventEnd}">
+                                <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Event State" sortBy="#{event.eventState}">
+                            <h:outputText value="#{event.eventState}"/>
+                        </p:column>
+                        <p:column headerText="Event Options">
+                            <h:outputText value="#{event.eventOptionsLabel}"/>
+                        </p:column>
+                        <p:column headerText="Event Type" sortBy="#{event.eventType}">
+                            <h:outputText value="#{event.eventType}"/>
+                        </p:column>
+                        <p:column headerText="Delivered" class="TexAlRight" rendered="#{authorizationChecker.viewStatistics}">
+                            <h:outputText value="#{event.countDelivered}">
+                                <f:convertNumber pattern="###.##"/>
+                            </h:outputText>
+                            <h:outputText value=" %"/>
+                        </p:column>
+                        <p:column headerText="Attempted" class="TexAlRight" rendered="#{authorizationChecker.viewStatistics}">
+                            <h:outputText value="#{event.countAttempted}">
+                                <f:convertNumber pattern="###.##"/>
+                            </h:outputText>
+                            <h:outputText value=" %"/>
+                        </p:column>
+                    </p:dataTable>
+
+
+                </div>
+
+            </p:fragment>
+
+            <p:fragment id="FEvDetail" rendered="#{eventList.pdpSrEvent!=null and eventList.pdpSrParticipant==null and eventList.pdpSrNotification==null}">
+                <p:breadCrumb>
+                    <p:menuitem value="Dashboard" outcome="dashboard"/>
+                    <p:menuitem value="Events" outcome="EventList"/>
+                    <p:menuitem value="#{eventList.pdpSrEvent.eventName}"/>
+                </p:breadCrumb>
+
+                <div class="ui-g ui-fluid">
+                    <c:forEach items="#{eventList.eventDetails}" var="i">
+                        <div class="ui-g-12 ui-lg-3">
+                            <div class="card">
+                                <p:panelGrid columns="2" style="background-color:white !important;" columnClasses="noLRPadding,lrPadding">
+
+                                    <i class="material-icons Fs42 hardblue">#{i.icon}</i>
+                                    <p:column>
+                                        <div style="margin-bottom: 8px"><h:outputText class="Fs14" value="#{i.label}" style="white-space: nowrap;"/></div>
+                                        <div><h:outputText class="hardblue Fs16 FontBold" value="#{i.value}" style="white-space: nowrap;"/></div>
+                                    </p:column>
+                                </p:panelGrid>
+
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+                
+                <c:set var="summary" value="#{eventList.eventNotificationSummary}"/>
+
+                <p:tabView id="TEvDet" activeIndex="#{eventList.activeTab}" scrollable="true">
+                    <p:tab title="Overview" rendered="#{authorizationChecker.viewStatistics}">
+                        <ui:include src="WEB-INF/include/dispatch/EventNotificationSummaryTab.xhtml"/>
+                    </p:tab>
+
+                    <p:tab title="Event Participants">
+                        <p:dataTable id="TBPart" widgetVar="PartTable" value="#{eventList.participantLazyModel}" lazy="true" var="part" reflow="true"
+                                     rows="25" rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false" selectionMode="single" selection="#{eventList.pdpSrParticipant}"
+                                     rowKey="#{part.participantId}">
+                            <p:ajax event="rowSelect" listener="#{eventList.onRowSelectParticipant}" update="@form"/>
+                            <p:column headerText="SA ID" filterBy="#{part.saId}" field="saId">
+                                <h:outputText value="#{part.saId}"/>
+                            </p:column>
+                            <p:column headerText="SP ID" filterBy="#{part.servicePointId}" field="servicePointId">
+                                <h:outputText value="#{part.servicePointId}"/>
+                            </p:column>
+                            <p:column headerText="ACCT ID" filterBy="#{part.acctId}" field="acctId">
+                                <h:outputText value="#{part.acctId}"/>
+                            </p:column>
+                            <p:column headerText="PREM ID" filterBy="#{part.premiseId}" field="premiseId">
+                                <h:outputText value="#{part.premiseId}"/>
+                            </p:column>
+                            <p:column headerText="DRUID" filterBy="#{part.druid}" field="druid">
+                                <h:outputText value="#{part.druid}"/>
+                            </p:column>
+                            <p:column headerText="SERVICE STREET ADDRESS" filterBy="#{part.serviceAddress}" field="serviceAddress">
+                                <h:outputText value="#{part.serviceAddress}"/>
+                            </p:column>
+                            <p:column headerText="PARTICIPANT NOTIFIED" filterBy="#{part.successfulNotification}" field="successfulNotification">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('PartTable').filter()">
+                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{eventList.successType}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <div jsf:rendered="#{part.delivered}"><i class="icon-ok"/></div>
+                                <div jsf:rendered="#{part.unsuccessful}"><i class="icon-block"/></div>
+                                <div jsf:rendered="#{part.attempted}"><i class="icon-block"/></div>
+                            </p:column>
+                        </p:dataTable>
+
+                    </p:tab>
+                    <p:tab title="Vendor Notifications">
+
+                        <p:dataTable id="TBVend" widgetVar="vendTable" value="#{eventList.vendorNotificationLazyModel}" lazy="true" var="notification"
+                                     reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false" selectionMode="single" selection="#{eventList.pdpSrNotification}"
+                                     rowKey="#{notification.notificationId}">
+                            <p:ajax event="rowSelect" listener="#{eventList.onRowSelectNotification}" update="@form"/>
+                            <p:column headerText="VENDOR" filterBy="#{notification.pdpSrVendor.vendor}" field="vendor">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('vendTable').filter()">
+                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{eventList.vendorsList}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{notification.pdpSrVendor.vendor}" rendered="#{notification.pdpSrVendor ne null}"/>
+                                <h:outputText value="Manual" rendered="#{notification.pdpSrVendor eq null}"/>
+                            </p:column>
+                            <p:column headerText="CHANNEL" filterBy="#{notification.notifyBy}" field="notifyBy">
+                                <h:outputText value="#{notification.notifyBy}"/>
+                            </p:column>
+                            <p:column headerText="LANGUAGE" filterBy="#{notification.language}" field="language">
+                                <h:outputText value="#{notification.language}"/>
+                            </p:column>
+                            <p:column headerText="EVENT NOTIFICATION PREFERENCE" filterBy="#{notification.notifyByValue}" field="notifyByValue">
+                                <h:outputText value="#{notification.notifyByValue}" converter="phoneConverter"/>
+                            </p:column>
+                            <p:column headerText="CURRENT STATUS" filterBy="#{notification.vendorStatusDisplayMessage}"
+                                      field="vendorStatusDisplayMessage">
+                                <h:outputText value="#{notification.vendorStatusDisplayMessage}"/>
+                            </p:column>
+                            <p:column headerText="NOTIFICATION SUCCESSFUL" filterBy="#{notification.pdpSrParticipant.successfulNotification}"
+                                      field="successfulNotification">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('vendTable').filter()">
+                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItems value="#{eventList.successType}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <div jsf:rendered="#{notification.delivered}"><i class="icon-ok"/></div>
+                                <div jsf:rendered="#{notification.unsuccessful}"><i class="icon-block"/></div>
+                                <div jsf:rendered="#{notification.attempted}"><i class="icon-block"/></div>
+                            </p:column>
+                        </p:dataTable>
+
+                    </p:tab>
+                    <p:tab title="Unsuccessful Participants">
+                        <h:panelGroup styleClass="buttons">
+                            <p:commandButton value="Export" ajax="false" style="margin-left:20px;" icon="fa fa-file-excel-o Fs14 white">
+                                <p:dataExporter type="csv" target="DTup" fileName="UnsuccessfulParticipants_#{eventList.now}"/>
+                            </p:commandButton>
+                        </h:panelGroup>
+                        <div class="EmptyBox10"/>
+                        <p:dataTable id="DTup" value="#{eventList.unsuccessfulNotificationLazyModel}" lazy="true" var="usNotified" reflow="true"
+                                     rows="25" rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false">
+                            <p:column headerText="SA ID" filterBy="#{usNotified.pdpSrParticipant.saId}" field="saId">
+                                <h:outputText value="#{usNotified.pdpSrParticipant.saId}"/>
+                            </p:column>
+                            <p:column headerText="SP ID" filterBy="#{usNotified.pdpSrParticipant.servicePointId}" field="servicePointId">
+                                <h:outputText value="#{usNotified.pdpSrParticipant.servicePointId}"/>
+                            </p:column>
+                            <p:column headerText="ACCT ID" filterBy="#{usNotified.pdpSrParticipant.acctId}" field="acctId">
+                                <h:outputText value="#{usNotified.pdpSrParticipant.acctId}"/>
+                            </p:column>
+                            <p:column headerText="DRUID" filterBy="#{usNotified.pdpSrParticipant.druid}" field="druid">
+                                <h:outputText value="#{usNotified.pdpSrParticipant.druid}"/>
+                            </p:column>
+                            <p:column headerText="SERVICE STREET ADDRESS" filterBy="#{usNotified.pdpSrParticipant.serviceAddress}"
+                                      field="serviceAddress">
+                                <h:outputText value="#{usNotified.pdpSrParticipant.serviceAddress}"/>
+                            </p:column>
+                        </p:dataTable>
+
+                    </p:tab>
+
+                </p:tabView>
+
+            </p:fragment>
+
+            <p:fragment id="FNotification" rendered="#{eventList.pdpSrEvent!=null and eventList.pdpSrNotification!=null and eventList.pdpSrParticipant==null}">
+                <p:breadCrumb>
+                    <p:menuitem value="Dashboard" outcome="dashboard"/>
+                    <p:menuitem value="Events" outcome="EventList"/>
+                    <p:menuitem value="#{eventList.pdpSrEvent.eventName}" action="#{eventList.handleNotificationRender()}" update="formEL"/>
+                    <p:menuitem value="Notifications" action="#{eventList.handleNotificationRender()}" update="formEL"/>
+                    <p:menuitem><h:outputText value="#{eventList.pdpSrNotification.notifyByValue}" converter="phoneConverter"/></p:menuitem>
+                </p:breadCrumb>
+                <div class="ui-g ui-fluid">
+                    <c:forEach items="#{eventList.eventDetails}" var="i">
+                        <div class="ui-g-12 ui-lg-3">
+                            <div class="card">
+                                <p:panelGrid columns="2" style="background-color:white !important;" columnClasses="noLRPadding,lrPadding">
+                                    <i class="material-icons Fs42 hardblue">#{i.icon}</i>
+                                    <p:column>
+                                        <div style="margin-bottom: 8px"><h:outputText class="Fs14" value="#{i.label}" style="white-space: nowrap;"/></div>
+                                        <div><h:outputText class="hardblue Fs16 FontBold" value="#{i.value}" style="white-space: nowrap;"/></div>
+                                    </p:column>
+                                </p:panelGrid>
+
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+
+                <div class="card">
+                    <p:dataTable id="NotificationTable" value="#{eventList.enpNotificationLazyModel}" lazy="true" var="enpNotif" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single"
+                                 selection="#{eventList.notificationForPdpSrParticipant}" rowKey="#{enpNotif.notificationId}">
+                        <p:ajax event="rowSelect" listener="#{eventList.onRowSelectNotificationParticipant}" update="@form"/>
+                        <p:column headerText="SA ID" sortBy="#{enpNotif.pdpSrParticipant.saId}" filterBy="#{enpNotif.pdpSrParticipant.saId}" field="saId">
+                            <h:outputText value="#{enpNotif.pdpSrParticipant.saId}"/>
+                        </p:column>
+                        <p:column headerText="SP ID" sortBy="#{enpNotif.pdpSrParticipant.servicePointId}"
+                                  filterBy="#{enpNotif.pdpSrParticipant.servicePointId}" field="servicePointId">
+                            <h:outputText value="#{enpNotif.pdpSrParticipant.servicePointId}"/>
+                        </p:column>
+                        <p:column headerText="ACCT ID" sortBy="#{enpNotif.pdpSrParticipant.acctId}" filterBy="#{enpNotif.pdpSrParticipant.acctId}"
+                                  field="acctId">
+                            <h:outputText value="#{enpNotif.pdpSrParticipant.acctId}"/>
+                        </p:column>
+                        <p:column headerText="PREM ID" sortBy="#{enpNotif.pdpSrParticipant.premiseId}" filterBy="#{enpNotif.pdpSrParticipant.premiseId}"
+                                  field="premiseId">
+                            <h:outputText value="#{enpNotif.pdpSrParticipant.premiseId}"/>
+                        </p:column>
+                        <p:column headerText="DRUID" sortBy="#{enpNotif.pdpSrParticipant.druid}" filterBy="#{enpNotif.pdpSrParticipant.druid}"
+                                  field="druid">
+                            <h:outputText value="#{enpNotif.pdpSrParticipant.druid}"/>
+                        </p:column>
+                        <p:column headerText="SERVICE STREET ADDRESS" sortBy="#{enpNotif.pdpSrParticipant.serviceAddress}"
+                                  filterBy="#{enpNotif.pdpSrParticipant.serviceAddress}" field="serviceAddress">
+                            <h:outputText value="#{enpNotif.pdpSrParticipant.serviceAddress}"/>
+                        </p:column>
+                        <p:column headerText="CHANNEL" sortBy="#{enpNotif.notifyBy}" filterBy="#{enpNotif.notifyBy}" field="notifyBy">
+                            <h:outputText value="#{enpNotif.notifyBy}"/>
+                        </p:column>
+                        <p:column headerText="CURRENT STATUS" filterBy="#{enpNotif.vendorStatusDisplayMessage}" field="vendorStatusDisplayMessage">
+                            <h:outputText value="#{enpNotif.vendorStatusDisplayMessage}"/>
+                        </p:column>
+                        <p:column headerText="NOTIFICATION SUCCESSFUL" sortBy="#{enpNotif.successfulNotification}">
+                            <div jsf:rendered="#{enpNotif.delivered}"><i class="icon-ok"/></div>
+                            <div jsf:rendered="#{enpNotif.unsuccessful}"><i class="icon-block"/></div>
+                            <div jsf:rendered="#{enpNotif.attempted}"><i class="icon-block"/></div>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+                <div class="card" jsf:rendered="#{eventList.pdpSrNotification.voiceRecordFileName != null}">
+                    <p:panelGrid columns="1" style="background-color:white !important;" columnClasses="noLRPadding,lrPadding">
+                        <h:outputText class="Fs14" value="Voice recording" style="white-space: nowrap;"/>
+                        <audio src="audio?fileName=#{eventList.pdpSrNotification.voiceRecordFileName}" controls="controls">
+                            <p>Your browser does not support the <code>audio</code> element </p>
+                        </audio>
+                    </p:panelGrid>
+                </div>
+            </p:fragment>
+
+            <ui:fragment id="FPartDetail" rendered="#{eventList.pdpSrEvent!=null and eventList.pdpSrParticipant!=null and eventList.pdpSrNotification==null}">
+                <p:breadCrumb>
+                    <p:menuitem value="Dashboard" outcome="dashboard"/>
+                    <p:menuitem value="Events" outcome="EventList"/>
+                    <p:menuitem value="#{eventList.pdpSrEvent.eventName}" action="#{eventList.clearParticipant()}" update="formEL"/>
+                    <p:menuitem value="Participants" action="#{eventList.clearParticipant()}" update="formEL"/>
+                    <p:menuitem value="SA #{eventList.pdpSrParticipant.saId}"/>
+                </p:breadCrumb>
+                <div class="ui-g ui-fluid">
+                    <c:forEach items="#{eventList.eventDetails}" var="i">
+                        <div class="ui-g-12 ui-lg-3">
+                            <div class="card">
+                                <p:panelGrid columns="2" style="background-color:white !important;" columnClasses="noLRPadding,lrPadding">
+                                    <i class="material-icons Fs42 hardblue">#{i.icon}</i>
+                                    <p:column>
+                                        <div style="margin-bottom: 8px"><h:outputText class="Fs14" value="#{i.label}" style="white-space: nowrap;"/></div>
+                                        <div><h:outputText class="hardblue Fs16 FontBold" value="#{i.value}" style="white-space: nowrap;"/></div>
+                                    </p:column>
+                                </p:panelGrid>
+
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+
+                <p:tabView id="VNTabView" scrollable="true">
+                    <p:tab id="VNTab" title="Vendor Notifications">
+                        <h:panelGroup styleClass="buttons" rendered="#{eventList.manualNotification eq null}">
+                            <p:commandButton id="manNotifButton" process="@this" update="@form" value="Manual Notification"
+                                             action="#{eventList.addManualNotification()}"/>
+                        </h:panelGroup>
+                        <div class="card card-w-title" jsf:rendered="#{eventList.manualNotification ne null}">
+                            <h1><h:outputText value="#{msg['notification.add']}" styleClass="FontBold Fs18 hardblue"/></h1>
+
+                            <p style="-webkit-margin-after: 2em;">
+                                Timestamp:
+                                <h:outputText id="notTS" value="#{eventList.manualNotification.creationTimestamp}">
+                                    <f:convertDateTime pattern="MM/dd/yyyy h:mm a" timeZone="America/Los_Angeles"/>
+                                </h:outputText>
+                            </p>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Method:" for="notMeth"/>
+                                <p:selectOneMenu id="notMeth" required="true" converter="omnifaces.SelectItemsConverter"
+                                                 value="#{eventList.manualNotification.notifyBy}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{eventList.notificationMethod}" var="v" itemLabel="#{v}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText required="true" id="notVal" value="#{eventList.manualNotification.notifyByValue}"/>
+                                <p:outputLabel value="Value:" for="notVal"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Delivery:" for="notDel"/>
+                                <p:selectOneMenu id="notDel" required="true" converter="omnifaces.GenericEnumConverter"
+                                                 value="#{eventList.manualNotification.successfulNotification}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{successfulNotificationTypeHelper.manualNotificationList}" var="v" itemLabel="#{v}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="buttons">
+                                <p:commandButton id="save" value="#{msg['save']}" actionListener="#{eventList.saveManualNotification()}"
+                                                 update="formEL:VNTabView"/>
+                                <p:spacer width="10"/>
+                                <p:commandButton id="cancel" value="#{msg['cancel']}" action="#{eventList.cancelManualNotification()}" process="@this"
+                                                 update="formEL:VNTabView"/>
+                            </h:panelGroup>
+                        </div>
+
+                        <p:dataTable value="#{eventList.pdpSrParticipantVendorNotifications}" var="notification" reflow="true" rows="25"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false" selectionMode="single" selection="#{eventList.pdpSrNotification}"
+                                     rowKey="#{notification.notificationId}">
+                            <p:ajax event="rowSelect" listener="#{eventList.onRowSelectNotification}" update="@form"/>
+                            <p:column headerText="VENDOR" sortBy="#{notification.pdpSrVendor.vendor}">
+                                <h:outputText value="#{notification.pdpSrVendor.vendor}" rendered="#{notification.pdpSrVendor ne null}"/>
+                                <h:outputText value="Manual" rendered="#{notification.pdpSrVendor eq null}"/>
+                            </p:column>
+                            <p:column headerText="CHANNEL" sortBy="#{notification.notifyBy}">
+                                <h:outputText value="#{notification.notifyBy}"/>
+                            </p:column>
+                            <p:column headerText="EVENT NOTIFICATION PREFERENCE" sortBy="#{notification.notifyByValue}">
+                                <h:outputText value="#{notification.notifyByValue}" converter="phoneConverter"/>
+                            </p:column>
+                            <p:column headerText="STATUS" sortBy="#{notification.vendorStatusDisplayMessage}">
+                                <h:outputText value="#{notification.vendorStatusDisplayMessage}"/>
+                            </p:column>
+                            <p:column headerText="NOTIFICATION SUCCESSFUL" sortBy="#{notification.pdpSrParticipant.successfulNotification}">
+                                <div jsf:rendered="#{notification.delivered}"><i class="icon-ok"/></div>
+                                <div jsf:rendered="#{notification.unsuccessful}"><i class="icon-block"/></div>
+                                <div jsf:rendered="#{notification.attempted}"><i class="icon-block"/></div>
+                            </p:column>
+                        </p:dataTable>
+
+                    </p:tab>
+                    <p:tab title="Customer Notification Preference">
+
+                        <p:dataTable value="#{eventList.participantRequestedNotificationLazyModel}" lazy="true" var="notification" reflow="true"
+                                     rows="25" rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false" selectionMode="single" selection="#{eventList.pdpSrNotification}"
+                                     rowKey="#{notification.notificationId}">
+                            <p:ajax event="rowSelect" listener="#{eventList.onRowSelectNotification}" update="@form"/>
+                            <p:column headerText="SP ID" sortBy="#{notification.pdpSrParticipant.servicePointId}"
+                                      filterBy="#{notification.pdpSrParticipant.servicePointId}" field="servicePointId">
+                                <h:outputText value="#{notification.pdpSrParticipant.servicePointId}"/>
+                            </p:column>
+                            <p:column headerText="CHANNEL" sortBy="#{notification.notifyBy}" filterBy="#{notification.notifyBy}" field="notifyBy">
+                                <h:outputText value="#{notification.notifyBy}"/>
+                            </p:column>
+                            <p:column headerText="EVENT NOTIFICATION PREFERENCE" sortBy="#{notification.notifyByValue}"
+                                      filterBy="#{notification.notifyByValue}" field="notifyByValue">
+                                <h:outputText value="#{notification.notifyByValue}" converter="phoneConverter"/>
+                            </p:column>
+                            <p:column headerText="SERVICE STREET ADDRESS" sortBy="#{notification.pdpSrParticipant.serviceAddress}"
+                                      filterBy="#{notification.pdpSrParticipant.serviceAddress}" field="serviceAddress">
+                                <h:outputText value="#{notification.pdpSrParticipant.serviceAddress}"/>
+                            </p:column>
+                        </p:dataTable>
+
+                    </p:tab>
+                </p:tabView>
+            </ui:fragment>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

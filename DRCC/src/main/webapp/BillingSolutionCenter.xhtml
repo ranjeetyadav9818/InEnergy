@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form>
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Billing Solution Center"/>
+            </p:breadCrumb>
+
+            <div class="card">
+                    <!-- Filters & Results -->
+                    <p:dataTable id="exceptionsTable" value="#{billingSolutionCenterController.exceptions}" lazy="true" var="exception" reflow="true" rows="25"
+                                 paginator="true" paginatorAlwaysVisible="false" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+                        <p:column headerText="SA ID" filterBy="#{exception.invoice.serviceAgreement.serviceAgreementId}" filterable="true" sortBy="#{exception.invoice.serviceAgreement.serviceAgreementId}">
+                            <p:link href="CustomerList.xhtml?o=#{parameterEncoderService.encode(exception.invoice.serviceAgreement.serviceAgreementId)}"
+                                    value="#{exception.invoice.serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="Invoice ID" filterBy="#{exception.invoice.id}" filterable="true" sortBy="#{exception.invoice.id}">
+                            <h:outputText value="#{exception.invoice.id}"/>
+                        </p:column>
+                        <p:column headerText="Date" filterable="false" sortBy="#{exception.invoice.date}">
+                            <h:outputText value="#{exception.invoice.date}" converter="localDateConverter"/>
+                        </p:column>
+                        <p:column headerText="Billing Cycle" filterBy="#{exception.invoice.serviceAgreement.billCycleCd}" filterable="true" sortBy="#{exception.invoice.serviceAgreement.billCycleCd}">
+                            <h:outputText value="#{exception.invoice.serviceAgreement.billCycleCd}"/>
+                        </p:column>
+                        <p:column headerText="Exception" filterBy="#{exception.message}" filterable="true" sortBy="#{exception.message}">
+                            <h:outputText value="#{exception.message}"/>
+                        </p:column>
+                        <p:column headerText="Actions">
+                            <p:commandButton value="Retry" icon="ui-icon-refresh" actionListener="#{billingSolutionCenterController.retry(exception)}" update="exceptionsTable"/>
+                        </p:column>
+                    </p:dataTable>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

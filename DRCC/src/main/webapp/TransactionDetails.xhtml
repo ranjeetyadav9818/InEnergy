@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+            <h:form id="form">
+                <div class="card card-w-title">
+                    <h1>Bids</h1>
+                    <p:dataTable value="#{transactionDetailsController.details}" var="bid" id="bidsList">
+                        <p:column headerText="Date" filterable="false" sortable="false">
+                            <h:outputText value="#{bid.date}">
+                                <f:convertDateTime pattern="yyyy-MMM-dd"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Seller" filterable="false" sortable="false">
+                            <h:outputText value="#{bid.seller}"/>
+                        </p:column>
+                        <p:column headerText="Quantity" filterable="false" sortable="false">
+                            <h:outputText value="#{bid.quantity}"/>
+                        </p:column>
+                        <p:column headerText="Price" filterable="false" sortable="false">
+                            <h:outputText value="#{bid.price}"/>
+                        </p:column>
+                        <p:column headerText="Actions" filterable="false" sortable="false" width="20%">
+                            <p><p:commandButton value="Buy"  update="@form" disabled="true"/></p>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+                <div class="card card-w-title">
+                    <h1>Awards</h1>
+                    <p:dataTable value="#{transactionDetailsController.details}" var="offer" id="awardsList">
+                        <p:column headerText="Buyer" filterable="false" sortable="false">
+                            <h:outputText value="#{offer.buyer}"/>
+                        </p:column>
+                        <p:column headerText="Seller" filterable="false" sortable="false">
+                            <h:outputText value="#{offer.seller}"/>
+                        </p:column>
+                        <p:column headerText="Watts" filterable="false" sortable="false">
+                            <h:outputText value="#{offer.quantity}"/>
+                        </p:column>
+                        <p:column headerText="Price" filterable="false" sortable="false">
+                            <h:outputText value="#{offer.price}"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+                <div class="card card-w-title">
+                    <h1>Settlements</h1>
+                    <p:dataTable value="#{transactionDetailsController.details}" var="settlement" id="settlementList">
+                        <p:column headerText="Consumer" filterable="false" sortable="false">
+                            <h:outputText value="#{settlement.consumer}"/>
+                        </p:column>
+                        <p:column headerText="Producer" filterable="false" sortable="false">
+                            <h:outputText value="#{settlement.producer}"/>
+                        </p:column>
+                        <p:column headerText="Actual Production" filterable="false" sortable="false">
+                            <h:outputText value="#{settlement.actualProduction}"/>
+                        </p:column>
+                        <p:column headerText="Last measured date" filterable="false" sortable="false">
+                            <h:outputText value="#{settlement.lastMeasuredDate}"/>
+                        </p:column>
+                        <p:column headerText="Status" filterable="false" sortable="false">
+                            <h:outputText value="#{settlement.status}"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+                <div class="card card-w-title">
+                    <h1>Invoices</h1>
+                    <p:dataTable value="#{transactionDetailsController.details}" var="bill" id="bills">
+                        <p:column headerText="Consumer" filterable="false" sortable="false">
+                            <h:outputText value="#{bill.consumer}"/>
+                        </p:column>
+                        <p:column headerText="Producer" filterable="false" sortable="false">
+                            <h:outputText value="#{bill.producer}"/>
+                        </p:column>
+                        <p:column headerText="Offered quantity" filterable="false" sortable="false">
+                            <h:outputText value="#{bill.offerQuantity}"/>
+                        </p:column>
+                        <p:column headerText="Real quantity" filterable="false" sortable="false">
+                            <h:outputText value="#{bill.realQuantity}"/>
+                        </p:column>
+                        <p:column headerText="Price" filterable="false" sortable="false">
+                            <h:outputText value="#{bill.price}"/>
+                        </p:column>
+                        <p:column headerText="Total" filterable="false" sortable="false">
+                            <h:outputText value="#{bill.total}"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </h:form>
+    </ui:define>
+</ui:composition>

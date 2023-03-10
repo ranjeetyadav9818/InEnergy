@@ -1,0 +1,182 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+    <j:useBean id="ratePlan" type="com.inenergis.entity.program.RatePlan"/>
+    <j:useBean id="seasonCalendar" type="com.inenergis.entity.program.SeasonCalendar"/>
+    <j:useBean id="holidayCalendar" type="com.inenergis.entity.program.HolidayCalendar"/>
+
+    <div class="card card-w-title">
+
+        <h3>General</h3>
+
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" id="gridId">
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="rateScheduleTitle" value="#{controller.selectedProfile.rateScheduleTitle}" maxlength="55" disabled="#{controller.viewModeOn}"/>
+                <p:outputLabel value="Rate Schedule Title:" for="rateScheduleTitle"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="rateCodeId" value="#{controller.selectedProfile.buildRateCodeId()}" disabled="true"/>
+                <p:outputLabel value="Rate Code ID:" for="rateCodeId"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Commodity"/>
+                <p:inputText id="commodity" value="#{controller.selectedProfile.ratePlan.commodityType}" disabled="true"/>
+<!--                <p:selectOneMenu id="commodityTypef" value="#{controller.selectedProfile.ratePlan.commodityType}" disabled="#{controller.viewModeOn}">-->
+<!--                    <f:selectItem noSelectionOption="false"/>-->
+<!--                    <f:selectItems value="#{constantsProvider.commodityTypes}" var="commodityType" itemLabel="#{commodityType.name}" itemValue="#{commodityType}"/>-->
+<!--                    <p:ajax event ="itemSelect" update="updateSector"/>-->
+
+<!--                </p:selectOneMenu>-->
+
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select"  id ="updateSector">
+                <p:outputLabel value="Sector"/>
+                <p:selectOneMenu id="sector" value="#{controller.selectedProfile.rateCodeSector}" disabled="#{controller.viewModeOn}" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                    <f:selectItem itemLabel="All"/>
+                    <f:selectItems value="#{constantsProvider.rateCodeSectors}" var="sector" itemLabel="#{sector.name}" itemValue="#{sector}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="Gassector" value="#{controller.selectedProfile.gasRateCodeSector}" disabled="#{controller.viewModeOn}" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                    <f:selectItem itemLabel="All"/>
+                    <f:selectItems value="#{constantsProvider.gasRateCodeSectors}" var="Gassector" itemLabel="#{Gassector.name}" itemValue="#{Gassector}"/>
+
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:calendar id="tariffIssueDate" value="#{controller.selectedProfile.tariffIssueDate}"
+                            timeZone="America/Los_Angeles" pattern="MM/dd/yyyy" mask="true"
+                            placeholder="mm/dd/yyyy" disabled="#{controller.viewModeOn}"/>
+                <p:outputLabel value="Tariff Issue Date:" for="tariffIssueDate"/>
+            </h:panelGroup>
+
+
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:calendar id="effectiveStartDate" value="#{controller.selectedProfile.effectiveStartDate}" mask="true"
+                            timeZone="America/Los_Angeles" pattern="MM/dd/yyyy"
+                            disabled="#{controller.viewModeOn}" placeholder="mm/dd/yyyy">
+                </p:calendar>
+                <p:outputLabel value="Effective Start Date:" for="effectiveStartDate"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-calendar">
+                <p:calendar id="effectiveEndDate" value="#{controller.selectedProfile.effectiveEndDate}"
+                            timeZone="America/Los_Angeles" pattern="MM/dd/yyyy" mask="true"
+                            disabled="#{controller.viewModeOn}" placeholder="mm/dd/yyyy">
+                </p:calendar>
+                <p:outputLabel value="Effective End Date:" for="effectiveEndDate"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-switch">
+                <p:outputLabel value="Rate Schedule Active:" for="rateScheduleActive"/>
+                <p:inputSwitch id="rateScheduleActive" value="#{controller.selectedProfile.active}" disabled="#{controller.viewModeOn}"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="tariffResolutionNumber" value="#{controller.selectedProfile.tariffResolutionNumber}" maxlength="255"
+                             disabled="#{controller.viewModeOn}"/>
+                <p:outputLabel value="Tariff Resolution Number:" for="tariffResolutionNumber"/>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Applicable Contract"/>
+
+                <p:selectOneMenu id="applicableContract" value="#{controller.selectedProfile.applicableContractEnuum}" disabled="#{controller.viewModeOn}">
+                    <f:selectItems value="#{constantsProvider.applicableContractEnuums}" var="applicableContract" itemLabel="#{applicableContract.name}" itemValue="#{applicableContract
+                    }"/>
+                    <p:ajax event ="itemSelect" update="gridId"/>
+
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select"  id="contractMenu" rendered="#{controller.selectedProfile.applicableContractEnuum == 'CONTRACT'}">
+                <p:outputLabel value="Contract Type"/>
+                <p:selectOneMenu id="contracttype"  value="#{controller.selectedProfile.contractTypes}"  disabled="#{controller.viewModeOn}"
+                                 style="width: 157px;"
+                                 autoWidth="false"       >
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{controller.contractTypeList}" var="contracttype" itemLabel="#{contracttype.name}" itemValue="#{contracttype.name}"/>
+                    <p:outputLabel value="#{contracttype}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputTextarea id="tariffReferencesNotes" value="#{controller.selectedProfile.tariffReferencesNote}" cols="56" maxlength="65535"
+                                 disabled="#{controller.viewModeOn}"/>
+                <p:outputLabel value="Tariff References Notes:" for="tariffReferencesNotes"/>
+            </h:panelGroup>
+
+
+
+            <!-- <h:panelGroup styleClass="md-inputfield-select" id="applicableEnum" >
+                <p:outputLabel value="Applicable Contract"/>
+
+                <p:selectOneMenu id="applicableContract" value="#{controller.selectedProfile.applicableContractEnuum}" disabled="#{controller.viewModeOn}">
+                    <f:selectItems value="#{constantsProvider.applicableContractEnuums}" var="applicableContract" itemLabel="#{applicableContract.name}" itemValue="#{applicableContract
+                    }"/>
+                </p:selectOneMenu>
+            </h:panelGroup> -->
+        </p:panelGrid>
+    </div>
+
+    <div class="card card-w-title">
+        <h3>Rate Plan Summary</h3>
+
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Design Type"/>
+                <p:selectOneMenu id="designType" value="#{controller.selectedProfile.designType}" disabled="#{controller.viewModeOn}">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{constantsProvider.designTypes}" var="designType"
+                                   itemLabel="#{designType.name}" itemValue="#{designType}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Design Sub-Type"/>
+                <p:selectOneMenu id="designSubType" value="#{controller.selectedProfile.designSubType}" disabled="#{controller.viewModeOn}">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{constantsProvider.designSubTypes}" var="designSubType"
+                                   itemLabel="#{designSubType.name}" itemValue="#{designSubType}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Service Type"/>
+                <p:selectOneMenu id="serviceType" value="#{controller.selectedProfile.serviceType}" disabled="#{controller.viewModeOn}">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{constantsProvider.ratePlanServiceTypes}" var="serviceType"
+                                   itemLabel="#{serviceType.label}" itemValue="#{serviceType}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Power Source"/>
+                <p:selectOneMenu id="powerSource" value="#{controller.selectedProfile.powerSource}" disabled="#{controller.viewModeOn}">
+                    <f:selectItem noSelectionOption="false"/>
+                    <f:selectItems value="#{controller.powerSources}" var="powerSource"
+                                   itemLabel="#{powerSource.value}" itemValue="#{powerSource.value}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+
+        <p:pickList value="#{controller.ratePlanDualListModel}" var="ratePlan" converter="ratePlanConverter"
+                    itemLabel="#{ratePlan.name}" itemValue="#{ratePlan}" disabled="#{controller.viewModeOn}">
+            <f:facet name="sourceCaption">Available Rate Plans</f:facet>
+            <f:facet name="targetCaption">Applicable Rate Plans</f:facet>
+        </p:pickList>
+    </div>
+
+</ui:composition>

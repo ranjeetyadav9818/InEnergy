@@ -1,0 +1,190 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:clx="http://java.sun.com/jsf/composite/components"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+    <j:useBean id="ratePlan" type="com.inenergis.entity.program.RatePlan"/>
+    <o:importConstants type="com.inenergis.entity.genericEnum.RatePercentageAncillaryType" />
+    <o:importConstants type="com.inenergis.entity.genericEnum.RatePercentageAncillaryApplicability" />
+
+    <h4>Ancillary flat fees
+        <p:commandButton action="#{controller.addAncillaryFlatFeeGroup()}" update="@form" icon="ui-icon-plus" process="@form" rendered="#{not controller.viewModeOn}" style="margin-bottom: 30px">
+            <o:skipValidators/>
+        </p:commandButton>
+    </h4>
+
+    <p:dataTable value="#{controller.ancillaryFlatFees}" var="fee" editable="true" id="ancillaryFlatFees">
+        <p:ajax event="rowEdit" listener="#{controller.onRateAncillaryRowEdit}" update="ancillaryFlatFees"/>
+        <p:column headerText="Fee name">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.name}" required="true" label="Fee name" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.feeTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}"/>
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu value="#{fee.name}" required="true" label="Fee name" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.ancillaryFees}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}"/>
+                    </p:selectOneMenu>
+
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Calendar">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.calendar.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.calendar}" label="Calendar" converter="masterCalendarConverter">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.calendars}" var="calendar" itemLabel="#{calendar.name}" itemValue="#{calendar}"/>
+                        <p:ajax update="touSelection"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="TOU">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.timeOfUse.getTOULabel()}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.timeOfUse}" label="TOU" converter="touCalendarConverter" id="touSelection">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.getTous(fee)}" var="tou" itemLabel="#{tou.getTOULabel()}" itemValue="#{tou}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Frequency">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.gasFrequency.name}" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}"/></f:facet>
+                <f:facet name="output"><h:outputText value="#{fee.frequency.name}" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.frequency}" label="Frequency" converter="omnifaces.GenericEnumConverter"  rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.ancillaryFrequencyTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu value="#{fee.gasFrequency}" label="Frequency" converter="omnifaces.GenericEnumConverter"  rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.gasRateAncillaryFrequencies}" var="frequency" itemLabel="#{frequency.name}" itemValue="#{frequency}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <c:forEach items="#{controller.selectedProfile.getActiveRateTiers()}" var="column">
+            <p:column headerText="Tier #{column.name}">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <clx:MoneyOutputComponent value="#{fee.getAncillaryFee(column).price}" />
+                    </f:facet>
+                    <f:facet name="input">
+                        <clx:MoneyInputComponent value="#{fee.getAncillaryFee(column).price}" errorLabel="Tier fee"/>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+        </c:forEach>
+        <p:column style="width: 32px;" class="showOnDesktop">
+            <p:rowEditor/>
+        </p:column>
+        <p:column style="width: 32px;" class="showOnDesktop">
+            <p:commandButton actionListener="#{controller.removeAncillaryFee(fee)}" icon="ui-icon-remove" update="ancillaryFlatFees"/>
+        </p:column>
+    </p:dataTable>
+
+    <h4>Ancillary percentage fees (Taxes...)
+        <p:commandButton action="#{controller.addAncillaryPercentageFee()}" update="@form" icon="ui-icon-plus" process="@form" rendered="#{not controller.viewModeOn}" style="margin-bottom: 30px">
+            <o:skipValidators/>
+        </p:commandButton>
+    </h4>
+
+    <p:dataTable value="#{controller.ancillaryPercentageFeeGroup}" var="fee" editable="true" id="ancillaryPercentageFeeGroup">
+        <p:ajax event="rowEdit" listener="#{controller.onAncillaryPercentageFeeRowEdit}" />
+        <p:column headerText="Fee name">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.name}" required="true" label="Fee name" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.feeTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}" />
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu value="#{fee.name}" required="true" label="Fee name" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.ancillaryFees}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Calendar">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.calendar.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.calendar}" label="Calendar" converter="masterCalendarConverter">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.calendars}" var="calendar" itemLabel="#{calendar.name}" itemValue="#{calendar}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Applicable to">
+            <p:cellEditor id="applicableFees">
+                <f:facet name="output">
+                    <h:outputText value="#{fee.applicability.name}" rendered="#{fee.applicability.name ne null}"/><h:outputText value=": " rendered="#{fee.applicability.name ne null and fee.applicability ne RatePercentageAncillaryApplicability.ALL}"/>
+                    <p:outputPanel rendered="#{fee.applicability ne RatePercentageAncillaryApplicability.ALL}">
+                        <ui:repeat value="#{fee.applicableFees}" var="feeName" varStatus="step">
+                            <h:outputText value="#{feeName}"/><h:outputText value=", " rendered="#{not step.last}" />
+                        </ui:repeat>
+                    </p:outputPanel>
+                </f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.applicability}" required="true" label="Applicable to" converter="omnifaces.GenericEnumConverter">
+                        <f:selectItems value="#{constantsProvider.ancillaryPercentageApplicabilities}" var="applicability" itemLabel="#{applicability.name}" itemValue="#{applicability}"/>
+                        <p:ajax event="change" update="applicableFees"/>
+                    </p:selectOneMenu>
+                    <p:selectCheckboxMenu rendered="#{fee.applicability ne null and fee.applicability ne RatePercentageAncillaryApplicability.ALL}"  value="#{fee.applicableFeesTransient}" label="Fees" filter="true"
+                                          filterMatchMode="startsWith" panelStyle="width:200px" multiple="true">
+                        <f:selectItems value="#{controller.feeTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}" />
+                    </p:selectCheckboxMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Type">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.type.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.type}" required="true" label="type" converter="omnifaces.GenericEnumConverter">
+                        <f:selectItems value="#{constantsProvider.ancillaryPercentageTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                        <p:ajax event="change" update="percentageInput"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Percentage">
+            <p:cellEditor id="percentageInput">
+                <f:facet name="output">
+                    <h:outputText rendered="#{fee.type eq RatePercentageAncillaryType.MANUAL}" value="#{fee.price.multiply(100)}"/><h:outputText rendered="#{fee.type eq RatePercentageAncillaryType.MANUAL}" value="%"/>
+                    <h:outputText rendered="#{fee.type eq RatePercentageAncillaryType.DYNAMIC}" value="#{fee.dynamicFee}"/>
+                </f:facet>
+                <f:facet name="input" >
+                    <p:inputNumber rendered="#{fee.type eq RatePercentageAncillaryType.MANUAL or fee.type eq null}" decimalPlaces="6" value="#{fee.price}" maxValue="100" style="max-width: 70px" label="Percentage"/>
+                    <p:selectOneMenu rendered="#{fee.type eq RatePercentageAncillaryType.DYNAMIC}" value="#{fee.dynamicFee}" required="true" label="Percentage">
+                        <f:selectItems value="#{controller.feeHierarchyNames}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column style="width: 32px;" class="showOnDesktop">
+            <p:rowEditor/>
+        </p:column>
+        <p:column style="width: 32px;" class="showOnDesktop">
+            <p:commandButton actionListener="#{controller.removeAncillaryFee(fee)}" icon="ui-icon-remove" update="ancillaryPercentageFeeGroup"/>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

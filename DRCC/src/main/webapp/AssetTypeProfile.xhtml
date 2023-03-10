@@ -1,0 +1,136 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <c:set var="controller" value="#{assetProfileController}"/>
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Asset Type Profile" outcome="AssetTypeProfile">
+                    <f:param name="n" value="#{parameterEncoderService.encode(controller.commodityType.name())}"/>
+                </p:menuitem>
+            </p:breadCrumb>
+            <div class="card card-w-title">
+                <p/>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Network Type" for="networkType"/>
+                    <p:selectOneMenu id="networkType" label="Network Type" converter="networkTypeConverter"
+                                     value="#{controller.networkTypeFilter}">
+                        <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.networkTypes}" var="networkType" itemLabel="#{networkType.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Profile Type" for="ProfeType"/>
+                    <p:selectOneMenu id="ProfeType" label="Profile Type" converter="omnifaces.GenericEnumConverter"
+                                     value="#{controller.profileTypeFilter}">
+                        <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.profileTypes}" var="profileType" itemLabel="#{profileType.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{controller.assetProfileName}" id="profileName"/>
+                    <p:outputLabel value="Asset Type Profile" for="profileName"/>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:commandButton id="idSearch" value="Search" action="#{controller.search()}" process="@form" update="@form"/>
+                </h:panelGroup>
+            </div>
+            <div class="card card-w-title" jsf:rendered="#{controller.newProfile ne null}">
+                <p:panelGrid layout="grid" columns="2" rendered="#{controller.newProfile ne null}" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Network Type" for="networkTypeNew"/>
+                        <p:selectOneMenu id="networkTypeNew" required="true" label="Network Type" converter="networkTypeConverter"
+                                         value="#{controller.newProfile.networkType}">
+                            <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                            <f:selectItems value="#{controller.networkTypes}" var="networkType" itemLabel="#{networkType.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Profile Type" for="newProfeType"/>
+                        <p:selectOneMenu id="newProfeType" label="Profile Type" converter="omnifaces.GenericEnumConverter"
+                                         value="#{controller.newProfile.assetProfileType}">
+                            <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.profileTypes}" var="profileType" itemLabel="#{profileType.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText value="#{controller.newProfile.name}" required="true" id="profileNameNew"/>
+                        <p:outputLabel value="Asset Type Profile" for="profileNameNew"/>
+                    </h:panelGroup>
+                    <p:column/>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:commandButton id="idSave" value="Save" action="#{controller.saveNew()}" process="@form" update="@form"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:commandButton id="idCancel" value="Cancel" action="#{controller.cancelNew()}" process="@this" update="@form"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </div>
+            <div class="card card-w-title">
+                <p:dataTable id="assetProfiles" value="#{controller.lazyAssetProfileDataModel}" lazy="true" var="profile" widgetVar="wgbAssetProfiles"
+                             reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{award.uuid}" selectionMode="single" style="text-align: center">
+                    <p:ajax event="rowSelect" listener="#{controller.onSelectAssetProfile}"/>
+                    <p:column headerText="ID" styleClass="topAligned" filterBy="#{profile.id}">
+                        <h:outputText value="#{profile.id}"/>
+                    </p:column>
+                    <p:column headerText="Network Type" styleClass="topAligned" filterBy="#{profile.networkType.id}" filterMatchMode="equals" width="15%">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wgbAssetProfiles').filter()" converter="javax.faces.Long" autoWidth="false"
+                                             style="width: 60%;font-size: 12px">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{controller.networkTypes}" var="networkType" itemLabel="#{networkType.name}" itemValue="#{networkType.id}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{profile.networkType.name}"/>
+                    </p:column>
+                    <p:column headerText="Asset Profile Name" styleClass="topAligned" filterBy="#{profile.name}" filterMatchMode="contains">
+                        <h:outputText value="#{profile.name}"/>
+                    </p:column>
+                    <p:column headerText="Asset Profile Type" styleClass="topAligned" filterBy="#{profile.assetProfileType}" filterMatchMode="equals">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wgbAssetProfiles').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false"
+                                             style="width: 60%;font-size: 12px">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.profileTypes}" var="profileType" itemLabel="#{profileType.name}" itemValue="#{profileType}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{profile.assetProfileType.name}"/>
+                    </p:column>
+                    <p:column width="5%">
+                        <p:commandButton action="#{controller.remove(profile)}" update="@form" icon="ui-icon-remove"/>
+                    </p:column>
+                </p:dataTable>
+                <br/>
+                <p:commandButton id="idAdd" value="Add" action="#{controller.addNew()}" process="@form" update="@form"/>
+            </div>
+            <p:dialog header="You are about to delete the next Asset Profile:" widgetVar="deleteDialog" modal="true" resizable="false" closeOnEscape="true"
+                      visible="#{controller.profileToDelete ne null}" style="text-align: justify">
+                <p:panelGrid columns="2" layout="grid">
+                    <h:panelGroup styleClass="md-inputfield"><p:outputLabel value="NetworkType Type" for="idNetwork"/> </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield"><p:outputLabel value="#{controller.profileToDelete.networkType.name}" id="idNetwork"/> </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield"><p:outputLabel value="Asset Profile Name:" for="idProfile"/> </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield"><p:outputLabel value="#{controller.profileToDelete.name}" id="idProfile"/> </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield" style="text-align: center">
+                        <p:commandButton id="delete" styleClass="button" value="Delete" action="#{controller.confirmRemove()}" update="@form"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield" style="text-align: center">
+                        <p:commandButton id="cancel" value="Cancel" action="#{controller.cancelRemove()}" update="@form"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Management"/>
+            </p:breadCrumb>
+
+            <div class="card" jsf:rendered="#{isoManagementController.newIso eq false}">
+                <p:commandButton value="Create Market" action="#{isoManagementController.createNewIso}" process="@this" update="form"/>
+            </div>
+
+            <div class="card card-w-title" jsf:rendered="#{isoManagementController.newIso eq true}">
+                <h1>Create Market</h1>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="name" value="#{isoManagementController.iso.name}">
+                        <f:validator validatorId="uniqueEntityValidator"/>
+                        <f:attribute name="currentEntity" value="#{isoManagementController.iso}"/>
+                        <f:attribute name="uniqueColumns" value="name"/>
+                        <f:attribute name="fields" value="{newValue}"/>
+                    </p:inputText>
+                    <p:outputLabel value="Market Name:" for="name"/>
+                </h:panelGroup>
+                <p>
+                    <p:outputLabel value="Market Active:" for="active" style="margin-top: 10px"/>
+                    <p:inputSwitch id="active" value="#{isoManagementController.iso.active}"/>
+                </p>
+                <p:commandButton id="save" value="Save" action="#{isoManagementController.saveNewIso()}" process="@form" update="@form"/>
+                <p:spacer width="5"/>
+                <p:commandButton id="cancel" value="Cancel" action="#{isoManagementController.cancelNewIso()}" process="@this" update="@form"/>
+            </div>
+
+            <div class="card">
+                <p:dataTable value="#{isoManagementController.isoList}" widgetVar="entityTable"
+                             lazy="true" var="iso" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                             paginator="true" paginatorAlwaysVisible="false"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             rowKey="#{iso.uuid}" selectionMode="single">
+
+                    <p:column headerText="Name" filterBy="#{iso.name}" field="name" width="35%">
+                        <h:outputText value="#{iso.name}"/>
+                    </p:column>
+                    <p:column headerText="Actions">
+                        <p:button value="Profile" outcome="IsoProfiles.xhtml">
+                            <f:param name="o" value="#{parameterEncoderService.encode(iso.id)}"/>
+                        </p:button>
+                        <p:spacer width="5"/>
+                        <p:button value="Location Registration" outcome="Locations">
+                            <f:param name="o" value="#{parameterEncoderService.encode(iso.id)}"/>
+                        </p:button>
+                        <p:spacer width="5"/>
+                        <p:splitButton value="Resource Registration">
+                            <p:menuitem value="Create" outcome="CreateResource">
+                                <f:param name="o" value="#{parameterEncoderService.encode(iso.id)}"/>
+                            </p:menuitem>
+                            <p:menuitem value="Search" outcome="Resources">
+                                <f:param name="o" value="#{parameterEncoderService.encode(iso.id)}"/>
+                            </p:menuitem>
+                            <p:menuitem value="Configuration" outcome="ResourceModificationEvaluation">
+                                <f:param name="o" value="#{parameterEncoderService.encode(iso.id)}"/>
+                            </p:menuitem>
+                        </p:splitButton>
+                        <p:button value="Bidding" outcome="Bid">
+                                <f:param name="o" value="#{parameterEncoderService.encode(iso.id)}"/>
+                        </p:button>
+                        <p:spacer width="5"/>
+                        <p:button value="Award" outcome="AwardSummary">
+                                <f:param name="o" value="#{parameterEncoderService.encode(iso.id)}"/>
+                        </p:button>
+                        <p:spacer width="5"/>
+                        <p:commandButton value="Load ISO Vocabulary"  action="#{bundleAccessor.onLoadDiccionary(iso)}" update="@form" oncomplete="location.reload()"/>
+                    </p:column>
+                </p:dataTable>
+                <p>Current ISO Vocabulary : #{msg['data.mapping.isoManagement']} </p>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

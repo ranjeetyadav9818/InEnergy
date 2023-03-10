@@ -1,0 +1,39 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-211-1" author="vm">
+        <createTable tableName="ASSET_DEVICE_SUPPLIER">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="TYPE" type="VARCHAR(255)"/>
+            <column name="CONTRACT_ENTITY_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE_SUPPLIER" baseColumnNames="CONTRACT_ENTITY_ID"
+                                 constraintName="FK_ASSET_DEVICE_SUPPLIER_CONTRACT_ENTITY"
+                                 referencedTableName="CONTRACT_ENTITY"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-211-2" author="vm">
+        <addColumn tableName="ASSET_DEVICE_SUPPLIER">
+            <column name="DEVICE_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE_SUPPLIER" baseColumnNames="DEVICE_ID"
+                                 constraintName="FK_ASSET_DEVICE_SUPPLIER_DEVICE"
+                                 referencedTableName="DEVICE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-211-3" author="vm">
+        <dropForeignKeyConstraint baseTableName="ASSET_DEVICE_SUPPLIER" constraintName="FK_ASSET_DEVICE_SUPPLIER_DEVICE"/>
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE_SUPPLIER" baseColumnNames="DEVICE_ID"
+                                 constraintName="FK_ASSET_DEVICE_SUPPLIER_ASSET_DEVICE"
+                                 referencedTableName="ASSET_DEVICE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-211-4" author="vm">
+        <renameTable oldTableName="ASSET_DEVICE_SUPPLIER" newTableName="ASSET_DEVICE_PARTY"/>
+    </changeSet>
+</databaseChangeLog>

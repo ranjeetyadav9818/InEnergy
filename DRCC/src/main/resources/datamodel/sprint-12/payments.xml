@@ -1,0 +1,72 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="payments" author="vm">
+        <createTable tableName="PAYMENT">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="TYPE" type="VARCHAR(55)"/>
+            <column name="DATE" type="DATETIME"/>
+            <column name="VALUE" type="DECIMAL(10,2) NOT NULL" defaultValue="0.00"/>
+            <column name="REFERENCE" type="VARCHAR(80)"/>
+            <column name="PAID_BY" type="VARCHAR(80)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="payments-2" author="vm">
+        <renameColumn tableName="PAYMENT" oldColumnName="REFERENCE" newColumnName="REFERENCE" columnDataType="BIGINT(20)"/>
+        <addUniqueConstraint tableName="INVOICE" columnNames="INVOICE_NUMBER"/>
+        <addForeignKeyConstraint baseTableName="PAYMENT"
+                                 baseColumnNames="REFERENCE"
+                                 constraintName="FK_PAYMENT_REFERENCE"
+                                 referencedTableName="INVOICE"
+                                 referencedColumnNames="INVOICE_NUMBER"/>
+    </changeSet>
+
+    <changeSet id="payments-3" author="vm">
+        <dropForeignKeyConstraint baseTableName="PAYMENT" constraintName="FK_PAYMENT_REFERENCE"/>
+    </changeSet>
+
+    <changeSet id="payments-4" author="vm">
+        <addColumn tableName="PAYMENT">
+            <column name="SERVICE_AGREEMENT_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="payments-5" author="vm">
+        <renameColumn tableName="PAYMENT"
+                      oldColumnName="SERVICE_AGREEMENT_ID"
+                      newColumnName="SERVICE_AGREEMENT_ID"
+                      columnDataType="VARCHAR(10)"/>
+    </changeSet>
+
+    <changeSet id="payments-6" author="vm">
+        <addForeignKeyConstraint baseTableName="PAYMENT"
+                                 baseColumnNames="SERVICE_AGREEMENT_ID"
+                                 constraintName="FK_PAYMENT_SERVICE_AGREEMENT"
+                                 referencedTableName="SERVICE_AGREEMENT"
+                                 referencedColumnNames="SERVICE_AGREEMENT_ID"/>
+    </changeSet>
+
+    <changeSet id="payments-7" author="vm">
+        <renameColumn tableName="PAYMENT" oldColumnName="VALUE" newColumnName="VALUE" columnDataType="BIGINT(20)"/>
+    </changeSet>
+
+    <changeSet id="payments-8" author="vm">
+        <renameColumn tableName="PAYMENT" oldColumnName="REFERENCE" newColumnName="INVOICE_NUMBER" columnDataType="BIGINT(20)"/>
+    </changeSet>
+
+    <changeSet id="payments-9" author="vm">
+        <addColumn tableName="INVOICE">
+            <column name="DATE" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="payments-10" author="vm">
+        <renameColumn tableName="PAYMENT" oldColumnName="INVOICE_NUMBER" newColumnName="REFERENCE" columnDataType="bigint(20)"/>
+    </changeSet>
+</databaseChangeLog>

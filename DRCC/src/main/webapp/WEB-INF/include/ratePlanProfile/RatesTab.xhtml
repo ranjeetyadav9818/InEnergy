@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:clx="http://java.sun.com/jsf/composite/components">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+    <j:useBean id="ratePlan" type="com.inenergis.entity.program.RatePlan"/>
+
+    <p:commandButton action="#{controller.addConsumptionRateGroup()}" update="@form" icon="ui-icon-plus" process="@form" rendered="#{not controller.viewModeOn}"
+                     style="margin-bottom: 30px">
+        <o:skipValidators/>
+    </p:commandButton>
+
+    <p:dataTable value="#{controller.consumptionFees}" var="fee" editable="true" id="consumptionFees">
+        <p:ajax event="rowEdit" listener="#{controller.onRateRowEdit}" update="consumptionFees"/>
+        <p:column headerText="Fee name">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.name}" required="true" label="Fee name" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.feeTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}"/>
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu value="#{fee.name}" required="true" label="Fee name" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.gasFeeTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}" />
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Calendar">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.calendar.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.calendar}" label="Calendar" converter="masterCalendarConverter">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.calendars}" var="calendar" itemLabel="#{calendar.name}" itemValue="#{calendar}"/>
+                        <p:ajax update="touSelection"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="TOU">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.timeOfUse.getTOULabel()}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.timeOfUse}" label="TOU" converter="touCalendarConverter" id="touSelection">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.getTous(fee)}" var="tou" itemLabel="#{tou.getTOULabel()}" itemValue="#{tou}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="During Event">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.event.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.event}" label="Event" converter="omnifaces.GenericEnumConverter">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.rateEventFees}" var="event" itemLabel="#{event.name}" itemValue="#{event}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Type">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{fee.rateType.name}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu value="#{fee.rateType}" label="Type" converter="omnifaces.GenericEnumConverter">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.rateTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <c:forEach items="#{controller.selectedProfile.getActiveRateTiers()}" var="column">
+            <p:column headerText="Tier #{column.name}">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <clx:MoneyOutputComponent value="#{fee.getConsumptionFee(column).price}"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <clx:MoneyInputComponent value="#{fee.getConsumptionFee(column).price}" errorLabel="Tier price"/>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+        </c:forEach>
+        <p:column style="width: 32px;" class="showOnDesktop">
+            <p:rowEditor/>
+        </p:column>
+        <p:column style="width: 32px;" class="showOnDesktop">
+            <p:commandButton actionListener="#{controller.removeConsumptionRate(fee)}" icon="ui-icon-remove" update="consumptionFees"/>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

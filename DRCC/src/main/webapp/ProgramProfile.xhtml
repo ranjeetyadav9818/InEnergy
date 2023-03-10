@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="#{programProfileController.program.name} program" outcome="ProgramManagement">
+                    <f:param name="o" value="#{parameterEncoderService.encode(programProfileController.program.id)}"/>
+                </p:menuitem>
+                <p:menuitem value="Program Profiles"/>
+            </p:breadCrumb>
+
+            <h:panelGroup
+                    rendered="#{(not programProfileController.newProfile and programProfileController.profile eq null) or programProfileController.newProfile}">
+                <div class="card card-w-title">
+                    <p:commandButton process="@this" update="@form" value="Create Profile" action="#{programProfileController.add()}"
+                                     rendered="#{not programProfileController.newProfile and programProfileController.profile eq null}"/>
+
+                    <p:outputPanel rendered="#{programProfileController.newProfile}">
+
+                        <h:panelGrid columns="1">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText required="true" id="profileName" value="#{programProfileController.profile.name}">
+                                    <f:validator validatorId="uniqueEntityValidator"/>
+                                    <f:attribute name="currentEntity" value="#{programProfileController.profile}"/>
+                                    <f:attribute name="uniqueColumns" value="name,program_id"/>
+                                    <f:attribute name="fields" value="{newValue},program.id"/>
+                                </p:inputText>
+                                <p:outputLabel value="Profile ID:" for="profileName" rendered="#{programProfileController.newProfile }"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-calendar">
+                                <p:calendar id="effectiveStart" value="#{programProfileController.profile.effectiveStartDate}"
+                                            pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                            timeZone="America/Los_Angeles" mask="true"
+                                            binding="${profileStartDateNew}" mindate="01/01/2000" required="true"/>
+                                <p:outputLabel value="Effective Start Date:" for="effectiveStart"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-calendar">
+                                <p:calendar id="effectiveEnd" value="#{programProfileController.profile.effectiveEndDate}"
+                                            pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                            timeZone="America/Los_Angeles" mask="true"
+                                            mindate="#{profileStartDateNew.value}">
+                                    <f:attribute name="startDate" value="#{profileStartDateNew}"/>
+                                    <f:validator validatorId="endDateRangeValidator"/>
+                                </p:calendar>
+                                <p:outputLabel value="Effective End Date:" for="effectiveEnd"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="Save" action="#{programProfileController.saveProfile()}" process="@form"
+                                         update="@form"/><p:spacer width="5"/>
+                        <p:spacer width="10"/>
+                        <p:commandButton id="cancel" value="Cancel" action="#{programProfileController.cancelProfile()}" process="@this"
+                                         update="@form"/>
+
+                    </p:outputPanel>
+                </div>
+            </h:panelGroup>
+
+            <div class="EmptyBox10"></div>
+
+            <div class="ContainerIndent">
+                <p:dataTable value="#{programProfileController.program.profiles}" var="profile" reflow="true">
+                    <p:column headerText="Name">
+                        <h:outputText value="#{profile.name}-#{profile.program.name}"/>
+                        <p:spacer width="5"/>
+                        <h:outputText value="Active" rendered="#{programProfileController.program.activeProfile == profile}" styleClass="greenLabel"/>
+                    </p:column>
+                    <p:column headerText="Effective Start Date">
+                        <h:outputText value="#{profile.effectiveStartDate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Effective End Date">
+                        <h:outputText value="#{profile.effectiveEndDate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Action">
+                        <p:commandButton rendered="#{not programProfileController.newProfile}" value="Edit"
+                                         action="#{programProfileController.editProfile(profile)}" update="@form"/>
+                    </p:column>
+                    <p:column headerText="Last Date Updated">
+                        <h:outputText value="#{profile.lastUpdate}">
+                            <f:convertDateTime pattern="MM/dd/yyyy h:mm a" timeZone="America/Los_Angeles"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </div>
+            <div class="EmptyBox20"></div>
+            <div class="ContainerIndent" jsf:rendered="#{not programProfileController.newProfile and programProfileController.profile ne null}">
+                <h3>Profile #{programProfileController.profile.name} details</h3>
+            </div>
+            <c:set var="controller" value="#{programProfileController}"/>
+
+            <div class="ContainerIndent">
+                <p:tabView id="profileTabView" rendered="#{not programProfileController.newProfile and programProfileController.profile ne null}">
+                    <c:set var="tabViewId" value="profileTabView"/>
+                    <p:tab id="GeneralTab" title="General">
+                        <ui:include src="WEB-INF/include/programProfile/GeneralTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="EligibilityTab" title="Eligibility">
+                        <ui:include src="WEB-INF/include/programProfile/EligibilityTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="EnrollmentTab" title="Enrollment">
+                        <ui:include src="WEB-INF/include/programProfile/EnrollmentTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="EquipmentTab" title="Equipment">
+                        <ui:include src="WEB-INF/include/programProfile/EquipmentTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="WholesaleTab" title="Wholesale">
+                        <ui:include src="WEB-INF/include/programProfile/WholesaleTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="DispatchTab" title="Dispatch">
+                        <ui:include src="WEB-INF/include/programProfile/DispatchTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="IncentivesTab" title="Incentives">
+                        <ui:include src="WEB-INF/include/programProfile/IncentivesTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="HistoryTab" title="History">
+                        <ui:include src="WEB-INF/include/programProfile/HistoryTab.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+                <div class="EmptyBox10"></div>
+
+                <h:panelGroup rendered="#{not programProfileController.newProfile and programProfileController.profile ne null}">
+                    <div style="margin: 20px 0;">
+                        <p:commandButton process="@this" update="@form" value="Cancel" action="#{programProfileController.cancelProfile()}"/>
+                        <p:spacer width="10"/>
+                        <p:commandButton update="@form" value="Save all" action="#{programProfileController.saveWholeProfile()}"/>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

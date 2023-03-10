@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <c:set var="controller" value="#{catalogAndInventoriesImportExportController}"/>
+        <c:set var="inventoryType" value="Transmission"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Catalogs and Inventories Import/Export" url="#"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <h3>Upload</h3>
+                <h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:fileUpload label="Assets" fileUploadListener="#{controller.submit}">
+                        <f:attribute name="type" value="assets"/>
+                    </p:fileUpload>
+                    <p:fileUpload label="Inventories" fileUploadListener="#{controller.submit}">
+                        <f:attribute name="type" value="devices"/>
+                    </p:fileUpload>
+                    <p:fileUpload label="Connections" fileUploadListener="#{controller.submit}">
+                        <f:attribute name="type" value="links"/>
+                    </p:fileUpload>
+                </h:panelGrid>
+            </div>
+            <div class="card card-w-title">
+                <h3>Download</h3>
+                <h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" value="Assets">
+                        <f:param name="n" value="#{catalogAndInventoriesImportExportController.commodityType}"/>
+                        <p:fileDownload value="#{controller.download('assets')}"/>
+                    </p:commandButton>
+                    <p:spacer/>
+                    <p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" value="Inventories">
+                        <f:param name="n" value="#{catalogAndInventoriesImportExportController.commodityType}"/>
+                        <p:fileDownload value="#{controller.download('inventories')}"/>
+                    </p:commandButton>
+                    <p:spacer/>
+                    <p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" value="Connections">
+                        <f:param name="n" value="#{catalogAndInventoriesImportExportController.commodityType}"/>
+                        <p:fileDownload value="#{controller.download('connections')}"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

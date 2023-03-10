@@ -1,0 +1,10 @@
+<div class="ui-g">
+  <div class="ui-g-12" style="padding: 0px" >
+    <app-header *ngIf="isUserLoggedIn()"></app-header>
+    <div class="ui-g-1"></div>
+    <div class="ui-g-10" style="padding: 0px;" >
+      <router-outlet></router-outlet>
+    </div>
+    <div class="ui-g-1"></div>
+  </div>
+</div>

@@ -1,0 +1,170 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="2" author="vm">
+        <addColumn tableName="ENERGY_CONTRACT_FEE">
+            <column name="COMPARISON_ELIGIBLE" type="tinyint(1)" defaultValue="0"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="3" author="vm">
+        <addColumn tableName="CHARGES_FEES">
+            <column name="COMPARISON_ELIGIBLE" type="tinyint(1)" defaultValue="0"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="4" author="vm">
+        <dropColumn tableName="ENERGY_CONTRACT_FEE" columnName="COMPARISON_ELIGIBLE"/>
+    </changeSet>
+    <changeSet id="5" author="vm">
+        <createTable tableName="CHARGES_FEE_COMPARISON">
+            <column name="CHARGES_ATTRIBUTE_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_ONE_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_TWO_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_COMPARATOR" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="6" author="vm">
+        <dropTable tableName="CHARGES_FEE_COMPARISON"/>
+    </changeSet>
+
+    <changeSet id="7" author="vm">
+        <createTable tableName="CHARGES_FEE_COMPARISON">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="ENTITY_NAME" type="VARCHAR(255)"/>
+            <column name="CHARGES_ATTRIBUTE_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_ONE_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_TWO_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_COMPARATOR" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="8" author="vm">
+        <addColumn tableName="ENERGY_CONTRACT_CREDIT">
+            <column name="COMPARISON_ELIGIBLE" type="tinyint(1)" defaultValue="0"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="9" author="vm">
+        <dropColumn tableName="ENERGY_CONTRACT_CREDIT" columnName="COMPARISON_ELIGIBLE"/>
+        <addColumn tableName="CREDIT_DISCOUNT_FEE">
+            <column name="COMPARISON_ELIGIBLE" type="tinyint(1)" defaultValue="0"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="10" author="vm">
+        <createTable tableName="CREDITS_DISCOUNTS_FEE_COMPARISON">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="ENTITY_NAME" type="VARCHAR(255)"/>
+            <column name="CHARGES_ATTRIBUTE_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_ONE_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_TWO_ID" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CHARGES_FEE_COMPARATOR" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="11" author="vm">
+        <addForeignKeyConstraint
+                baseTableName="CHARGES_FEE_COMPARISON"
+                baseColumnNames="CHARGES_ATTRIBUTE_ID"
+                constraintName="FK_CHARGES_FEE_COMPARISON_CHARGES_ATTRIBUTE_ID"
+                referencedTableName="CHARGES_ATTRIBUTE"
+                referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="12" author="vm">
+        <addForeignKeyConstraint
+                baseTableName="CHARGES_FEE_COMPARISON"
+                baseColumnNames="CHARGES_FEE_ONE_ID"
+                constraintName="FK_CHARGES_FEE_COMPARISON_CHARGES_FEE_ONE_ID"
+                referencedTableName="CHARGES_FEES"
+                referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="13" author="vm">
+        <addForeignKeyConstraint
+                baseTableName="CHARGES_FEE_COMPARISON"
+                baseColumnNames="CHARGES_FEE_TWO_ID"
+                constraintName="FK_CHARGES_FEE_COMPARISON_CHARGES_FEE_TWO_ID"
+                referencedTableName="CHARGES_FEES"
+                referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="14" author="vm">
+        <renameTable oldTableName="CREDITS_DISCOUNTS_FEE_COMPARISON" newTableName="CREDIT_DISCOUNT_FEE_COMPARISON"/>
+    </changeSet>
+
+    <changeSet id="15" author="vm">
+        <renameColumn tableName="CREDIT_DISCOUNT_FEE_COMPARISON"
+                      oldColumnName="CHARGES_ATTRIBUTE_ID"
+                      newColumnName="CREDIT_DISCOUNT_ID"
+                      columnDataType="bigint(20)"/>
+    </changeSet>
+
+    <changeSet id="16" author="vm">
+        <dropColumn tableName="CREDIT_DISCOUNT_FEE_COMPARISON" columnName="ENTITY_NAME"/>
+    </changeSet>
+
+    <changeSet id="17" author="vm">
+        <renameColumn tableName="CREDIT_DISCOUNT_FEE_COMPARISON"
+                      oldColumnName="CHARGES_FEE_ONE_ID"
+                      newColumnName="CREDIT_DISCOUNT_FEE_ONE_ID"
+                      columnDataType="bigint(20)"/>
+        <renameColumn tableName="CREDIT_DISCOUNT_FEE_COMPARISON"
+                      oldColumnName="CHARGES_FEE_TWO_ID"
+                      newColumnName="CREDIT_DISCOUNT_FEE_TWO_ID"
+                      columnDataType="bigint(20)"/>
+    </changeSet>
+
+    <changeSet id="18" author="vm">
+        <renameColumn tableName="CREDIT_DISCOUNT_FEE_COMPARISON"
+                      oldColumnName="CHARGES_FEE_COMPARATOR"
+                      newColumnName="CREDIT_DISCOUNT_FEE_COMPARATOR"
+                      columnDataType="varchar(255)"/>
+    </changeSet>
+    <changeSet id="19" author="vm">
+        <addForeignKeyConstraint
+                baseTableName="CREDIT_DISCOUNT_FEE_COMPARISON"
+                baseColumnNames="CREDIT_DISCOUNT_ID"
+                constraintName="FK_CREDIT_DISCOUNT_FEE_COMPARISON_CREDIT_DISCOUNT_ID"
+                referencedTableName="CREDIT_DISCOUNT"
+                referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="20" author="vm">
+        <addForeignKeyConstraint
+                baseTableName="CREDIT_DISCOUNT_FEE_COMPARISON"
+                baseColumnNames="CREDIT_DISCOUNT_FEE_ONE_ID"
+                constraintName="FK_CREDIT_DISCOUNT_FEE_COMPARISON_CREDIT_DISCOUNT_FEE_ONE_ID"
+                referencedTableName="CREDIT_DISCOUNT_FEE"
+                referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="21" author="vm">
+        <addForeignKeyConstraint
+                baseTableName="CREDIT_DISCOUNT_FEE_COMPARISON"
+                baseColumnNames="CREDIT_DISCOUNT_FEE_TWO_ID"
+                constraintName="FK_CREDIT_DISCOUNT_FEE_COMPARISON_CREDIT_DISCOUNT_FEE_TWO_ID"
+                referencedTableName="CREDIT_DISCOUNT_FEE"
+                referencedColumnNames="ID"/>
+    </changeSet>
+</databaseChangeLog>

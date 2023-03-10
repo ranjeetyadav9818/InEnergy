@@ -1,0 +1,162 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Commodities</h3>
+        <h:panelGroup id="commodities">
+            <p:commandButton action="#{energyContractController.addCommodity()}" update="commodities" process="commodities"
+                             icon="ui-icon-add" rendered="#{readonly == false}">
+                <o:skipValidators/>
+            </p:commandButton>
+            <p:outputLabel rendered="#{empty energyContractController.energyContract.parties}">No commodities defined yet</p:outputLabel>
+            <ui:repeat value="#{energyContractController.energyContract.commodities}" var="commodity" varStatus="commodityStatus">
+                <p:separator rendered="#{not commodityStatus.first}"/>
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Commodity Type" for="commodityType"/>
+                        <p:selectOneMenu id="commodityType" value="#{commodity.commodityType}" required="true"
+                                         disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.commodityTypes}"
+                                           var="commodityType" itemLabel="#{commodityType.name}" itemValue="#{commodityType}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Product Type" for="productType"/>
+                        <p:selectOneMenu id="productType" value="#{commodity.commodityProductType}" required="true"
+                                         disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.commodityProductTypes}"
+                                           var="commodityProductType" itemLabel="#{commodityProductType.name}" itemValue="#{commodityProductType}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Program" for="commodityProgram"/>
+                        <p:selectOneMenu id="commodityProgram" value="#{commodity.commodityProgram}" required="true"
+                                         converter="commodityProgramConverter"
+                                         disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{energyContractController.commodityPrograms}"
+                                           var="commodityProgram" itemLabel="#{commodityProgram.name}" itemValue="#{commodityProgram}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton action="#{energyContractController.removeCommodity(commodity)}"
+                                         update=":form:#{tabViewId}:commodities" process="@this" icon="ui-icon-remove"
+                                         rendered="#{readonly == false}">
+                            <o:skipValidators/>
+                        </p:commandButton>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Sub-Program" for="subProgram"/>
+                        <p:selectOneMenu id="subProgram" value="#{commodity.commoditySubProgram}"
+                                         converter="commoditySubProgramConverter"
+                                         disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{energyContractController.commoditySubPrograms}"
+                                           var="commoditySubProgram" itemLabel="#{commoditySubProgram.name}" itemValue="#{commodityProgram}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Power Source" for="powerSource"/>
+                        <p:selectOneMenu id="powerSource" value="#{commodity.commodityPowerSource}" disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.commodityPowerSources}"
+                                           var="powerSource" itemLabel="#{powerSource.name}" itemValue="#{powerSource}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <p:spacer/>
+                    <p:spacer/>
+                </p:panelGrid>
+                <h4 class="with-icon">Quantities</h4>
+                <h:panelGroup id="quantities">
+                    <p:commandButton action="#{energyContractController.addQuantity(commodity)}" update="quantities" process="quantities"
+                                     icon="ui-icon-add" rendered="#{readonly == false}">
+                        <o:skipValidators/>
+                    </p:commandButton>
+                    <p:spacer width="10"/>
+                    <p:outputLabel rendered="#{empty commodity.quantities}">No quantities defined yet</p:outputLabel>
+                    <ui:repeat value="#{commodity.quantities}" var="quantity">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Minimum Quality:" for="minimumQuality"/>
+                                <p:inputNumber label="Minimum Quality" decimalPlaces="5" maxValue="10000" id="minimumQuality"
+                                               value="#{quantity.minimumQuality}" required="true" readonly="#{readonly}"/>
+                                <p:selectOneMenu id="minimumQualityUnit" value="#{quantity.minimumQualityUnit}" required="true"
+                                                 disabled="#{readonly}">
+                                    <f:selectItems value="#{constantsProvider.commodityUnits}" var="unit" itemValue="#{unit}" itemLabel="#{unit.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Maximum Quality:" for="maximumQuality"/>
+                                <p:inputNumber label="Maximum Quality" decimalPlaces="5" maxValue="10000" id="maximumQuality"
+                                               value="#{quantity.maximumQuality}" required="true" readonly="#{readonly}"/>
+                                <p:selectOneMenu id="maximumQualityUnit" value="#{quantity.maximumQualityUnit}" required="true"
+                                                 disabled="#{readonly}">
+                                    <f:selectItems value="#{constantsProvider.commodityUnits}" var="unit" itemValue="#{unit}" itemLabel="#{unit.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-icon">
+                                <p:commandButton action="#{energyContractController.removeQuantity(commodity, quantity)}"
+                                                 update=":form:#{tabViewId}:commodities" process="@this" icon="ui-icon-remove"
+                                                 rendered="#{readonly == false}">
+                                    <o:skipValidators/>
+                                </p:commandButton>
+                            </h:panelGroup>
+
+                            <p:spacer/>
+
+                            <h:panelGroup>
+                                <p:calendar value="#{quantity.dateFrom}" pattern="MM/dd/yyyy" timeZone="UTC" mask="true" placeholder="mm/dd/yyyy"
+                                            disabled="#{readonly}" label="Quantity Start Date">
+                                    <f:validator validatorId="endDateRangeValidator"/>
+                                </p:calendar>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:calendar value="#{quantity.dateTo}" pattern="MM/dd/yyyy" timeZone="UTC" mask="true" placeholder="mm/dd/yyyy"
+                                            disabled="#{readonly}" label="Quantity End Date">
+                                    <f:validator validatorId="endDateRangeValidator"/>
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Frequency" for="frequency"/>
+                                <p:selectOneMenu id="frequency" value="#{quantity.frequency}" disabled="#{readonly}" label="Frequency">
+                                    <f:selectItem noSelectionOption="true"/>
+                                    <f:selectItems value="#{constantsProvider.commodityFrequencies}"
+                                                   var="frequency" itemLabel="#{frequency.name}" itemValue="#{frequency}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </ui:repeat>
+                </h:panelGroup>
+            </ui:repeat>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="commodities" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="commodities" process="commodities" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

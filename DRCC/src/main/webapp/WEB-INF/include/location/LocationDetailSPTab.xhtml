@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{locationSubmissionDetailController.selectableAgreementPointMap}" id="TblocSP" var="apm" reflow="true" rows="25"
+                 rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single" rowKey="#{apm.rowKey}">
+        <p:ajax event="rowSelect" listener="#{locationSubmissionDetailController.onServicePointSelect}"/>
+        <p:column headerText="SP ID" filterBy="#{apm.servicePoint.servicePointId}">
+            <h:outputText value="#{apm.servicePoint.servicePointId}"/>
+        </p:column>
+        <p:column headerText="Meter ID" filterBy="#{apm.servicePoint.meter.meterId}">
+            <h:outputText value="#{apm.servicePoint.meter.meterId}"/>
+        </p:column>
+
+        <p:column headerText="Meter Badge Number" filterBy="#{apm.servicePoint.meter.badgeNumber}">
+            <h:outputText value="#{apm.servicePoint.meter.badgeNumber}"/>
+        </p:column>
+        <p:column headerText="Start Date" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{apm.startDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="End Date" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{apm.endDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

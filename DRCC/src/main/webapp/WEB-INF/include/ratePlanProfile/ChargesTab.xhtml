@@ -1,0 +1,218 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+
+    <h3 class="with-icon">Charges Attributes</h3>
+    <p:commandButton action="#{ratePlanController.addChargesAttribute()}" update="@form" icon="ui-icon-add" rendered="#{not controller.viewModeOn}"/>
+
+    <c:forEach items="#{ratePlanController.selectedProfile.chargesAttributes}" var="attribute">
+        <div class="card">
+
+            <p:panelGrid columns="4">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Category" for="attributeCategory"/>
+                    <p:selectOneMenu id="attributeCategory" value="#{attribute.category}" required="true" disabled="#{controller.viewModeOn}">
+                        <f:selectItem/>
+                        <f:selectItems value="#{constantsProvider.chargeAttributesCategory}" var="category" itemLabel="#{category.label}"
+                                       itemValue="#{category}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Charge Option" for="chargeOption"/>
+                    <p:selectOneMenu id="chargeOption" value="#{attribute.option}" disabled="#{controller.viewModeOn}">
+                        <f:selectItem/>
+                        <f:selectItems value="#{constantsProvider.chargesOptions}" var="option" itemLabel="#{option.label}" itemValue="#{option}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Service Type" for="chargeServiceType"/>
+                    <p:selectOneMenu id="chargeServiceType" value="#{attribute.serviceType}" disabled="#{controller.viewModeOn}">
+                        <f:selectItem/>
+                        <f:selectItems value="#{constantsProvider.chargesServiceType}" var="serviceType" itemLabel="#{serviceType.label}"
+                                       itemValue="#{serviceType}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:commandButton action="#{ratePlanController.removeChargesAttribute(attribute)}" update="@form" process="@this"
+                                     icon="ui-icon-remove" rendered="#{not controller.viewModeOn}"/>
+                </h:panelGroup>
+
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Equipment Type" for="chargeEquipmentType"/>
+                    <p:selectOneMenu id="chargeEquipmentType" value="#{attribute.equipmentType}" disabled="#{controller.viewModeOn}">
+                        <f:selectItem/>
+                        <f:selectItems value="#{constantsProvider.chargesEquipmentType}" var="equipmentType" itemLabel="#{equipmentType.label}"
+                                       itemValue="#{equipmentType}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield-switch">
+                    <p:outputLabel value="Waiveable" for="waiveable"/>
+                    <p:inputSwitch id="waiveable" value="#{attribute.waiveable}" disabled="#{controller.viewModeOn}"/>
+                </h:panelGroup>
+                <p:column/><p:column/>
+            </p:panelGrid>
+            <h4 class="with-icon">Fees</h4>
+            <p:commandButton action="#{ratePlanController.addFees(attribute)}" update="@form" icon="ui-icon-add"
+                             rendered="#{not controller.viewModeOn}"/>
+            <c:forEach items="#{attribute.fees}" var="fee" varStatus="feeIterStatus">
+                <p:separator rendered="#{not feeIterStatus.first}"/>
+                <p:panelGrid columns="4">
+                    <p:column/>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Season" for="feeSeason"/>
+                        <p:selectOneMenu id="feeSeason" value="#{fee.season}" required="true" converter="rateSeasonConverter"
+                                         disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{ratePlanController.selectedProfile.seasonCalendars}" var="season" itemLabel="#{season.name}"
+                                           itemValue="#{season}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Time of use period" for="timeOfUsePeriod"/>
+                        <p:selectOneMenu id="timeOfUsePeriod" value="#{fee.timeOfUsePeriod}" required="true" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.timeTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:commandButton action="#{ratePlanController.removeFee(attribute,fee)}" update="@form" process="@this" icon="ui-icon-remove"
+                                         rendered="#{not controller.viewModeOn}"/>
+                    </h:panelGroup>
+
+                    <p:column/>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Time of day" for="timeOfDayFrom"/>
+                        <p:selectOneMenu id="timeOfDayFrom" value="#{fee.timeOfDayFrom}" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.hourEnds}" var="he" itemLabel="#{he.name()}" itemValue="#{he}"/>
+                        </p:selectOneMenu>
+                        to
+                        <p:selectOneMenu id="timeOfDayTo" value="#{fee.timeOfDayTo}" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.hourEnds}" var="he" itemLabel="#{he.name()}" itemValue="#{he}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Event option" for="eventOption"/>
+                        <p:selectOneMenu id="eventOption" value="#{fee.eventOption}" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.feesEventOptions}" var="option" itemLabel="#{option.label}" itemValue="#{option}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <p:column/>
+
+                    <p:column/>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Fee type" for="feeType"/>
+                        <p:selectOneMenu id="feeType" value="#{fee.feeType}" required="true" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.feeTypes}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Frequency" for="feeFrequency"/>
+                        <p:selectOneMenu id="feeFrequency" value="#{fee.feeFrequency}" required="true" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.feeFrequencies}" var="frequency" itemLabel="#{frequency.label}" itemValue="#{frequency}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <p:column/>
+
+
+                    <p:column/>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber id="feeAmmount" label="fee" required="true" value="#{fee.feeAmount}" decimalPlaces="5"
+                                       minValue="0" maxValue="100000" disabled="#{controller.viewModeOn}"/>
+                        <p:outputLabel value="Fee" for="feeAmmount"/>
+                    </h:panelGroup>
+                    <p:column>
+                        per
+                        <p:selectOneMenu value="#{fee.feeUnit}" style="margin-left: 25px" required="true" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.feeableUnits}" var="unit" itemLabel="#{unit.label}" itemValue="#{unit}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column/>
+
+                    <p:column/>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Baseline" for="baseline"/>
+                        <p:selectOneMenu id="baseline" value="#{fee.baseline}" required="true" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.feeBaselines}" var="baseline" itemLabel="#{baseline.label}" itemValue="#{baseline}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber label="Baseline (from)" value="#{fee.baselineFrom}" decimalPlaces="5" minValue="0" maxValue="1000000"
+                                       required="true" disabled="#{controller.viewModeOn}"/>
+                        to
+                        <p:inputNumber label="Baseline (to)" value="#{fee.baselineTo}" decimalPlaces="5" minValue="0" maxValue="1000000"
+                                       required="true" disabled="#{controller.viewModeOn}"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:selectOneMenu value="#{fee.baselineUnit}" required="true" disabled="#{controller.viewModeOn}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.feeBaselineUnits}" var="unit" itemLabel="#{unit.label}" itemValue="#{unit}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <p:spacer/>
+                    <h:panelGroup styleClass="md-inputfield-switch">
+                        <p:outputLabel value="Comparison Eligible" for="comparisonEligible"/>
+                        <p:inputSwitch id="comparisonEligible" value="#{fee.comparisonEligible}" disabled="#{controller.viewModeOn}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </c:forEach>
+
+            <j:useBean id="feeComparison" type="com.inenergis.entity.program.ChargesFeeComparison"/>
+
+            <h3 class="with-icon">Fee Comparison</h3>
+            <p:commandButton action="#{ratePlanController.addFeeComparison(attribute)}" update="@form" icon="ui-icon-add"
+                             rendered="#{not controller.viewModeOn}"/>
+            <c:forEach items="#{attribute.chargesFeeComparisons}" var="feeComparison">
+                <p:panelGrid columns="5">
+                    <p:column/>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:selectOneMenu id="feeComparisonOne" value="#{feeComparison.chargesFeeOne}" required="true"
+                                         disabled="#{controller.viewModeOn}" label="Fee One" converter="chargesFeeConverter">
+                            <f:selectItem/>
+                            <c:forEach items="#{ratePlanController.chargesFees}" var="fee" varStatus="idx">
+                                <f:selectItem itemValue="#{fee}" itemLabel="Fee #{idx.index + 1}"/>
+                            </c:forEach>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        and <p:spacer width="20"/>
+                        <p:selectOneMenu id="feeComparisonTwo" value="#{feeComparison.chargesFeeTwo}" required="true"
+                                         disabled="#{controller.viewModeOn}" label="Fee Two" converter="chargesFeeConverter">
+                            <f:selectItem/>
+                            <c:forEach items="#{ratePlanController.chargesFees}" var="fee" varStatus="idx">
+                                <f:selectItem itemValue="#{fee}" itemLabel="Fee #{idx.index + 1}"/>
+                            </c:forEach>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        use <p:spacer width="20"/>
+                        <p:selectOneMenu id="feeComparisonComparator" value="#{feeComparison.comparator}" required="true"
+                                         disabled="#{controller.viewModeOn}" label="Fee Comparator">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.chargesFeeComparators}" var="comparator"
+                                           itemLabel="#{comparator.name}" itemValue="#{comparator}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:commandButton action="#{ratePlanController.removeFeeComparison(attribute, feeComparison)}" update="@form"
+                                         process="@this" icon="ui-icon-remove" rendered="#{not controller.viewModeOn}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </c:forEach>
+        </div>
+    </c:forEach>
+</ui:composition>

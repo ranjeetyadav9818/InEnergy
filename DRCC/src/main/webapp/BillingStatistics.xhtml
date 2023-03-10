@@ -1,0 +1,157 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:clx="http://java.sun.com/jsf/composite/components"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formCL">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Billing Cycle Statistics"/>
+            </p:breadCrumb>
+            <div class="card">
+                <p:panelGrid columns="3">
+                    <h:panelGroup>
+                        <p:selectOneRadio id="cycleSelection" value="#{billingStatisticsController.cycleSelectionType}" converter="omnifaces.GenericEnumConverter">
+                            <f:selectItems value="#{billingStatisticsController.cycleSelectionTypeEnums}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                            <p:ajax event="change" update="@form"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{billingStatisticsController.cycleSelectionType eq 'CHOOSE_PERIOD'}">
+                        <p:selectOneMenu id="yearSel" label="Cycle Year" value="#{billingStatisticsController.year}" required="true" converter="javax.faces.Long"
+                                         disabled="#{billingStatisticsController.cycleSelectionType ne 'CHOOSE_PERIOD'}" style="margin-bottom: 0px;">
+                            <f:selectItems value="#{billingStatisticsController.years}" var="year" itemLabel="#{year.toString()}" itemValue="#{year}"/>
+                            <p:ajax event="change" listener="#{billingStatisticsController.loadCycle()}" update="@form"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{billingStatisticsController.cycleSelectionType eq 'CHOOSE_PERIOD'}">
+                        <p:selectOneMenu id="monthSel" label="Cycle Month" value="#{billingStatisticsController.month}" required="true"
+                                         converter="omnifaces.GenericEnumConverter"
+                                         disabled="#{billingStatisticsController.cycleSelectionType ne 'CHOOSE_PERIOD'}" style="margin-bottom: 0px;">
+                            <f:selectItems value="#{constantsProvider.months}" var="month" itemValue="#{month}" itemLabel="#{month.name}"/>
+                            <p:ajax event="change" listener="#{billingStatisticsController.loadCycle()}" update="@form"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </div>
+
+            <div class="ui-g dashboard">
+                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <p:panel header="Invoice Statictics" styleClass="ui-shadow-content" style="text-align: center; height: 360px;">
+                        <p:chart type="pie" model="#{billingStatisticsController.paymentStatisticsPieChart}"
+                                 rendered="#{billingStatisticsController.paymentStatisticsPieChart.data.size() != 0}"/>
+                        <p:panel style="text-align: center;margin: 20px;border-width: 0;"
+                                 rendered="#{billingStatisticsController.paymentStatisticsPieChart.data.size() == 0}">No data</p:panel>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <p:panel header="Payment Statistics" styleClass="ui-shadow-content" style="text-align: center; height: 360px;">
+                        <p:chart type="bar" model="#{billingStatisticsController.paymentStatisticsBarChart}" style="text-align: center;margin: 20px;border-width: 0;"
+                                 rendered="#{billingStatisticsController.paymentStatisticsBarChart.series[0].data.size() != 0}"/>
+                        <p:panel style="text-align: center;margin: 20px;border-width: 0;"
+                                 rendered="#{billingStatisticsController.paymentStatisticsBarChart.series[0].data.size() == 0}">No data</p:panel>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                    <p:dataTable value="#{billingStatisticsController.paymentDetailedStatistics}" var="stat"
+                                 selectionMode="single" rowKey="#{stat.date}"
+                                 style="text-align: center;margin-top: 10px">
+
+                        <p:ajax event="rowSelect" listener="#{billingStatisticsController.onRowSelect}" update="@form"/>
+
+                        <j:useBean id="stat" type="com.inenergis.entity.PaymentDetailedStatistics"/>
+
+                        <f:facet name="header">Billing Cycles</f:facet>
+
+                        <p:column headerText="Date" sortBy="#{stat.date}">
+                            <h:outputText value="#{stat.date}" converter="localDateConverter"/>
+                        </p:column>
+
+                        <p:column headerText="Serial" sortBy="#{stat.serial}">
+                            <h:outputText value="#{stat.serial}"/>
+                        </p:column>
+
+                        <p:column headerText="Invoices" sortBy="#{stat.count}">
+                            <h:outputText value="#{stat.count}"/>
+                        </p:column>
+
+                        <p:column headerText="Total">
+                            <clx:MoneyOutputComponent value="#{stat.total}"/>
+                        </p:column>
+
+                        <p:column headerText="Invoices Paid">
+                            <h:outputText value="#{stat.paidPercentage}%"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:rendered="#{billingStatisticsController.showInvoices}">
+                    <p:dataTable value="#{billingStatisticsController.lazyInvoicesPerDay}" widgetVar="custTableInvoiceDetail" lazy="true"
+                                 var="invoice" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" style="text-align: center;margin-top: 10px">
+
+                        <j:useBean id="invoice" type="com.inenergis.entity.billing.Invoice"/>
+
+                        <f:facet name="header">Invoices</f:facet>
+
+                        <p:column headerText="Reference" filterBy="#{invoice.invoiceNumber}">
+                            <h:outputText value="#{invoice.invoiceNumber}"/>
+                        </p:column>
+                        <p:column headerText="SA" filterBy="#{invoice.serviceAgreement.serviceAgreementId}">
+                            <p:link value="#{invoice.serviceAgreement.serviceAgreementId}" outcome="CustomerList.xhtml">
+                                <f:param name="o" value="#{parameterEncoderService.encode(invoice.serviceAgreement.serviceAgreementId)}"/>
+                            </p:link>
+                        </p:column>
+                        <p:column headerText="Rate Plans">
+                            <ui:repeat value="#{invoice.serviceAgreement.ratePlanEnrollments}" var="rpe">
+                                <h:outputText value="#{rpe.ratePlan.name} " rendered="#{rpe.ratePlan.active eq true}"/>
+                            </ui:repeat>
+                        </p:column>
+                        <p:column headerText="Customer">
+                            <h:outputText value="#{invoice.serviceAgreement.account.person.toName()}"/>
+                        </p:column>
+                        <p:column headerText="SP">
+                            <p:link value="#{invoice.serviceAgreement.agreementPointMaps.get(0).servicePoint.servicePointId}" outcome="ServicePointList.xhtml">
+                                <f:param name="o" value="#{parameterEncoderService.encode(invoice.serviceAgreement.agreementPointMaps.get(0).servicePoint.servicePointId)}"/>
+                            </p:link>
+                        </p:column>
+                        <p:column headerText="City" filterBy="#{invoice.serviceAgreement.mailingCityUpr}">
+                            <h:outputText value="#{invoice.serviceAgreement.mailingCityUpr}"/>
+                        </p:column>
+                        <p:column headerText="Postal Code" filterBy="#{invoice.serviceAgreement.mailingPostal}">
+                            <h:outputText value="#{invoice.serviceAgreement.mailingPostal}"/>
+                        </p:column>
+                        <p:column headerText="Paid" filterBy="#{invoice.paymentDate}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('custTableInvoiceDetail').filter()" autoWidth="false"
+                                                 converter="javax.faces.Boolean" style="width: 60%;font-size: 12px;margin-bottom: 0;">
+                                    <f:selectItem noSelectionOption="true"/>
+                                    <f:selectItem itemLabel="Yes" itemValue="#{true}"/>
+                                    <f:selectItem itemLabel="No" itemValue="#{false}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="Yes" rendered="#{invoice.paymentDate ne null}"/>
+                            <h:outputText value="No" rendered="#{invoice.paymentDate eq null}"/>
+                        </p:column>
+                        <p:column headerText="Total">
+                            <clx:MoneyOutputComponent value="#{invoice.getTotal()}"/>
+                        </p:column>
+                        <p:column headerText="Due Date" sortBy="#{invoice.dueDate}">
+                            <h:outputText value="#{invoice.dueDate}" converter="localDateConverter"/>
+                        </p:column>
+                        <p:column headerText="Paid Date" sortBy="#{invoice.paymentDate}">
+                            <h:outputText value="#{invoice.paymentDate}" converter="localDateConverter"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,17 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ContainerIndent">
+            <h:outputText styleClass="red" value="Error: #{pfExceptionHandler.exception.cause.cause.message}" rendered="#{pfExceptionHandler.exception.cause.cause.message ne null}"/>
+            <h:outputText styleClass="red" value="Error: #{pfExceptionHandler.exception.cause.message}" rendered="#{pfExceptionHandler.exception.cause.cause.message eq null and pfExceptionHandler.exception.cause.message ne null}"/>
+            <h:outputText styleClass="red" value="Error: #{pfExceptionHandler.exception.message}" rendered="#{pfExceptionHandler.exception.cause.cause.message eq null and pfExceptionHandler.exception.cause.message eq null}"/>
+        </div>
+    </ui:define>
+</ui:composition>

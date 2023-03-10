@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form id="FVSM">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Billing Cycle Schedule"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+
+                <p:outputPanel id="vsmDiv">
+                    <h:panelGroup rendered="#{billingCycleController.billingCycle eq null}">
+                        <p:commandButton id="addVSMButton" process="@this" update="FVSM:vsmDiv" value="Add Billing Cycle Schedule"
+                                         action="#{billingCycleController.add}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{billingCycleController.billingCycle ne null}">
+                        <h3>Adding Billing Cycle Schedule</h3>
+
+                        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup styleClass="md-inputfield-calendar">
+                                    <p:outputLabel value="Date:" for="billingDate"/>
+                                    <p:calendar id="billingDate" value="#{billingCycleController.billingCycle.date}" pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                                required="true"
+                                                converter="localDateConverter"/>
+                                </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="code" value="#{billingCycleController.billingCycle.serial}" required="true"/>
+                                <p:outputLabel value="Serial:" for="code"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{billingCycleController.save()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="5"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{billingCycleController.cancel()}" process="@this" update="FVSM:vsmDiv"/>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </div>
+            <div class="card card-w-title">
+                <p:outputPanel id="vsmDivT">
+
+                    <!-- Filters & Results -->
+                    <p:dataTable id="baTable" value="#{billingCycleController.billingCycleSchedules}" widgetVar="mappingWidget" editable="true"
+                                 var="cycle" reflow="true" rows="25" paginator="true" paginatorAlwaysVisible="false" rowKey="#{cycle.id}"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 selectionMode="single">
+
+                        <p:ajax event="rowEdit" listener="#{billingCycleController.onRowEdit}"/>
+
+                        <p:column headerText="Serial" filterBy="#{cycle.serial}" filterable="true" sortBy="#{cycle.serial}">
+                            <h:outputText value="#{cycle.serial}"/>
+                        </p:column>
+
+                        <p:column headerText="Date" filterBy="#{cycle.date}" filterable="true" sortBy="#{cycle.date}">
+                            <h:outputText value="#{cycle.date}" converter="localDateConverter"/>
+                        </p:column>
+
+                        <p:column headerText="Actions">
+                            <p:commandButton value="Delete" icon="ui-icon-delete" actionListener="#{billingCycleController.delete(cycle)}" update="baTable"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

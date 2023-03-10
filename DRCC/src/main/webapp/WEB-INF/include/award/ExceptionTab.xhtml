@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <p:dataTable value="#{awardSummaryController.lazyAwardExceptionDataModel}" id="exceptionsTab" widgetVar="custTableE" lazy="true" var="exception"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100" editable="true"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{exception.uuid}" style="text-align: center">
+        <p:ajax event="rowEdit" listener="#{awardSummaryController.onRowEdit}" />
+        <p:ajax event="rowEditCancel" listener="#{awardSummaryController.onRowCancel}"/>
+
+        <p:column headerText="Award ID"
+                  filterBy="#{exception.award.id}"
+                  field="award.id" filterMatchMode="contains">
+            <h:outputText value="#{exception.award.id}"/>
+        </p:column>
+
+        <p:column headerText="Resource Name"
+                  filterBy="#{exception.award.resource.name}"
+                  field="award.resource.name" filterMatchMode="contains">
+            <h:outputText value="#{exception.award.resource.name}"/>
+        </p:column>
+
+
+        <p:column headerText="Trade Date" filterable="false">
+            <h:outputText value="#{exception.award.tradeDate}"><f:convertDateTime pattern="MM/dd/yyyy"/></h:outputText>
+        </p:column>
+
+        <p:column headerText="Details" filterBy="#{exception.description}" field="description">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{exception.description}"/></f:facet>
+                <f:facet name="input"><h:inputText value="#{exception.description}"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+
+        <p:column headerText="Award Accuracy">
+            <h:outputText value="PENDING"/>
+        </p:column>
+
+        <p:column headerText="Status" filterBy="#{exception.status}" field="status">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{exception.status}"/></f:facet>
+                <f:facet name="input"><h:inputText value="#{exception.status}"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+
+        <p:column style="width: 32px" class="showOnDesktop">
+            <p:rowEditor/>
+        </p:column>
+
+    </p:dataTable>
+</ui:composition>

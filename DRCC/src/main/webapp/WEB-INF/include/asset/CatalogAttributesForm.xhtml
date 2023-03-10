@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:p="http://primefaces.org/ui">
+
+    <j:useBean id="controller" type="com.inenergis.controller.asset.CatalogController"/>
+
+    <h:panelGrid id="catalogAttributes" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10">
+        <ui:repeat value="#{attributeList}" var="catalogAttruibute">
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText value="#{catalogAttruibute.stringValue}"
+                             required="#{catalogAttruibute.profileAttribute.mandatory}" size="30" maxlength="255" label="#{catalogAttruibute.profileAttribute.name}"
+                             rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'TEXT'}"/>
+                <p:inputNumber value="#{catalogAttruibute.numberValue}" required="#{catalogAttruibute.profileAttribute.mandatory}"
+                               rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'NUMBER'}"
+                               decimalPlaces="5" maxValue="999999.99999" label="#{catalogAttruibute.profileAttribute.name}"/>
+                <p:calendar value="#{catalogAttruibute.dateValue}" pattern="MM/dd/yyyy" mask="true"
+                            converter="localDateTimeConverter" required="#{catalogAttruibute.profileAttribute.mandatory}"
+                            label="#{catalogAttruibute.profileAttribute.name}" rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'DATE'}"/>
+                <p:outputLabel value="#{catalogAttruibute.profileAttribute.name}:"/>
+            </h:panelGroup>
+        </ui:repeat>
+    </h:panelGrid>
+</ui:composition>

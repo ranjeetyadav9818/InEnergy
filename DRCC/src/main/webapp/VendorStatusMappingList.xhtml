@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Vendor Status Mapping" outcome="VendorStatusMappingList"/>
+        </p:breadCrumb>
+
+        <h:form id="FVSM">
+            <div class="card card-w-title">
+                <h:panelGroup id="vsmDiv">
+                    <p:commandButton id="addVSMButton" process="@this" update="FVSM:vsmDiv" value="Add Mapping"
+                                     action="#{vendorStatusMappingList.add}" rendered="#{vendorStatusMappingList.vendorStatusMapping eq null}"/>
+
+                    <h:panelGroup rendered="#{vendorStatusMappingList.vendorStatusMapping ne null}">
+                        <h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="padding-top: 20px;">
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Vendor:"/>
+                                <p:selectOneMenu id="vendor" required="true" label="Vendor" converter="omnifaces.SelectItemsConverter"
+                                                 value="#{vendorStatusMappingList.vendorStatusMapping.vendor}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{vendorStatusMappingList.vendors}" var="v" itemLabel="#{v.vendor}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="statCode" required="true" label="Status Code"
+                                             value="#{vendorStatusMappingList.vendorStatusMapping.statusCode}" maxlength="100"
+                                             autoResize="true"/>
+                                <p:outputLabel value="Status Code:" for="statCode"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputTextarea id="vendVal" required="true" label="Vendor Value"
+                                                 value="#{vendorStatusMappingList.vendorStatusMapping.vendorMessage}" maxlength="1024" cols="40"
+                                                 autoResize="true"/>
+                                <p:outputLabel value="Vendor Value:" for="vendVal"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputTextarea id="dispVal" required="true" label="Display Value"
+                                                 value="#{vendorStatusMappingList.vendorStatusMapping.displayMessage}" maxlength="1024" cols="40"
+                                                 autoResize="true"/>
+                                <p:outputLabel value="Display Value:" for="dispVal"/>
+                            </h:panelGroup>
+
+                            <ui:remove>
+                                <p:outputLabel value="Notification Type:" for="notType"/>
+                                <p:selectOneMenu id="notType" required="true" label="Notification Type"
+                                                 value="#{vendorStatusMappingList.vendorStatusMapping.successfulNotification}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{successfulNotificationTypeHelper.list}"/>
+                                </p:selectOneMenu>
+                            </ui:remove>
+                        </h:panelGrid>
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{vendorStatusMappingList.saveVendorStatusMapping()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="10"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{vendorStatusMappingList.cancelVendorStatusMapping()}" process="@this"
+                                         update="FVSM:vsmDiv"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </div>
+
+            <div class="card card-w-title">
+                <p:outputPanel id="vsmDivT">
+                    <p:dataTable id="vsmTable" value="#{vendorStatusMappingList.vendorStatusMappings}" widgetVar="mappingWidget" editable="true" var="vsm"
+                                 reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{vsm.vendorStatusMappingId}"
+                                 selection="#{vendorStatusMappingList.selectedVendorStatusMapping}" selectionMode="single">
+
+                        <p:ajax event="rowEdit" listener="#{vendorStatusMappingList.onRowEdit}"/>
+                        <p:ajax event="rowEditCancel" listener="#{vendorStatusMappingList.onRowCancel}"/>
+
+                        <p:column headerText="Vendor" filterBy="#{vsm.vendor.vendor}">
+                            <h:outputText value="#{vsm.vendor.vendor}"/>
+                        </p:column>
+                        <p:column headerText="Status Code" filterBy="#{vsm.statusCode}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{vsm.statusCode}"/></f:facet>
+                                <f:facet name="input"><p:inputTextarea value="#{vsm.statusCode}" label="Status Code" maxlength="100"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Vendor Value" filterBy="#{vsm.vendorMessage}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{vsm.vendorMessage}"/></f:facet>
+                                <f:facet name="input"><p:inputTextarea value="#{vsm.vendorMessage}" label="Vendor Value" maxlength="1024"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Display Value" filterBy="#{vsm.displayMessage}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{vsm.displayMessage}"/></f:facet>
+                                <f:facet name="input"><p:inputTextarea value="#{vsm.displayMessage}" label="Display Value" maxlength="1024"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Success Type" filterBy="#{vsm.successfulNotification}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{vsm.successfulNotification}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu id="notType" required="true" value="#{vsm.successfulNotification}" label="Success Type">
+                                        <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                        <f:selectItems value="#{successfulNotificationTypeHelper.list}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <p:contextMenu for="vsmTable" widgetVar="vsmMenu">
+                        <p:menuitem value="Delete" update="FVSM:vsmDivT" icon="ui-icon-trash-1"
+                                    actionListener="#{vendorStatusMappingList.deleteVendorStatusMapping()}"/>
+                        <p:menuitem value="Hide" icon="ui-icon-close" onclick="PF('vsmMenu').hide()"/>
+                    </p:contextMenu>
+
+                </p:outputPanel>
+            </div>
+
+        </h:form>
+
+        <div class="EmptyBox20"></div>
+
+    </ui:define>
+
+
+</ui:composition>

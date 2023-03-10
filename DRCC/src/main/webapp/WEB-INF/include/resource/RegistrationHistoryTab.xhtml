@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dataTable value="#{resourceDetailController.lazyRegistrationSubmissionStatusDataModel}" id="TbRehHist" widgetVar="custTableA" lazy="true" var="rHistory"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{rHistory.uuid}" selectionMode="single">
+        <p:ajax event="rowSelect" listener="#{resourceDetailController.onSelectStatus}" update="formRD"/>
+        <p:column headerText="Registration ID" filterBy="#{rHistory.isoRegistrationId}" field="isoRegistrationId" filterMatchMode="contains">
+            <h:outputText value="#{rHistory.isoRegistrationId}"/>
+        </p:column>
+        <p:column headerText="Registration Start" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{rHistory.activeStartDate}"><f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/></h:outputText>
+        </p:column>
+        <p:column headerText="Registration End" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{rHistory.activeEndDate}"><f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/></h:outputText>
+        </p:column>
+        <p:column headerText="Count of Locations" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{fn:length(rHistory.locations)}"/>
+        </p:column>
+        <p:column headerText="#{msg['data.mapping.sublaps']}" filterBy="#{rHistory.isoResource.isoSublap}" field="isoResource.isoSublap">
+            <h:outputText value="#{rHistory.isoResource.isoSublap} "/>
+        </p:column>
+        <p:column headerText="LSE" filterBy="#{rHistory.isoResource.isoLse}" field="isoResource.isoLse" filterMatchMode="contains">
+            <h:outputText value="#{rHistory.isoResource.isoLse}"/>
+        </p:column>
+        <p:column headerText="Registration Status" filterBy="#{rHistory.registrationStatus}" field="registrationStatus">
+            <h:outputText value="#{rHistory.registrationStatus.text}"/>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

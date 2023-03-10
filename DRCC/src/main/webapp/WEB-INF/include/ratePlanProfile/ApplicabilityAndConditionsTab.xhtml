@@ -1,0 +1,104 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <div class="card card-w-title">
+        <h3>Applicability Description</h3>
+
+        <h:panelGroup styleClass="md-inputfield">
+            <p:inputTextarea value="#{ratePlanController.selectedProfile.applicabilityDescription}" id="applicabilityDescription" maxlength="255" cols="120"
+                             disabled="#{controller.viewModeOn}"/>
+        </h:panelGroup>
+    </div>
+
+    <div class="card card-w-title" jsf:id="generalApplicability">
+        <h3 class="with-icon">General Applicability</h3>
+        <p:commandButton action="#{ratePlanController.addGeneralAvailability()}" update="form:profileTabView:generalApplicability" icon="ui-icon-add" rendered="#{not controller.viewModeOn}"/>
+
+        <ui:repeat value="#{ratePlanController.generalEligibility}" var="eligibility" varStatus="availabilityStatus">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Attribute Type"/>
+                    <p:selectOneMenu value="#{eligibility.generalAvailability.attributeType}" disabled="#{controller.viewModeOn}">
+                        <f:selectItems value="#{constantsProvider.generalEligibilityAttributeType}"
+                                       var="attributeType" itemLabel="#{attributeType.name}" itemValue="#{attributeType}"/>
+                        <p:ajax listener="#{ratePlanController.loadDistinctValues(eligibility)}" update="generalAvailability"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <p:commandButton action="#{ratePlanController.removeGeneralAvailability(eligibility)}" update="form:profileTabView:generalApplicability" process="@this"
+                                 icon="ui-icon-remove" rendered="#{not controller.viewModeOn}"/>
+            </p:panelGrid>
+
+            <p:pickList id="generalAvailability" value="#{eligibility.dualListModel}" var="el" itemValue="#{el}" itemLabel="#{el}" disabled="#{controller.viewModeOn}">
+                <f:facet name="sourceCaption">Available</f:facet>
+                <f:facet name="targetCaption">Applicable</f:facet>
+            </p:pickList>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title" jsf:id="iDdemands">
+        <h3 class="with-icon">Demand</h3>
+        <p:commandButton action="#{ratePlanController.addDemand()}" update="form:profileTabView:iDdemands" icon="ui-icon-add" rendered="#{not controller.viewModeOn}"/>
+
+        <p:outputLabel rendered="#{empty ratePlanController.selectedProfile.ratePlanDemands}">No demands defined yet</p:outputLabel>
+
+        <ui:repeat value="#{ratePlanController.selectedProfile.ratePlanDemands}" var="demand" varStatus="demandIterStatus">
+            <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Demand"/>
+                    <p:inputNumber label="Demand" value="#{demand.value}" maxValue="10000" decimalPlaces="2" required="true" size="8" disabled="#{controller.viewModeOn}"/>
+                    <p:selectOneMenu value="#{demand.unit}" disabled="#{controller.viewModeOn} " rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                        <f:selectItem itemLabel="kW" itemValue="KW"/>
+                        <f:selectItem itemLabel="MW" itemValue="MW"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu value="#{demand.unit}" disabled="#{controller.viewModeOn}" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                        <f:selectItem itemLabel="Therms" itemValue="THERMS"/>
+
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Compare"/>
+                    <p:selectOneMenu value="#{demand.relationalOperator}" converter="omnifaces.GenericEnumConverter" disabled="#{controller.viewModeOn}">
+                        <f:selectItems value="#{constantsProvider.relationalOperators}" var="operator" itemLabel="#{operator.name}" itemValue="#{operator}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value=" to "/>
+                    <p:selectOneMenu value="#{demand.demandType}" disabled="#{controller.viewModeOn}">
+                        <f:selectItems value="#{constantsProvider.demandTypes}" var="demandType" itemLabel="#{demandType.name}" itemValue="#{demandType}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <p:outputLabel value="Time Horizon" style="padding-top: 6px; display: block;"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value=" month out of the last "/>
+                    <p:selectOneMenu value="#{demand.timeHorizon}" label="Time Horizon" disabled="#{controller.viewModeOn}">
+                        <f:selectItems value="#{constantsProvider.months}" var="month" itemLabel="#{month.value}" itemValue="#{month.value}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value=" prior month"/>
+                    <p:selectOneMenu value="#{demand.priorMonths}" disabled="#{controller.viewModeOn}">
+                        <f:selectItems value="#{constantsProvider.months}" var="month" itemLabel="#{month.value}" itemValue="#{month.value}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-checkbox">
+                    <p:inputSwitch value="#{demand.consecutive}" id="isConsecutive" disabled="#{controller.viewModeOn}"/>
+                    <p:outputLabel value="consecutive" for="isConsecutive"/>
+                </h:panelGroup>
+
+                <p:commandButton action="#{ratePlanController.removeDemand(demand)}" process="@this" update="form:profileTabView:iDdemands" icon="ui-icon-remove" rendered="#{not controller.viewModeOn}"/>
+            </p:panelGrid>
+        </ui:repeat>
+    </div>
+</ui:composition>

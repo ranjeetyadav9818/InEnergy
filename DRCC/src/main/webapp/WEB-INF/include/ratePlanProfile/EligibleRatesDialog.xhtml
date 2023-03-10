@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:p="http://primefaces.org/ui">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RateEligibilityController"/>
+
+    <p:dialog header="The rate plan that the client is enrolled to is linked to other rate plans. Do you want to unenroll from all of them?" widgetVar="unenrollDialog"
+              modal="true" resizable="false" closeOnEscape="true" visible="#{controller.showModal}" style="text-align: center" height="60">
+        <p:spacer width="15"/>
+        <p:commandButton value="Yes, unenroll them all" action="#{controller.unenrollAll()}" update="@form"/>
+        <p:spacer width="15"/>
+        <p:commandButton value="No, unenroll only this one" action="#{controller.unenrollOne()}" update="@form"/>
+        <p:spacer width="15"/>
+        <p:commandButton value="Cancel" action="#{controller.cancelUnenrollment()}" update="@form"/>
+        <p:spacer width="15"/>
+    </p:dialog>
+
+</ui:composition>

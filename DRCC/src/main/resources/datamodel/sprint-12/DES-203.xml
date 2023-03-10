@@ -1,0 +1,44 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet context="ddl" id="PRE-DES-203" author="egamas">
+        <tagDatabase tag="PRE-DES-203"/>
+    </changeSet>
+
+    <changeSet id="DES-203-1" author="egamas">
+        <addColumn tableName="PROGRAM_EVENT_DURATION">
+            <column name="PROGRAM_PRODUCT_ID" type="bigint(20) NOT NULL"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="PROGRAM_EVENT_DURATION"
+                                 baseColumnNames="PROGRAM_PRODUCT_ID"
+                                 constraintName="FK_PROGRAM_EVENT_DURATION_PRODUCT"
+                                 referencedTableName="PROGRAM_PRODUCT"
+                                 referencedColumnNames="ID"/>
+
+    </changeSet>
+
+    <changeSet id="DES-203-2" author="egamas">
+        <sql>
+            UPDATE PROGRAM_OPTION SET `TYPE`= case `TYPE`
+                when 'Entire Program'
+                then 'ENTIRE_PROGRAM'
+                when 'Day-Ahead'
+                then 'DAY_AHEAD'
+                else 'DAY_OFF'
+            end;
+        </sql>
+        <rollback>
+            UPDATE PROGRAM_OPTION SET `TYPE`= case `TYPE`
+                when 'ENTIRE_PROGRAM'
+                then 'Entire Program'
+                when 'DAY_AHEAD'
+                then 'Day-Ahead'
+                else 'Day-Off'
+            end;
+        </rollback>
+    </changeSet>
+
+
+</databaseChangeLog>

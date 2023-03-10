@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet author="egamas" id="DES-58-1.sql">
+        <sqlFile path="DES-58-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="vm" id="energy_contracts">
+        <sqlFile path="energy_contracts.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <include file="DES-59.xml" relativeToChangelogFile="true"/>
+    <changeSet author="vm" id="energy_contracts-2">
+        <sqlFile path="energy_contracts-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="vm" id="energy_contracts-3">
+        <sqlFile path="energy_contracts-3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="vm" id="energy_contracts-4">
+        <sqlFile path="energy_contracts-4.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-172-1.sql">
+        <sqlFile path="DES-172-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="vm" id="energy_contracts-5">
+        <sqlFile path="energy_contracts-5.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <include file="DES-173-2.xml" relativeToChangelogFile="true"/>
+    <changeSet author="vm" id="energy_contracts-6">
+        <sqlFile path="energy_contracts-6.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DES-174" author="vm">
+        <sqlFile path="DES-174.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <include file="DES-175.xml" relativeToChangelogFile="true"/>
+    <include file="DES-59-2.xml" relativeToChangelogFile="true"/>
+    <include file="DES-180.xml" relativeToChangelogFile="true"/>
+</databaseChangeLog>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.2.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+           xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core"
+           xmlns:camel="http://camel.apache.org/schema/blueprint"
+           xmlns:camelcxf="http://camel.apache.org/schema/blueprint/cxf"
+       xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://www.osgi.org/xmlns/blueprint-ext/v1.1.0 https://svn.apache.org/repos/asf/aries/tags/blueprint-0.3.1/blueprint-core/src/main/resources/org/apache/aries/blueprint/ext/blueprint-ext.xsd 
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+       http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd
+       http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
+
+  
+   <bean id="drccRoute" class="com.inenergis.drcc.camel.route.DrccRouteBuilder"/>
+   <bean id="voiceRecordingRoute" class="com.inenergis.drcc.camel.route.VoiceRecordingRouteBuilder"/>
+   <bean id="cdwRoute" class="com.inenergis.drcc.camel.route.CDWRouteBuilder"/>
+
+   <bean id="cvsFileSorter" class="com.inenergis.drcc.camel.beans.FileSorter"/>
+   <bean id="cvsFileFilter" class="com.inenergis.drcc.camel.beans.FileFilter"/>
+   <bean id="recordingsFileFilter" class="com.inenergis.drcc.camel.filter.VoiceRecordingFileFilter"/>
+
+    
+    <!-- this is our file based idempotent store configured to use the .filestore.dat as file -->
+    <bean id="fileStore" class="org.apache.camel.processor.idempotent.FileIdempotentRepository">
+        <!-- the filename for the store -->
+        <property name="fileStore" value="work/drcc/fileidempotent/.filestore.dat"/>
+        <!-- the max filesize in bytes for the file. Camel will trunk and flush the cache
+             if the file gets bigger -->
+        <property name="maxFileStoreSize" value="512000"/>
+        <!-- the number of elements in our store -->
+        <property name="cacheSize" value="250"/>
+    </bean>
+    
+   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+   	<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+    	<property name="url" value="${database.url}"/>
+   	<property name="username" value="${database.user}"/>
+   	<property name="password" value="${database.password}"/>
+   	 <property name="removeAbandoned" value="true"/>
+   <property name="initialSize" value="20" />
+   <property name="maxActive" value="30" />
+   </bean>
+   
+   <!-- configure the Camel SQL component to use the JDBC data source -->
+	<bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
+  		<property name="dataSource" ref="dataSource"/>
+	</bean>
+    
+     <!-- Imported OSGi services include the Transaction manager and JDBC DataSource  filter="(datasource.name=DerbyDS)"
+    <reference id="mysql-db" interface="javax.sql.DataSource" availability="mandatory"  />
+    <bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
+        <property name="dataSource" ref="mysql-db"/>
+    </bean>
+    
+    -->
+
+    <reference id="entityManagerFactory" interface="javax.persistence.EntityManagerFactory" />
+    <reference id="transactionManager" interface="javax.transaction.TransactionManager" />
+
+
+    <bean id="jpa" class="org.apache.camel.component.jpa.JpaComponent">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
+    <bean id="beanService" class="com.inenergis.drcc.camel.service.BeanService">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+        <tx:transaction method="*"/>
+    </bean>
+
+</blueprint>

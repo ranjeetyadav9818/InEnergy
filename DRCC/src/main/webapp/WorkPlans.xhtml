@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <script type="text/javascript">
+            function handleDrop(event, ui) {
+                var droppedTask = ui.draggable;
+
+                droppedTask.fadeOut('fast');
+            }
+        </script>
+        <p:outputPanel id="OPwp">
+            <h:form id="formWP">
+                <p:breadCrumb>
+                    <p:menuitem value="Dashboard" outcome="dashboard"/>
+                    <p:menuitem value="Configure Work Plans" outcome="WorkPlans"/>
+                </p:breadCrumb>
+
+                <div class="card card-w-title">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Program Type" for="programType"/>
+                            <p:selectOneMenu id="programType" value="#{workPlanController.programType}" required="true"
+                                             style="width: 157px;"
+                                             autoWidth="false">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{constantsProvider.programTypes}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                                <p:ajax listener="#{workPlanController.updateDropDownMenus()}" process="@this" update="@form"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Program" for="program" rendered="#{workPlanController.programType ne 'RATE'}"/>
+                            <p:selectOneMenu id="program" converter="programConverter" value="#{workPlanController.program}" required="true"
+                                             style="width: 157px;"
+                                             autoWidth="false" rendered="#{workPlanController.programType ne 'RATE'}">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{workPlanController.programList}" var="program" itemLabel="#{program.name}" itemValue="#{program}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Rate Plan" for="ratePlan" rendered="#{workPlanController.programType eq 'RATE'}"/>
+                            <p:selectOneMenu id="ratePlan" converter="ratePlanConverter" value="#{workPlanController.ratePlan}" required="true"
+                                             style="width: 157px;" rendered="#{workPlanController.programType eq 'RATE'}"
+                                             autoWidth="false">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{workPlanController.ratePlanList}" var="ratePlan" itemLabel="#{ratePlan.name}" itemValue="#{ratePlan}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Work Plan" for="wpType"/>
+                            <p:selectOneMenu id="wpType" converter="omnifaces.GenericEnumConverter" value="#{workPlanController.workPlanType}" required="true">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{workPlanController.workPlanTypes}" var="planTypes" itemLabel="#{planTypes.name}"
+                                               itemValue="#{planTypes}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton value="Search" id="search" update="@form" action="#{workPlanController.search()}"/>
+                </div>
+                <div class="card card-w-title" jsf:rendered="#{workPlanController.workPlan ne null}">
+                    <h1>Available Tasks</h1>
+                    <p:dataTable id="DTavailableTasks" value="#{workPlanController.availableTasks}" var="availTasks" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+                        <p:column style="width:20px">
+                            <h:outputText id="dragIcon" styleClass="ui-icon ui-icon-zoom-out-map"/>
+                            <p:draggable for="dragIcon" revert="true" helper="clone"/>
+                        </p:column>
+                        <p:column headerText="Task ID">
+                            <h:outputText value="#{availTasks.id}"/>
+                        </p:column>
+                        <p:column headerText="Task Title">
+                            <h:outputText value="#{availTasks.name}"/>
+                        </p:column>
+                        <p:column headerText="Business Owner">
+                            <h:outputText value="#{availTasks.businessOwner.name}"/>
+                        </p:column>
+                        <p:column headerText="Task Duration">
+                            <h:outputText value="#{availTasks.durationValue}"/>
+                            <p:spacer width="5"/>
+                            <h:outputText value="#{availTasks.durationMeasure.getName()}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <h:panelGroup rendered="#{workPlanController.workPlan ne null}">
+                        <div class="MarginTop20">
+                            <p:commandButton id="addAll" value="Add All" action="#{workPlanController.addAll}" process="@this" update="@form"/>
+                        </div>
+                    </h:panelGroup>
+                </div>
+                <div class="card card-w-title" jsf:rendered="#{workPlanController.workPlan ne null}">
+                    <h1>Work Plan Tasks</h1>
+                    <p:dataTable id="DTselectedTasks" value="#{workPlanController.workPlan.workPlanTaskLists}" var="taskList" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 editable="true" editMode="cell">
+                        <p:column headerText="Order">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText styleClass="ui-icon ui-icon-pencil" style="display: inline-block;margin-right:8px;"/>
+                                    <h:outputText value="#{taskList.order}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText size="15" value="#{taskList.order}">
+                                        <p:ajax event="change" process="@this" update="@form" listener="#{workPlanController.reOrder}"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Task ID">
+                            <h:outputText value="#{taskList.task.id}"/>
+                        </p:column>
+                        <p:column headerText="Task Title">
+                            <h:outputText value="#{taskList.task.name}"/>
+                        </p:column>
+                        <p:column headerText="Business Owner">
+                            <h:outputText value="#{taskList.task.businessOwner.name}"/>
+                        </p:column>
+                        <p:column headerText="Task Duration">
+                            <h:outputText value="#{taskList.task.durationValue}"/>
+                            <p:spacer width="5"/>
+                            <h:outputText value="#{taskList.task.durationMeasure.getName()}"/>
+                        </p:column>
+                        <p:column headerText="Action">
+                            <p:commandButton value="Remove" action="#{workPlanController.remove(taskList)}" update="@form"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:outputPanel styleClass="MarginTop20 MarginBottom40">
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{workPlanController.save()}" process="@form" update="@form" style="float: left"/>
+                        <p:spacer width="15" style="float: left"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}" action="#{workPlanController.cancel}" process="@this" update="@form" style="float: left"/>
+                        <p:commandButton id="removeAll" value="Remove All" action="#{workPlanController.removeAll}" process="@this" update="@form" style="float: right"/>
+                    </p:outputPanel>
+                    <p:droppable for="DTselectedTasks" tolerance="touch" activeStyleClass="ui-state-highlight" datasource="DTavailableTasks"
+                                 onDrop="handleDrop">
+                        <p:ajax listener="#{workPlanController.onTaskDrop}" update="@form"/>
+                    </p:droppable>
+                </div>
+            </h:form>
+        </p:outputPanel>
+    </ui:define>
+</ui:composition>

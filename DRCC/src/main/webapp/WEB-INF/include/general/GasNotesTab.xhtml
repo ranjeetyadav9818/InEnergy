@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:panelGroup rendered="#{controller.newGasNote eq null}" style="margin: 10px 0;display: block;">
+        <p:commandButton value="Add Note" action="#{controller.createNote()}" process="@form" update="@form"/>
+    </h:panelGroup>
+    <p:panelGrid columns="1" rendered="#{controller.newGasNote ne null}" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <h:panelGroup styleClass="md-inputfield">
+            <p:inputText value="#{controller.newGasNote.title}" id="newNoteTitle" required="true"/>
+            <p:outputLabel value="Note title" for="newNoteTitle"/>
+        </h:panelGroup>
+
+        <h:panelGroup styleClass="md-inputfield">
+            <p:inputTextarea value="#{controller.newGasNote.description}" id="newNoteDesc" required="true"/>
+            <p:outputLabel value="Note Description" for="newNoteDesc"/>
+        </h:panelGroup>
+    </p:panelGrid>
+    <h:panelGroup rendered="#{controller.newGasNote ne null}" styleClass="buttons">
+        <p:commandButton value="Save" action="#{controller.saveNote()}" process="@form" update="@form"/>
+        <p:spacer width="10"/>
+        <p:commandButton value="Cancel" action="#{controller.cancelNote()}" process="@this" update="@form"/>
+    </h:panelGroup>
+    <p:dataTable value="#{controller.gasNotes}" var="gasNote">
+        <p:column headerText="Title">
+            <h:outputText value="#{gasNote.title}"/>
+        </p:column>
+        <p:column headerText="Note detail">
+            <h:outputText value="#{gasNote.description}"/>
+        </p:column>
+        <p:column headerText="User">
+            <h:outputText value="#{gasNote.author}"/>
+        </p:column>
+        <p:column headerText="Create date">
+            <h:outputText value="#{gasNote.creationDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/>
+            </h:outputText>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

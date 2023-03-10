@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <p:dataTable value="#{awardDetailController.award.instructions}" id="instrTab" widgetVar="custTableI" lazy="true" var="row"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="false" paginatorAlwaysVisible="false" rowKey="#{row.isoId}" disabledSelection="true" selectionMode="single" style="text-align: center">
+        <p:column headerText="Batch Sent Date-Time">
+            <h:outputText value="#{row.batchSentTime}"><f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/></h:outputText>
+        </p:column>
+
+        <p:column headerText="Batch Received Date-Time">
+            <h:outputText value="#{row.batchReceivedTime}"><f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/></h:outputText>
+        </p:column>
+        <p:column headerText="Start Time">
+            <h:outputText value="#{row.startTime}"><f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/></h:outputText>
+        </p:column>
+        <p:column headerText="Dispatch Operating Targets (DOT)" filterBy="#{row.DOT}" field="DOT">
+            <h:outputText value="#{row.DOT}"/>
+        </p:column>
+        <p:column headerText="Instruction Type" filterBy="#{row.type}" field="type">
+            <h:outputText value="#{row.type}"/>
+        </p:column>
+
+        <p:column headerText="XML Source">
+            <h:outputText value=""/>
+            <p:commandLink action="#{controller.formatXML(row)}"
+                           update="@form" oncomplete="PF('xmlView').show();" rendered="#{row.xmlSource ne null}">
+                <i class="icon-eye"/>
+            </p:commandLink>
+        </p:column>
+
+    </p:dataTable>
+    <p:dialog header="XML" widgetVar="xmlView" modal="true" resizable="false" width="80%" closeOnEscape="true">
+        <p:scrollPanel style="width:500px;height:500px" scrollMode="native">
+            <p:panelGrid columns="1" style="width: 100%;background-color: white">
+                <h:outputText value="#{controller.selectedXml}"/>
+            </p:panelGrid>
+        </p:scrollPanel>
+    </p:dialog>
+</ui:composition>

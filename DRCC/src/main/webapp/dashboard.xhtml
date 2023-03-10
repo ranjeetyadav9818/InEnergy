@@ -1,0 +1,235 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:clx="http://java.sun.com/jsf/composite/components"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+		<style type="text/css">
+			.ui-panel {
+				margin: 8px;
+			}
+			.dashboard .overview-box { min-height: 80px;}
+			.dashboard .overview-box .overview-box-count { margin: 0px 0px 0px 8px}
+		</style>
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+		<div class="ui-g dashboard">
+			<div class="ui-g-12 ui-md-6 ui-lg-3">
+				<div class="ui-g card overview-box overview-box-1">
+					<span class="overview-box-name"># Customers</span>
+					<span class="overview-box-count">7,034,694</span>
+				</div>
+			</div>
+			<div class="ui-g-12 ui-md-6 ui-lg-3">
+				<div class="ui-g card overview-box overview-box-2">
+					<span class="overview-box-name"># Active Locations</span>
+					<span class="overview-box-count">45,034</span>
+				</div>
+			</div>
+			<div class="ui-g-12 ui-md-6 ui-lg-3">
+				<div class="ui-g card overview-box overview-box-3">
+					<span class="overview-box-name">All resources capacity</span>
+					<span class="overview-box-count">35,405 MW</span>
+				</div>
+			</div>
+			<div class="ui-g-12 ui-md-6 ui-lg-3">
+				<div class="ui-g card overview-box overview-box-4">
+					<span class="overview-box-name">Events dispatched last 30 days</span>
+					<span class="overview-box-count">14</span>
+				</div>
+			</div>
+			<p:panel id="addWidgetPanel" header="Available Widgets" style="width: 100%" toggleable="true" >
+				<h:form>
+					<p:selectOneMenu value="#{dashboard.selectedPanel}" styleClass="selectfield" id="selectedPanel" style="margin-top: 10px">
+						<f:selectItems value="#{dashboard.deletedPanels}" var="panel" itemLabel="#{panel}" itemValue="#{panel}"/>
+					</p:selectOneMenu>
+					<p:spacer width="20"/>
+					<p:commandButton value="Add" actionListener="#{dashboard.addPanel()}" update="@form,board" process="@this,selectedPanel"/>
+				</h:form>
+			</p:panel>
+		<p:dashboard id="board" model="#{dashboard.model}"  >
+			<p:ajax event="reorder" listener="#{dashboard.handleReorder}"/>
+			<p:panel id="most_recent_events" header="Most Recent Events" toggleable="true" closable="true" styleClass="activity-feed">
+				<p:ajax event="close" listener="#{dashboard.handleClose}" update=":addWidgetPanel"/>
+				<p:dataTable value="#{dashboard.pdpSrEvents}" var="event" reflow="true" rows="5" selectionMode="single" paginator="true" paginatorAlwaysVisible="false" selection="#{dashboard.pdpSrEvent}" rowKey="#{event.eventId}">
+					<p:ajax event="rowSelect" listener="#{dashboard.onRowSelectEvent}"/>
+					<p:column headerText="Event Name" style="min-width:100px" sortBy="#{event.eventName}">
+						<h:outputText value="#{event.eventName}"/>
+					</p:column>
+					<p:column headerText="Program" style="min-width:80px" sortBy="#{event.eventProgram}">
+						<h:outputText value="#{event.eventProgram}"/>
+					</p:column>
+					<p:column headerText="Event Start" style="min-width:140px">
+						<h:outputText value="#{event.eventStart}">
+							<f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Event End" style="min-width:140px">
+						<h:outputText value="#{event.eventEnd}">
+							<f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+						</h:outputText>
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+			<p:panel id="my_programs" header="My Programs" toggleable="true" closable="true" styleClass="activity-feed">
+				<p:ajax event="close" listener="#{dashboard.handleClose}" update="addWidgetPanel"/>
+				<c:forEach items="#{leftMenu.getPrograms()}" var="program" end="2">
+					<p>
+						#{program.name}
+						(<p:link value="Program Profile" outcome="ProgramProfile.xhtml"><f:param name="o" value="#{parameterEncoderService.encode(program.id)}"/></p:link> -
+						<p:link value="Program Management" outcome="ProgramManagement.xhtml"><f:param name="o" value="#{parameterEncoderService.encode(program.id)}"/></p:link> -
+						<p:link value="Eligibility &amp; Enrollment" outcome="EligibilityEnrollment.xhtml"><f:param name="o" value="#{parameterEncoderService.encode(program.id)}"/></p:link>)
+					</p>
+				</c:forEach>
+			</p:panel>
+
+			<p:panel id="alerts" header="Alerts" toggleable="true" closable="true" styleClass="activity-feed">
+				<p:ajax event="close" listener="#{dashboard.handleClose}" update="addWidgetPanel"/>
+				<p:dataTable value="#{monitorController.lazyTaskInstanceDataModel}" id="taskInstanceTable" widgetVar="taskInstanceTable" lazy="true"
+							 var="taskInstance" reflow="true" rows="5" rowsPerPageTemplate="5,10"
+							 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+							 paginator="true" paginatorAlwaysVisible="false">
+
+					<p:column headerText="Start Date" filterable="false">
+						<h:outputText value="#{taskInstance.start}">
+							<f:convertDateTime pattern="MM/dd/yyyy"/>
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Task Name" filterBy="#{taskInstance.task.name}" field="task.name" filterable="false">
+						<h:outputText value="#{taskInstance.task.name}"/>
+					</p:column>
+
+					<p:column headerText="Business Owner" filterBy="#{taskInstance.task.businessOwner.name}" field="task.businessOwner.name" filterable="false">
+						<h:outputText value="#{taskInstance.task.businessOwner.name}"/>
+					</p:column>
+
+					<p:column headerText="Current Status">
+						<p:cellEditor>
+							<f:facet name="output"><h:outputText value="#{taskInstance.status.text}"/></f:facet>
+							<f:facet name="input">
+								<h:outputText value="#{taskInstance.status.text}" rendered="#{taskInstance.status ne 'IN_PROCESS'}"/>
+								<p:selectOneMenu value="#{taskInstance.status}" required="true" autoWidth="false"
+												 style="width: 75px;margin-left: 4px;" converter="omnifaces.GenericEnumConverter"
+												 rendered="#{taskInstance.status eq 'IN_PROCESS'}">
+									<f:selectItems value="#{constantsProvider.taskInstanceModifiableStatuses}" var="status" itemValue="#{status}"
+												   itemLabel="#{status.text}"/>
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Est Due Date" field="actualEnd">
+						<h:outputText value="#{taskInstance.estimatedEnd}">
+							<f:convertDateTime pattern="MM/dd/yyyy"/>
+						</h:outputText>
+					</p:column>
+
+				</p:dataTable>
+			</p:panel>
+
+			<p:panel id="next_bids" header="Next Bids" toggleable="true" closable="true" styleClass="activity-feed">
+				<p:ajax event="close" listener="#{dashboard.handleClose}" update="addWidgetPanel"/>
+				<p:dataTable var="bid" value="#{dashboard.bids}" reflow="true" rows="5" rowsPerPageTemplate="5,10" paginator="true" paginatorAlwaysVisible="false"
+							 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+					<p:column headerText="Resource ID" width="20%">
+						<h:outputText value="#{bid.isoResource.name}"/>
+					</p:column>
+
+					<p:column headerText="Bid Status">
+						<h:outputText value=" #{bid.status.name}" styleClass="#{bid.status.getIcon()}"/>
+					</p:column>
+
+					<p:column headerText="Capacity Risk" style="text-align: center;">
+						<p:tooltip for="capacityRiskLow" value="Low Risk"/>
+						<h:outputText id="capacityRiskLow" styleClass="fa fa-fw fa-thumbs-o-up green" rendered="#{bid.properties.capacityRisk eq 'Low'}"/>
+
+						<p:tooltip for="capacityRiskHigh" value="High Risk"/>
+						<h:outputText id="capacityRiskHigh" styleClass="fa fa-fw fa-thumbs-o-down red" rendered="#{bid.properties.capacityRisk eq 'High'}"/>
+					</p:column>
+
+					<p:column headerText="Resource Adequacy Potential (MWH)" >
+						<h:outputText value="#{bid.properties.resourceAdequacyPotential}" converter="bidCapacityInMWConverter"/>
+					</p:column>
+
+					<p:column headerText="Program Risk" style="text-align: center;">
+						<p:tooltip for="programRiskLow" value="Low Risk"/>
+						<h:outputText id="programRiskLow" styleClass="fa fa-fw fa-thumbs-o-up green" rendered="#{bid.properties.programRisk eq 'Low'}"/>
+
+						<p:tooltip for="programRiskHigh" value="High Risk"/>
+						<h:outputText id="programRiskHigh" styleClass="fa fa-fw fa-thumbs-o-down red" rendered="#{bid.properties.programRisk eq 'High'}"/>
+					</p:column>
+
+					<p:column headerText="Customer Fatigue Risk" style="text-align: center;">
+						<p:tooltip for="customerFatigueRiskLow" value="Low Risk"/>
+						<h:outputText id="customerFatigueRiskLow" styleClass="fa fa-fw fa-thumbs-o-up green" rendered="#{bid.properties.customerFatigueRisk eq 'Low'}"/>
+
+						<p:tooltip for="customerFatigueRiskHigh" value="High Risk"/>
+						<h:outputText id="customerFatigueRiskHigh" styleClass="fa fa-fw fa-thumbs-o-down red" rendered="#{bid.properties.customerFatigueRisk eq 'High'}"/>
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+
+			<p:panel id="events_summary" header="Events Summary" toggleable="true" closable="true" styleClass="activity-feed">
+				<p:ajax event="close" listener="#{dashboard.handleClose}" update="addWidgetPanel"/>
+				<div class="ui-g">
+					<div class="ui-g-12 ui-md-6">
+						<span>DISPATCHED CURRENT MONTH</span>
+						<div class="knob invoice">14</div>
+					</div>
+					<div class="ui-g-12 ui-md-6">
+						<span>DISPATCHED CURRENT YEAR</span>
+						<div class="knob tax">31</div>
+					</div>
+				</div>
+			</p:panel>
+			<p:panel id="current_event" header="Current event" toggleable="true" closable="true" styleClass="activity-feed">
+				<p:ajax event="close" listener="#{dashboard.handleClose}" update="addWidgetPanel"/>
+				<div class="card timeline ui-fluid" style="text-align: left">
+					<div class="ui-g">
+
+						<div class="ui-g-3">
+							<span class="event-time">2h ago</span>
+							<i class="material-icons" style="color:darkslategray">trending_down</i>
+						</div>
+						<div class="ui-g-9">
+							<span class="event-owner" style="color:darkslategray">Event started</span>
+							<span class="event-text">2,347 users impacted</span>
+						</div>
+
+						<div class="ui-g-3">
+							<span class="event-time">12h ago</span>
+							<i class="material-icons" style="color:darkblue">backup</i>
+						</div>
+						<div class="ui-g-9">
+							<span class="event-owner" style="color:darkblue">Event dispatched</span>
+							<span class="event-text">Id: 123981</span>
+						</div>
+
+						<div class="ui-g-3">
+							<span class="event-time">2d ago</span>
+							<i class="material-icons" style="color:darkgreen">monetization_on</i>
+						</div>
+						<div class="ui-g-9">
+							<span class="event-owner" style="color:darkgreen">Bid accepted</span>
+							<span class="event-text">Average capacity: 10.5 MW <br/>
+								Average price:
+								<clx:MoneyOutputComponent id="amount" value="#{950}" />
+							</span>
+						</div>
+					</div>
+				</div>
+			</p:panel>
+			<p:panel id="upcoming_events" header="Current event" toggleable="true" closable="true" styleClass="activity-feed">
+				<p:ajax event="close" listener="#{dashboard.handleClose}" update="addWidgetPanel"/>
+				<p:schedule value="#{dashboard.scheduleModel}" leftHeaderTemplate="prev,next"/>
+			</p:panel>
+		</p:dashboard>
+		</div>
+
+	</ui:define>
+
+</ui:composition>

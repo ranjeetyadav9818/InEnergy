@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet author="egamas" id="DRCC-XXX-4.sql">
+        <sqlFile path="DRCC-XXX-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-190-2.sql">
+        <sqlFile path="DRCC-190-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-190-3" author="egamas">
+        <sql>ALTER TABLE PROGRAM_FIRM_SERVICE_LEVEL MODIFY COLUMN `FSL_VALUE` decimal(19,2);</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-209.sql">
+        <sqlFile path="DRCC-209.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-194" author="antonio.lopez">
+        <sqlFile path="DRCC-194.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-194-2" author="antonio.lopez">
+        <sqlFile path="DRCC-194-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-148-FIX">
+        <sql>alter table MI_ISO_PROFILE_PRODUCT MODIFY COLUMN `RESOURCE_MIN_CAPACITY` BIGINT(11) NOT NULL;</sql>
+        <sql>alter table MI_ISO_PROFILE_PRODUCT MODIFY COLUMN `TELEMETRY_MIN_THRESHOLD` BIGINT(11) NOT NULL;</sql>
+    </changeSet>
+    <changeSet author="egamas" id="DRCM-improving searches">
+        <sql>CREATE INDEX idx_postCode_premise ON PREMISE(SERVICE_POSTAL);</sql>
+        <sql>CREATE INDEX idx_city_premise ON PREMISE(SERVICE_CITY_UPR);</sql>
+        <sql>ALTER TABLE PERSON MODIFY COLUMN BUSINESS_NAME VARCHAR(255);</sql>
+        <sql>CREATE INDEX idx_bus_name_person ON PERSON(BUSINESS_NAME);</sql>
+        <sql>CREATE INDEX idx_cust_name_person ON PERSON(CUSTOMER_NAME);</sql>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-BIDModel.sql">
+        <sqlFile path="DRCC-BIDModel.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-BIDModel2.sql">
+        <sql>alter table SEGMENT ADD COLUMN `NAME` VARCHAR(50) NOT NULL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCM-fix on IsoResourceModel">
+        <sql>ALTER TABLE ISO_RESOURCE ADD COLUMN ISO_PRODUCT_ID bigint(20);</sql>
+        <sql>ALTER TABLE ISO_RESOURCE ADD CONSTRAINT `FK_ISO_RESOURCE_ISO_PRODUCT` foreign key(ISO_PRODUCT_ID) REFERENCES MI_ISO_PROFILE_PRODUCT(ID);</sql>
+        <sql>ALTER TABLE ISO_RESOURCE DROP COLUMN ISO_ID;</sql>
+    </changeSet>
+    <changeSet id="DRCC-237" author="antonio.lopez">
+        <sqlFile path="DRCC-237.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-240" author="antonio.lopez">
+        <sqlFile path="DRCC-240.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-250-1" author="egamas">
+        <sqlFile path="DRCC-250.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-221" author="vm">
+        <sql>ALTER TABLE `BID` MODIFY STATUS ENUM('BID','SUBMITTED','AUTO_BID','OUTAGE','NO_BID','ACTION_REQUIRED');</sql>
+    </changeSet>
+    <changeSet id="DRCC-258" author="vm">
+        <sqlFile path="DRCC-258.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-260" author="vm">
+        <sql>ALTER TABLE `BID` MODIFY STATUS varchar(30) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-250-2">
+        <sqlFile path="DRCC-250-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-250-3">
+        <sqlFile path="DRCC-250-3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-250-4">
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` modify column `BID_SUBMISSION_ISO_HOUR` int(2) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="minorfix-discreteload-in-pmaxpmin" author="vm">
+        <sql>ALTER TABLE `PMAX_PMIN` DROP COLUMN DISCRETE_LOAD</sql>
+    </changeSet>
+    <changeSet id="remove-enums-from-db" author="vm">
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` MODIFY `TYPE` varchar(30) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` MODIFY `MARKET_TYPE` varchar(30) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` MODIFY `TELEMETRY_MIN_THRESHOLD_UNIT` varchar(30) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` MODIFY `RESOURCE_MIN_CAPACITY_UNIT` varchar(30) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` MODIFY `METER_INTERVAL_TYPE` varchar(30) DEFAULT NULL;</sql>
+
+        <sql>ALTER TABLE `DATA_MAPPING` MODIFY `TYPE` varchar(30) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="remove-enums-from-db-2" author="vm">
+        <sql>ALTER TABLE `RISK_CONDITION` MODIFY `CATEGORY` varchar(50) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `RISK_CONDITION` MODIFY `SOURCE` varchar(50) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `RISK_CONDITION` MODIFY `COMPARISON_OPERATOR` varchar(50) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `RISK_CONDITION` MODIFY `TARGET` varchar(50) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-250-add-modified-flag-to-bid" author="vm">
+        <sql>ALTER TABLE `BID` ADD COLUMN `SCHEDULE_MODIFIED` tinyint(1) DEFAULT '0';</sql>
+    </changeSet>
+    <changeSet id="DRCC-250-add-default-schedule-to-bid" author="vm">
+        <sql>ALTER TABLE `BID` ADD COLUMN `DEFAULT_SCHEDULE` tinyint(1) DEFAULT '0';</sql>
+    </changeSet>
+    <changeSet id="DRCC-250-remove-column-from-program_profile" author="vm">
+        <sql>ALTER TABLE `PROGRAM_PROFILE` DROP COLUMN `CUSTOMER_FATIGUE_THRESHOLD`;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-250-add-meta-data-to-bid" author="vm">
+        <sql>ALTER TABLE `BID` ADD COLUMN `SUBMITTED_TIME` DATETIME;</sql>
+        <sql>ALTER TABLE `BID` ADD COLUMN `SUBMITTED_BY` VARCHAR(255);</sql>
+    </changeSet>
+    <changeSet id="DRCC-250-add-meta-data-to-bid" author="antonio.lopez">
+        <sql>ALTER TABLE BID ADD CONSTRAINT unique_bid UNIQUE(TRADE_DATE,REGISTRATION_STATUS_ID);</sql>
+    </changeSet>
+    <changeSet id="DRCC-250-add-cancel-reason-to-bid" author="antonio.lopez">
+        <sql>ALTER TABLE BID ADD COLUMN CANCEL_REASON VARCHAR(250);</sql>
+    </changeSet>
+    <changeSet id="DRCC-277" author="vm">
+        <sql>ALTER TABLE `PROGRAM_SA_ENROLLMENT` ADD COLUMN `AVERAGE_SUMMER_ON_PEAK_WATT_H` bigint(20) DEFAULT 0;</sql>
+    </changeSet>
+    <changeSet id="DRCC-277-2" author="vm">
+        <sqlFile path="DRCC-277.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-277_Demand_Alter" author="egamas">
+        <sql>ALTER TABLE PROGRAM_DEMAND ADD COLUMN DEMAND_MINIMUN_TYPE VARCHAR(50);</sql>
+        <sql>ALTER TABLE PROGRAM_DEMAND DROP COLUMN DATE_FROM;</sql>
+        <sql>ALTER TABLE PROGRAM_DEMAND DROP COLUMN DATE_TO;</sql>
+        <sql>ALTER TABLE PROGRAM_DEMAND ADD COLUMN TIME_HORIZON int(2);</sql>
+        <sql>ALTER TABLE PROGRAM_DEMAND ADD COLUMN PRIOR_MONTHS int(2);</sql>
+    </changeSet>
+    <changeSet id="DRCC-289-ISO-Profiles" author="vm">
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` ADD COLUMN `AUTO_DISPATCH` tinyint(1) DEFAULT '0';</sql>
+        <sql>ALTER TABLE `MI_ISO_PROFILE_PRODUCT` ADD COLUMN `AWARD_INSTRUCTION` varchar(50) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-isoStartDate">
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN ISO_START_DATE DATE DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-drop-fsl">
+        <sql>ALTER TABLE PROGRAM_SA_ENROLLMENT DROP COLUMN FSL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-more-space for errors">
+        <sql>ALTER TABLE LR_EXCEPTION MODIFY TYPE varchar(500) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-index-redefined">
+        <sql>ALTER TABLE PROGRAM_SA_ENROLLMENT DROP INDEX UNIQUE_ENROLLMENT;</sql>
+        <sql>ALTER TABLE PROGRAM_SA_ENROLLMENT ADD CONSTRAINT UNIQUE_ENROLLMENT UNIQUE ( PROGRAM_ID, SA_ID, ENROLLMENT_SOURCE, EFFECTIVE_START_DATE, EFFECTIVE_END_DATE);</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-isoStartDate-redifined">
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS MODIFY COLUMN ISO_START_DATE DATETIME DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-scid">
+        <sql>ALTER TABLE `MI_ISO_PROFILE` ADD COLUMN `SC_ID` VARCHAR(255) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-registration-batch-id">
+        <sql>ALTER TABLE `REGISTRATION_STATUS` ADD COLUMN `ISO_BATCH_ID` VARCHAR(255) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-152-bid-refactor" author="antonio.lopez">
+        <sqlFile path="DRCC-152-bid-refactor.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-289" author="vm">
+        <sqlFile path="DRCC-289.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-290" author="antonio">
+        <sqlFile path="DRCC-290.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-289-2" author="vm">
+        <sql>ALTER TABLE PROGRAM_PROFILE ADD COLUMN `DRMS` varchar(50) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE PROGRAM_PROFILE ADD COLUMN `AGGREGATOR_DISPATCH_TYPE` varchar(50) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-152-bid-detailed-status">
+        <sql>ALTER TABLE `BID` ADD COLUMN `DETAILED_STATUS` VARCHAR(255) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="fix for enums" author="antonio">
+        <sqlFile path="enums-fixed.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-289-3" author="vm">
+        <sqlFile path="DRCC-289-3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="fix to peak demand history" author="antonio">
+        <sql>ALTER TABLE LAYER7_PEAK_DEMAND_HISTORY MODIFY COLUMN SUMMER_ON_PEAK_KW varchar(20);</sql>
+        <sql>ALTER TABLE LAYER7_PEAK_DEMAND_HISTORY MODIFY COLUMN SUMMER_ON_PEAK_KW_H varchar(20);</sql>
+        <sql>ALTER TABLE LAYER7_PEAK_DEMAND_HISTORY MODIFY COLUMN WINTER_PARTIAL_PEAK_KW varchar(20);</sql>
+        <sql>ALTER TABLE LAYER7_PEAK_DEMAND_HISTORY MODIFY COLUMN WINTER_PARTIAL_PEAK_KW_H varchar(20);</sql>
+        <sql>ALTER TABLE LAYER7_PEAK_DEMAND_HISTORY MODIFY COLUMN SUMMER_ON_PEAK_HOURS varchar(20);</sql>
+        <sql>ALTER TABLE LAYER7_PEAK_DEMAND_HISTORY MODIFY COLUMN WINTER_PARTIAL_PEAK_HOURS varchar(20);</sql>
+    </changeSet>
+    <changeSet id="DRCC-313" author="antonio">
+        <sql>alter table PROGRAM_ELIG_PREMISE_TYPE DROP FOREIGN KEY fk_PROGRAM_PREMISE_TYPE_PROGRAM_PROFILE1;</sql>
+        <sql>alter table PROGRAM_ELIG_PREMISE_TYPE ADD CONSTRAINT `fk_PROGRAM_PREMISE_TYPE_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES
+                `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;</sql>
+        <sql>alter table SAFETY_REDUCTION_FACTOR DROP FOREIGN KEY FK_SRF_PROGRAM_PROFILE;</sql>
+        <sql>alter table SAFETY_REDUCTION_FACTOR ADD CONSTRAINT `FK_SRF_PROGRAM_PROFILE` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES
+                `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;</sql>
+        <sql>alter table PROGRAM_MULTI_PARTICIPATION_PROGRAM DROP FOREIGN KEY fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_PROGRAM;</sql>
+        <sql>alter table PROGRAM_MULTI_PARTICIPATION_PROGRAM ADD CONSTRAINT `fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_PROGRAM` FOREIGN KEY (`PROGRAM_ID`) REFERENCES
+                `PROGRAM` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;</sql>
+        <sql>alter table PROGRAM_MULTI_PARTICIPATION DROP FOREIGN KEY fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_OPTION1;</sql>
+        <sql>alter table PROGRAM_MULTI_PARTICIPATION ADD CONSTRAINT `fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_OPTION1` FOREIGN KEY (`PROGRAM_OPTION_ID`) REFERENCES
+                `PROGRAM_OPTION` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;</sql>
+    </changeSet>
+    <!--changeSet id="DRCC-309" author="vm">
+        <sqlFile path="DRCC-309.sql" relativeToChangelogFile="true"/>
+    </changeSet-->
+    <changeSet id="DRCC-320" author="vm">
+        <sql>ALTER TABLE `PROGRAM_SA_ENROLLMENT` CHANGE COLUMN `AVERAGE_SUMMER_ON_PEAK_WATT_H` `AVERAGE_SUMMER_ON_PEAK_WATT` bigint(20) DEFAULT '0';</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-313-2" author="antonio">
+        <sql>
+            alter table ELIGIBLE_PROGRAMS DROP FOREIGN KEY FK_EP_PROGRAM;
+            alter table ELIGIBLE_PROGRAMS ADD CONSTRAINT `FK_EP_PROGRAM` FOREIGN KEY (`PROGRAM_ID`) REFERENCES
+            `PROGRAM` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+            alter table PROGRAM_SA_ENROLLMENT DROP FOREIGN KEY FK_SA_ENROLLMENT_PROGRAM;
+            alter table PROGRAM_SA_ENROLLMENT ADD CONSTRAINT `FK_SA_ENROLLMENT_PROGRAM` FOREIGN KEY (`PROGRAM_ID`) REFERENCES
+            `PROGRAM` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+            alter table ELIGIBLE_PROGRAMS DROP FOREIGN KEY FK_PEP_PROFILE;
+            alter table ELIGIBLE_PROGRAMS ADD CONSTRAINT `FK_PEP_PROFILE` FOREIGN KEY (`PROFILE_ID`) REFERENCES
+            `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+            alter table PROGRAM_MULTI_PARTICIPATION DROP FOREIGN KEY fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_PROFILE1;
+            alter table PROGRAM_MULTI_PARTICIPATION ADD CONSTRAINT `fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES
+            `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+
+            alter table PROGRAM_MULTI_PARTICIPATION_PROGRAM DROP FOREIGN KEY fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_MULTI_PART;
+            alter table PROGRAM_MULTI_PARTICIPATION_PROGRAM ADD CONSTRAINT `fk_PROGRAM_MULTI_PARTICIPATION_PROGRAM_MULTI_PART` FOREIGN KEY (`PROGRAM_MULTI_PARTICIPATION_ID`) REFERENCES `PROGRAM_MULTI_PARTICIPATION` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+
+            alter table LOCATION_REGISTRATION_STATUS DROP FOREIGN KEY PROGRAM_SA_ENROLL_FK;
+            alter table LOCATION_REGISTRATION_STATUS ADD CONSTRAINT `PROGRAM_SA_ENROLL_FK` FOREIGN KEY (`PROGRAM_SA_ENROLLMENT_ID`) REFERENCES `PROGRAM_SA_ENROLLMENT` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+
+            alter table LR_EXCEPTION DROP FOREIGN KEY LRS_STATUS_FK;
+            alter table LR_EXCEPTION ADD CONSTRAINT `LRS_STATUS_FK` FOREIGN KEY (`LRS_ID`) REFERENCES
+            `LOCATION_REGISTRATION_STATUS` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;</sql>
+    </changeSet>
+    <changeSet id="DRCC-313-3" author="antonio">
+        <sql>
+        ALTER TABLE REGISTRATION_STATUS MODIFY COLUMN ENOUGH_DAYS_METER VARCHAR(100);
+        ALTER TABLE LOCATION_REGISTRATION_STATUS MODIFY COLUMN STATUS VARCHAR(100);
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-323" author="vm">
+        <sqlFile path="DRCC-323.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="enoug_days_meter_fix" author="egamas">
+        <sql>alter table REGISTRATION_STATUS modify column `ENOUGH_DAYS_METER` VARCHAR (255);</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-313-4" author="antonio">
+        <sql>
+            ALTER TABLE REGISTRATION_STATUS MODIFY COLUMN ISO_REGISTRATION_ID VARCHAR(100);
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-313-5" author="antonio">
+        <sql>
+            ALTER TABLE REGISTRATION_STATUS ADD COLUMN ISO_NAME VARCHAR(100);
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-313-6" author="antonio">
+        <sql>
+            ALTER TABLE REGISTRATION_STATUS MODIFY COLUMN ACTIVE_START_DATE DATETIME;
+            ALTER TABLE REGISTRATION_STATUS MODIFY COLUMN ACTIVE_END_DATE DATETIME;
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-277-1" author="antonio">
+        <sql>
+            ALTER TABLE REGISTRATION_STATUS ADD COLUMN INCONSISTENCY_SOLVED tinyint(1) DEFAULT '0';
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-342" author="antonio">
+        <sqlFile path="DRCC-342.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-AwardModel.sql" author="egamas">
+        <sqlFile path="DRCC-AwardModel.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="remove-trailing-spaces-in-substation" author="vm">
+        <sql>UPDATE `SERVICE_POINT` set `SUBSTATION` = TRIM(`SUBSTATION`);</sql>
+    </changeSet>
+    <changeSet id="" author="egamas">
+        <sqlFile path="DRCC-PersistBid.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-344" author="vm">
+        <sql>UPDATE `MI_ISO_PROFILE_PRODUCT` SET `AUTO_DISPATCH` = 1;</sql>
+    </changeSet>
+    <changeSet id="DRCC-342-2" author="vm">
+        <sqlFile path="DRCC-342-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-345" author="vm">
+        <sql>ALTER TABLE `SUBLAP_PROGRAM_MAPPING` MODIFY `SUBLAP_CODE` varchar(5) DEFAULT '';</sql>
+    </changeSet>
+    <changeSet id="DRCC-352" author="antonio">
+        <sqlFile path="DRCC-352.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-352-2" author="antonio">
+        <sqlFile path="DRCC-352-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-CreateTableAwardException.sql" author="egamas">
+        <sqlFile path="DRCC-CreateTableAwardException.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-AwardModelTotals" author="egamas">
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` ADD COLUMN `TOTAL_HOURS` INTEGER(10) NULL;</sql>
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` ADD COLUMN `TOTAL_CAPACITY` BIGINT(20) NULL;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-AawardModelOtherResources" author="egamas">
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` ADD COLUMN `OTHER_RESOURCES_IMPACTED` VARCHAR(1) NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-ModifyTableAwardException" author="egamas">
+        <sql>ALTER TABLE `AWARD_EXCEPTION` ADD COLUMN `DATE_ADDED` DATETIME NULL;</sql>
+        <sql>ALTER TABLE `AWARD_EXCEPTION` ADD COLUMN `DATE_RESOLVED` DATETIME NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-355-2" author="vm">
+        <sql>DROP TABLE IF EXISTS `EVENT_ENROLLMENT_LINKS`;</sql>
+    </changeSet>
+    <changeSet id="DRCC-355" author="vm">
+        <sqlFile path="DRCC-355.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-353" author="antonio">
+        <sqlFile path="DRCC-353.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-353-2" author="antonio">
+        <sqlFile path="DRCC-353-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-355-3" author="vm">
+        <sql>ALTER TABLE `EVENT` ADD COLUMN `EXTERNAL_EVENT_ID` VARCHAR(55) NULL;</sql>
+    </changeSet>
+    <changeSet id="LOCATION_SUBMISSION_STATUS_RENAME" author="vm">
+        <sql>RENAME TABLE `LOCATION_REGISTRATION_STATUS` TO `LOCATION_SUBMISSION_STATUS`;</sql>
+    </changeSet>
+    <changeSet id="DRCC-368" author="vm">
+        <sqlFile path="DRCC-368.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-370" author="vm">
+        <sqlFile path="DRCC-370.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-341" author="antonio">
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` ADD COLUMN `INSTRUCTION_UID` VARCHAR(55) NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-341-TRAJECTORY.sql" author="antonio">
+        <sqlFile path="DRCC-341-TRAJECTORY.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-370-2" author="vm">
+        <sql>ALTER TABLE `IMPACTED_RESOURCE` MODIFY COLUMN `TOTAL_IMPACTED_LOCATIONS` bigint(20) unsigned NOT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-371.sql" author="antonio">
+        <sqlFile path="DRCC-371.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-AwardModelTotals2" author="egamas">
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` DROP COLUMN `TOTAL_HOURS`;</sql>
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` DROP COLUMN `TOTAL_CAPACITY`;</sql>
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` DROP COLUMN `DISPATCH_PROGRESS`;</sql>
+        <sql>ALTER TABLE `DISPATCH_BATCH` ADD COLUMN `TOTAL_HOURS` INTEGER(10) NULL;</sql>
+        <sql>ALTER TABLE `DISPATCH_BATCH` ADD COLUMN `DISPATCH_PROGRESS` VARCHAR(1) NULL;</sql>
+    </changeSet>
+
+    <changeSet id="instructionRefactor" author="egamas">
+        <sqlFile path="DRCC-RemoveHEFromInstruction.sql" relativeToChangelogFile="true"/>
+        <sqlFile path="DRCC-LinkExceptionToDispatchBatch.sql" relativeToChangelogFile="true"/>
+        <sqlFile path="DRCC-CreateInstructionDetail.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-371-aux.sql" author="antonio">
+        <sql>ALTER TABLE `AWARD_EXCEPTION` ADD COLUMN `EVENT_ID` bigint(20) UNSIGNED NOT NULL;</sql>
+        <sql>ALTER TABLE `AWARD_EXCEPTION` ADD CONSTRAINT `FK_AWARD_EVENT` FOREIGN KEY (`EVENT_ID`) REFERENCES `EVENT` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-372-Merge-RemoveDispatchBatch" author="egamas">
+        <sqlFile path="DRCC-372-Merge-RemoveDispatchBatch.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-372-AwardTable" author="egamas">
+        <sqlFile path="DRCC-372-AwardTable.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-372-RemoveBidFromInstruction" author="egamas">
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` DROP COLUMN `BID_ID`; </sql>
+    </changeSet>
+
+    <changeSet id="DRCC-372-AddRetailSchEnum" author="egamas">
+        <sql>ALTER TABLE `AWARD` ADD COLUMN `RETAIL_TYPE` VARCHAR(50) NULL ; </sql>
+    </changeSet>
+    <changeSet id="DRCC-382.sql" author="antonio">
+        <sql>ALTER TABLE `IMPACTED_CUSTOMER` ADD COLUMN `DRMS_PROGRAM_ID` VARCHAR(55) NOT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-376" author="vm">
+        <sqlFile path="DRCC-376.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-372-EVENT-null" author="antonio">
+        <sql>ALTER TABLE `AWARD` MODIFY COLUMN `EVENT_ID` BIGINT(20) UNSIGNED NULL;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-387" author="antonio">
+        <sqlFile path="DRCC-387.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-387-2" author="antonio">
+        <sqlFile path="DRCC-387-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-387-3" author="antonio">
+        <sql>TRUNCATE TABLE ISO_OUTAGE;</sql>
+        <sql>ALTER TABLE ISO_OUTAGE ADD COLUMN `DATE` date NOT NULL;</sql>
+    </changeSet>
+    <changeSet id="ISO_OUTAGE_SCHEMA_CHANGE" author="vm">
+        <sql>ALTER TABLE `ISO_OUTAGE` MODIFY COLUMN `DATE` DATETIME NOT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-391-1" author="egamas">
+        <sql>ALTER TABLE `AWARD_INSTRUCTION` ADD COLUMN `XML_SOURCE` TEXT;</sql>
+        <sql>ALTER TABLE `AWARD_TRAJECTORY` ADD COLUMN `XML_SOURCE` TEXT;</sql>
+    </changeSet>
+    <changeSet id="DRCC-341-new-approach" author="antonio">
+        <sql>ALTER TABLE `EVENT` ADD COLUMN `ERROR_REASON` VARCHAR(255) NULL;</sql>
+        <sql>ALTER TABLE `EVENT` DROP COLUMN `ERROR_DATE`;</sql>
+    </changeSet>
+    <changeSet id="DRCC-394" author="vm">
+        <sql>ALTER TABLE `ISO_OUTAGE` DROP KEY `RESOURCE_ID`, ADD UNIQUE KEY `RESOURCE_ID` (`RESOURCE_ID`,`DATE`);</sql>
+    </changeSet>
+    <changeSet id="DRCC-381" author="egamas">
+        <sql>ALTER TABLE `EVENT` ADD COLUMN `DRMS_PROGRAM_ID` VARCHAR(55) NOT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-374" author="antonio">
+        <sqlFile path="DRCC-374.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-374-new-columns-in-ADS" author="antonio.lopez">
+        <sql>ALTER TABLE AWARD_INSTRUCTION ADD COLUMN BATCH_SENT_TIME DATETIME NULL;</sql>
+        <sql>ALTER TABLE AWARD_INSTRUCTION ADD COLUMN BATCH_RECEIVED_TIME DATETIME NULL;</sql>
+        <sql>ALTER TABLE AWARD_TRAJECTORY ADD COLUMN BATCH_SENT_TIME DATETIME NULL;</sql>
+        <sql>ALTER TABLE AWARD_TRAJECTORY ADD COLUMN BATCH_RECEIVED_TIME DATETIME NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-380-fixing-fk" author="antonio.lopez">
+        <sql>ALTER TABLE LOCATION_CHANGELOG DROP FOREIGN KEY `CHANGELOG_LOCATION_FK`</sql>
+        <sql>ALTER TABLE LOCATION_CHANGELOG ADD CONSTRAINT `CHANGELOG_LOCATION_FK`
+            FOREIGN KEY (`LOCATION_ID`)
+            REFERENCES `LOCATION_SUBMISSION_STATUS` (`ID`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION</sql>
+    </changeSet>
+    <changeSet id="DRCC-380-fixing-fk-2" author="antonio.lopez">
+        <sql>ALTER TABLE LOCATION_REGISTRATION_LINKS DROP FOREIGN KEY `REGISTRATION_LOCATION_LINK_LOCATION_FK`</sql>
+        <sql>ALTER TABLE LOCATION_REGISTRATION_LINKS ADD
+            CONSTRAINT `REGISTRATION_LOCATION_LINK_LOCATION_FK`
+            FOREIGN KEY (`LOCATION_ID`)
+            REFERENCES `LOCATION_SUBMISSION_STATUS` (`ID`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION</sql>
+    </changeSet>
+    <changeSet id="DRCC-404" author="js">
+        <sqlFile path="DRCC-404.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-169-1" author="egamas">
+        <sqlFile path="DRCC-169.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+
+    <changeSet id="DRCC-324" author="vm">
+        <sqlFile path="DRCC-324.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-414" author="antonio">
+        <sqlFile path="DRCC-414.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-169-2" author="egamas">
+        <sql>ALTER TABLE `PROGRAM_ELIG_CUSTOMER_TYPE` MODIFY COLUMN `ID` bigint(20) NOT NULL AUTO_INCREMENT;</sql>
+        <sql>
+            INSERT INTO `PROGRAM_ELIG_CUSTOMER_TYPE` (`UUID`,`PROGRAM_PROFILE_ID`,`CUSTOMER_TYPE`)
+            SELECT UUID() AS `UUID`, `ID` AS `PROGRAM_PROFILE_ID`, replace(`CUSTOMER_TYPE`,'/','_') AS `CUSTOMER_TYPE`
+            FROM PROGRAM_PROFILE
+            WHERE `CUSTOMER_TYPE` IS NOT NULL AND TRIM(`CUSTOMER_TYPE`) != '';
+        </sql>
+    </changeSet>
+
+    <changeSet id="DRCC-169-3" author="egamas">
+        <sql>ALTER TABLE `PROGRAM_PROFILE` DROP COLUMN `CUSTOMER_TYPE`;</sql>
+    </changeSet>
+    <changeSet id="DRCC-414-fix in kw" author="antonio.lopez">
+        <sql>
+        UPDATE MI_ISO_PROFILE_PRODUCT set RESOURCE_MIN_CAPACITY_UNIT ='KW' WHERE RESOURCE_MIN_CAPACITY_UNIT='kW';
+        UPDATE MI_ISO_PROFILE_PRODUCT set TELEMETRY_MIN_THRESHOLD_UNIT ='KW' WHERE TELEMETRY_MIN_THRESHOLD_UNIT='kW';
+        UPDATE MI_ISO_PROFILE_PRODUCT set MAX_RESOURCE_SIZE_UNIT ='KW' WHERE MAX_RESOURCE_SIZE_UNIT='kW';
+        UPDATE PROGRAM_DEMAND set MIN_UNIT ='KW' WHERE MIN_UNIT='kW';
+        UPDATE PROGRAM_FSL_RULE set ENERGY_UNIT ='KW' WHERE ENERGY_UNIT='kW';
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-425" author="js">
+        <sqlFile path="DRCC-425.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-425-2" author="js">
+        <sqlFile path="DRCC-425-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-441-1" author="egamas">
+        <sql>
+            alter table `PLAN_INSTANCE` DROP FOREIGN KEY `fk_PLAN_INSTANCE_WORK_PLAN1`;
+            ALTER TABLE `PLAN_INSTANCE` ADD
+                CONSTRAINT `fk_PLAN_INSTANCE_WORK_PLAN1` FOREIGN KEY (`WORK_PLAN_ID`) REFERENCES `drcc`.`WORK_PLAN` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-441-2" author="egamas">
+        <sql>
+            ALTER TABLE `PLAN_INSTANCE` MODIFY COLUMN `START` DATETIME DEFAULT NULL;
+        </sql>
+    </changeSet>
+    <changeSet id="201703141409-type-fix" author="vm">
+        <sql>ALTER TABLE `PROGRAM_AGGREGATOR` CHANGE `MAILING_ADDRES` `MAILING_ADDRESS` varchar(255) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-424" author="antonio">
+        <sql>ALTER TABLE `BID` ADD COLUMN `LAST_RESET` DATETIME DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-441-4" author="egamas">
+        <sql>
+            ALTER TABLE `NOTIFICATION_INSTANCE` DROP FOREIGN KEY `fk_NOTIFICATION_INSTANCE_NOTIFICATION_DEFINITION1`;
+            ALTER TABLE `NOTIFICATION_DEFINITION` MODIFY COLUMN `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+            ALTER TABLE `NOTIFICATION_INSTANCE` ADD CONSTRAINT `fk_NOTIFICATION_INSTANCE_NOTIFICATION_DEFINITION1`
+            FOREIGN KEY (`NOTIFICATION_DEFINITION_ID`) REFERENCES `NOTIFICATION_DEFINITION` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-441-4.1" author="egamas">
+        <sql>ALTER TABLE `NOTIFICATION_DEFINITION` MODIFY COLUMN `BUSINESS_OWNER_ID` bigint(20); </sql>
+    </changeSet>
+    <changeSet id="DRCC-441-5" author="egamas">
+        <sqlFile path="DRCC-441-5.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="20170315-fix-on-victor-enum-change" author="vm">
+        <sql>UPDATE PROGRAM_FSL_RULE SET COMPARISON_REFERENCE='AVERAGE_SUMMER_ON_PEAK' WHERE COMPARISON_REFERENCE='Average Summer on-peak';</sql>
+        <sql>UPDATE PROGRAM_FSL_RULE SET COMPARISON_REFERENCE='MAX_SUMMER_ON_PEAK' WHERE COMPARISON_REFERENCE='Max Summer on-peak';</sql>
+        <sql>UPDATE PROGRAM_FSL_RULE SET COMPARISON_REFERENCE='AVERAGE_WINTER_PARTIAL_PEAK' WHERE COMPARISON_REFERENCE='Average Winter partial-peak';</sql>
+        <sql>UPDATE PROGRAM_FSL_RULE SET COMPARISON_REFERENCE='MAX_WINTER_PARTIAL_PEAK' WHERE COMPARISON_REFERENCE='Max Winter partial-peak';</sql>
+    </changeSet>
+    <changeSet id="DRCC-455" author="antonio">
+        <sqlFile path="DRCC-455.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-451-1" author="egamas">
+        <sql>ALTER TABLE `NOTIFICATION_INSTANCE` ADD COLUMN `SENT` TINYINT(1) DEFAULT 0;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-456-1" author="egamas">
+        <sqlFile path="DRCC-456-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-465" author="antonio">
+        <sqlFile path="DRCC-465.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-465-fix" author="antonio">
+        <sql>alter table LR_EXCEPTION DROP FOREIGN KEY LRS_STATUS_FK;
+            alter table LR_EXCEPTION ADD CONSTRAINT `LRS_STATUS_FK` FOREIGN KEY (`LRS_ID`) REFERENCES
+            `LOCATION_SUBMISSION_STATUS` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-465-fix-2" author="antonio">
+        <sql>ALTER TABLE NOTIFICATION_INSTANCE MODIFY COLUMN `BUSINESS_OWNER_ID` BIGINT(20) NULL;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-465-fix-3" author="egamas">
+        <sql>ALTER TABLE `NOTIFICATION_INSTANCE` ADD COLUMN `TYPE` varchar(45) NOT NULL;</sql>
+        <sql>ALTER TABLE `NOTIFICATION_INSTANCE` DROP FOREIGN KEY `fk_NOTIFICATION_INSTANCE_NOTIFICATION_DEFINITION1`</sql>
+        <sql>ALTER TABLE `NOTIFICATION_INSTANCE` DROP KEY `fk_NOTIFICATION_INSTANCE_NOTIFICATION_DEFINITION1_idx`</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-465-fix-4" author="egamas">
+        <sql>ALTER TABLE `NOTIFICATION_INSTANCE` DROP COLUMN `NOTIFICATION_DEFINITION_ID`;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-465-route-to-send-mail" author="egamas">
+        <sql>ALTER TABLE `NOTIFICATION_INSTANCE` ADD COLUMN `MSG_HEADER` VARCHAR(255);</sql>
+        <sql>ALTER TABLE `NOTIFICATION_INSTANCE` ADD COLUMN `MSG_BODY` VARCHAR(255);</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-479" author="antonio">
+        <sqlFile path="DRCC-479.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    
+    <changeSet id="DRCC-494" author="vm">
+        <sql>ALTER TABLE `EVENT` add column `CREATED_ON` datetime DEFAULT NULL;</sql>
+        <sql>ALTER TABLE `EVENT` add column `CREATED_BY` varchar(50) DEFAULT NULL;</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-477-1" author="egamas">
+        <sql>
+            INSERT INTO `NOTIFICATION_DEFINITION` (`UUID`, `TYPE`, `DESCRIPTION`, `BUSINESS_OWNER_ID`)
+            VALUES
+            (UUID(), 'BAM_RESUME_ALERT', 'BAM resumed alert', NULL);
+        </sql>
+    </changeSet>
+
+    <changeSet id="DES-2" author="vm">
+        <sqlFile path="DES-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Aggregators" outcome="GasAggregatorList"/>
+            <p:menuitem value="Add new aggregator" url="#"/>
+        </p:breadCrumb>
+        <h:form id="form">
+            <div class="card card-w-title">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="aggregatorName" value="#{createAggregator.aggregator.name}">
+                        <f:validator validatorId="uniqueEntityValidator"/>
+                        <f:attribute name="currentEntity" value="#{createAggregator.aggregator}"/>
+                        <f:attribute name="uniqueColumns" value="name"/>
+                        <f:attribute name="fields" value="{newValue}"/>
+                    </p:inputText>
+                    <p:outputLabel value="Aggregator Name:" for="aggregatorName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="aggregatorMailingAddress" value="#{createAggregator.aggregator.mailingAddress}"/>
+                    <p:outputLabel value="Mailing address:" for="aggregatorMailingAddress"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="aggregatorMailingCity" value="#{createAggregator.aggregator.mailingCity}"/>
+                    <p:outputLabel value="Mailing city:" for="aggregatorMailingCity"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Mailing state:" for="aggregatorState"/>
+                    <p:selectOneMenu id="aggregatorState" value="#{gasCreateAggregator.aggregator.mailingState}" styleClass="selectfield" converter="omnifaces.GenericEnumConverter">
+                        <f:selectItems value="#{gasConstantsProvider.states}" var="state" itemLabel="#{state.label}" itemValue="#{state}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="aggregatorMailingZip" value="#{createAggregator.aggregator.mailingZipCode}"/>
+                    <p:outputLabel value="Mailing zip code:" for="aggregatorMailingZip"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="aggregatorPOC" value="#{createAggregator.aggregator.primaryPOC}"/>
+                    <p:outputLabel value="Primary POC:" for="aggregatorPOC"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="aggregatorPOCPhone" value="#{createAggregator.aggregator.primaryPOCPhone}"/>
+                    <p:outputLabel value="Primary POC phone:" for="aggregatorPOCPhone"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-calendar">
+                    <p:calendar id="aggregatorStartDate" value="#{createAggregator.aggregator.effectiveStartDate}"
+                                pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy" mask="true"/>
+                    <p:outputLabel value="Effective Start Date:" for="aggregatorStartDate"/>
+                </h:panelGroup>
+
+                <p:commandButton id="save" value="Save" action="#{createAggregator.save()}" process="@form" update="@form,:layout-menubar"/>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

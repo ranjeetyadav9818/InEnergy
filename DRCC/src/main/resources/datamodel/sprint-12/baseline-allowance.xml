@@ -1,0 +1,23 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="baseline-allowance" author="vm">
+        <createTable tableName="BASELINE_ALLOWANCE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="CODE" type="VARCHAR(255)"/>
+            <column name="WATTS" type="BIGINT(11)"/>
+            <column name="TIME_OF_USE_CALENDAR_ID" type="BIGINT(11) UNSIGNED"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="BASELINE_ALLOWANCE"
+                                 baseColumnNames="TIME_OF_USE_CALENDAR_ID"
+                                 constraintName="FK_BASELINE_ALLOWANCE_TIME_OF_USE_CALENDAR"
+                                 referencedTableName="TIME_OF_USE_CALENDAR"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+</databaseChangeLog>

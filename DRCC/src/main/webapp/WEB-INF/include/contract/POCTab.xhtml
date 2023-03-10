@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{contractEntityDetailController.entity.pointOfContacts}" id="pocTab" widgetVar="wdgPoc" lazy="false" var="poc"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{poc.uuid}" selection="false" style="text-align: center" editable="true" editMode="row">
+        <p:ajax event="rowEdit" listener="#{controller.onRowEdit}"/>
+        <p:ajax event="rowEditCancel" listener="#{controller.onRowCancel}"/>
+        <p:column headerText="Name" filterBy="#{poc.name}">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{poc.name}"/></f:facet>
+                <f:facet name="input"><p:inputText id="Name" value="#{poc.name}" required="true" label="Name"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Title" filterBy="#{poc.title}">
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{poc.title}"/></f:facet>
+                <f:facet name="input"><p:inputText value="#{poc.title}"/></f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Phone" filterMatchMode="contains" sortable="false">
+                <h:outputText value="#{poc.getAllPhones()}"/>
+        </p:column>
+        <p:column headerText="Email" filterMatchMode="contains" sortable="false">
+                <h:outputText value="#{poc.getAllMails()}"/>
+        </p:column>
+        <p:column headerText="Type" filterBy="#{poc.pocType}">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('wdgPoc').filter()">
+                    <f:selectItem noSelectionOption="false" value="#{null}"/>
+                    <f:selectItems value="#{constantsProvider.pocTypes}" var="pocTypeFilter" itemLabel="#{pocTypeFilter.label}"
+                                   itemValue="#{pocTypeFilter}"/>
+                </p:selectOneMenu>
+            </f:facet>
+            <p:cellEditor>
+                <f:facet name="output"><h:outputText value="#{poc.pocType.label}"/></f:facet>
+                <f:facet name="input">
+                    <p:selectOneMenu id="idPocType" converter="omnifaces.GenericEnumConverter" value="#{poc.pocType}"
+                                     required="true" style="width: 157px;" autoWidth="false">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.pocTypes}" var="pocType" itemLabel="#{pocType.label}"
+                                       itemValue="#{pocType}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column style="width: 5%"><p:rowEditor/></p:column>
+    </p:dataTable>
+</ui:composition>

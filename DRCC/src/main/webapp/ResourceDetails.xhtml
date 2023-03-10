@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <c:set var="bidHistoryModel" value="#{resourceDetailController.lazyBidHistoryModel}" scope="request"/>
+
+        <h:form id="formRD">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration" url="#"/>
+                <p:menuitem value="#{resourceDetailController.resource.isoProduct.profile.iso.name}" url="#"/>
+                <p:menuitem value="Resources" outcome="Resources"/>
+                <p:menuitem value="Resource #{resourceDetailController.resource.name}" rendered="#{resourceDetailController.resource.name ne null}"/>
+            </p:breadCrumb>
+
+            <div class="card">
+                <p:carousel id="resourceCarousel" numVisible="4" circular="true" responsive="true"
+                            value="#{resourceDetailController.resourceDetails}" var="res">
+                    <i class="material-icons #{res.icon} Fs20 hardblue TexAlCenter"/>
+                    <h:outputText class="Fs20 hardblue" value="#{res.name}"/>
+                    <h:dataTable var="db" value="#{res.dataBeans}" style="border:0;">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+            </div>
+            <div class="EmptyBox20"></div>
+
+                <p:tabView id="locationDetail" scrollable="false" activeIndex="#{resourceDetailController.tabIndex}">
+                    <p:tab id="idExceptions" title="Registration History">
+                        <ui:include src="WEB-INF/include/resource/RegistrationHistoryTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="idServicePoints" title="Pmax-Pmin History">
+                        <ui:include src="WEB-INF/include/resource/PmaxPminTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="bidHistory" title="Bid History">
+                        <ui:include src="WEB-INF/include/resource/BidHistoryTab.xhtml"/>
+                    </p:tab>
+                    <p:tab title="Award History">
+                        <ui:include src="WEB-INF/include/resource/AwardHistoryTab.xhtml"/>
+                    </p:tab>
+                    <p:tab title="Dispatch History">
+                        <ui:include src="WEB-INF/include/resource/DispatchHistoryTab.xhtml"/>
+                    </p:tab>
+                    <p:tab title="Outage History">
+                        <ui:include src="WEB-INF/include/resource/OutageHistoryTab.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

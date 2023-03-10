@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <p:dataTable value="#{locationSubmissionController.lazyLocationSubmissionStatusDataModelNonReg}" id="TbNonReg" widgetVar="custTableNR" lazy="true" var="nonReg" reflow="true" rows="25" rowsPerPageTemplate="25,50,100" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{nonReg.uuid}" selectionMode="single">
+        <p:ajax event="rowSelect" listener="#{locationSubmissionController.onSelectStatus}" update="form"/>
+        <p:column headerText="SA ID"  filterBy="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}" field="programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId" filterMatchMode="contains">
+            <h:outputText value="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}" />
+        </p:column>
+        <p:column headerText="UU ID" filterBy="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.saUuid}" field="programServiceAgreementEnrollment.serviceAgreement.saUuid" filterMatchMode="contains">
+            <h:outputText value="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.saUuid}"/>
+        </p:column>
+        <p:column headerText="Customer Name" filterBy="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}" field="programServiceAgreementEnrollment.serviceAgreement.account.person.customerName" filterMatchMode="contains">
+            <h:outputText value="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}"/>
+            <h:outputText value="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.account.person.businessName}"/>
+        </p:column>
+        <p:column headerText="Service Address" filterBy="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}" field="programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1} "/>
+        </p:column>
+        <p:column headerText="City" filterBy="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}" field="programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{nonReg.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr} " />
+        </p:column>
+        <p:column headerText="Program" filterBy="#{nonReg.programServiceAgreementEnrollment.program.name}" field="programServiceAgreementEnrollment.program.name" filterMatchMode="contains">
+            <h:outputText value="#{nonReg.programServiceAgreementEnrollment.program.name}"/>
+        </p:column>
+        <p:column headerText="Reason" filterBy="#{nonReg.isoNonRegistrableReason}" field="isoNonRegistrableReason" filterMatchMode="contains">
+            <h:outputText value="#{nonReg.isoNonRegistrableReason}"/>
+        </p:column>
+        <p:column headerText="Effective Date" filterBy="#{nonReg.isoNonRegistrableDate}" field="isoNonRegistrableDate" filterable="false" filterMatchMode="contains">
+            <h:outputText value="#{nonReg.isoNonRegistrableDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Commodity"  filterBy="#{pend.programServiceAgreementEnrollment.serviceAgreement.commodity}" field="programServiceAgreementEnrollment.serviceAgreement.commodity" filterMatchMode="contains">
+            <h:outputText value="#{pend.programServiceAgreementEnrollment.serviceAgreement.commodity}" />
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

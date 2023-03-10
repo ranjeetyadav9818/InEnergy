@@ -1,0 +1,238 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:o="http://omnifaces.org/ui"
+        xmlns:clx="http://java.sun.com/jsf/composite/components">
+
+<o:importFunctions type="com.inenergis.controller.general.Functions" var="ine" />
+
+    <div class="topbar">
+        <div class="logo" style="float: left">
+            <h:link outcome="/dashboard">
+                <h:graphicImage name="images/Inenergis_Logo.png" styleClass="" style="width: 55px"/>
+            </h:link>
+        </div>
+
+        <span style="color: whitesmoke; font-size: 30px;float:left; margin: 10px">
+            <span>Energy Array</span>
+        </span>
+        <h:form id="searchForm">
+        <ul class="topbar-menu fadeInDown animated" style="float: left">
+            <li class="search-item search-box-li">
+                <i class="fa fa-search" style="top: 16px;left: 10px;right: 600px;z-index: 10"/>
+                <p:autoComplete value="#{searchController.querySearch}" styleClass="search-box" style="border: 0;" inputStyleClass="search-box-input" placeholder="Search" id="searchQuery" completeMethod="#{searchController.partialSearch}"
+                                    var="match" itemLabel="#{match.toString()}" itemValue="#{match}" groupBy="#{searchController.getGroup(match)}" minQueryLength="2" emptyMessage="No matches found"
+                                onkeyup="if (event.keyCode == 13) {  document.getElementById('searchForm:generalSearchButton').click(); return false; }" autoHighlight="false" converter="elasticObjectConverter">
+                    <p:ajax event="itemSelect" listener="#{searchController.onSelectSearchMatch}"/>
+                    <f:facet name="itemtip">
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'asset'}">
+                            <f:facet name="header">
+                                Asset #{match.id}
+                            </f:facet>
+                            <h:outputText value="Name:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.name)}" escape="false"/>
+                            <h:outputText value="Description:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.description)}" escape="false"/>
+                            <h:outputText value="Make:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.make)}" escape="false"/>
+                            <h:outputText value="Supplier part number:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.supplierPartNumber)}" escape="false"/>
+                            <h:outputText value="Model:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.model)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'device'}">
+                            <f:facet name="header">
+                                Device #{match.id}
+                            </f:facet>
+                            <h:outputText value="Name:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.name)}" escape="false"/>
+                            <h:outputText value="Description:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.description)}" escape="false"/>
+                            <h:outputText value="External Id:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.externalId)}" escape="false"/>
+                            <h:outputText value="Address:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.address1)}" escape="false"/>
+                            <h:outputText value="City:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.city)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'location'}">
+                            <f:facet name="header">
+                                Location #{match.isoResourceId}
+                            </f:facet>
+                            <h:outputText value="#{msg['data.mapping.sublap']}:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.sublap)}" escape="false"/>
+                            <h:outputText value="LSE:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.lse)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'resource'}">
+                            <f:facet name="header">
+                                Resource #{match.name}
+                            </f:facet>
+                            <h:outputText value="Name:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.name)}" escape="false"/>
+                            <h:outputText value="#{msg['data.mapping.sublap']}:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.sublap)}" escape="false"/>
+                            <h:outputText value="LSE:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.lse)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'registration'}">
+                            <f:facet name="header">
+                                Registration #{match.id}
+                            </f:facet>
+                            <h:outputText value="Market Registration Id:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.isoRegistrationId)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'APM'}">
+                            <f:facet name="header">
+                                Service Agreement #{match.serviceAgreementId}
+                            </f:facet>
+                            <h:outputText value="Customer:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.computedName)}" escape="false"/>
+                            <h:outputText value="Status:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.status)}" escape="false"/>
+                            <h:outputText value="Phone:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.phone)}" converter="phoneConverter" escape="false"/>
+                            <h:outputText value="Address:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch, match.street)}, #{ine:highlighter(controller.querySearch, match.city)}
+                                (#{ine:highlighter(controller.querySearch,match.state)}), #{ine:highlighter(controller.querySearch,match.postalCode)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'APM'}">
+                            <f:facet name="header">
+                                Service Point #{ine:highlighter(controller.querySearch,match.servicePointId)}
+                            </f:facet>
+                            <h:outputText value="Premise Id:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.premiseId)}" escape="false"/>
+                            <h:outputText value="Meter Id:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.meterId)}" escape="false"/>
+                            <h:outputText value="Badge:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.meterBadgeNumber)}" escape="false"/>
+                            <h:outputText value="Address:" />
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" cellpadding="5" style="width: 300px" rendered="${match.getType() eq 'SUGGESTION'}">
+                            Go to #{match.suggestion} section
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" cellpadding="5" style="width: 300px" rendered="${match.getType() eq 'ISO' or match.getType() eq 'ENERGY_PROGRAM'}">
+                            Go to #{match.action} section
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'AGGREGATOR'}">
+                            <f:facet name="header">
+                                Aggregator #{ine:highlighter(controller.querySearch,match.name)}
+                            </f:facet>
+                            <h:outputText value="Address:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.address)}" escape="false"/>
+                            <h:outputText value="City:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.city)}" escape="false"/>
+                            <h:outputText value="State:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.state)}" escape="false"/>
+                            <h:outputText value="Primary POC:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.primaryPOC)}" escape="false"/>
+                            <h:outputText value="Primary POC phone:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.phone)}" converter="phoneConverter" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'EVENT'}">
+                            <f:facet name="header">
+                                Event #{ine:highlighter(controller.querySearch,match.name)}
+                            </f:facet>
+                            <h:outputText value="Program:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.program)}" escape="false"/>
+                            <h:outputText value="DRMS Program Id:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.drmsId)}" escape="false"/>
+                            <h:outputText value="Dispatch Level:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.dispatchLevel)}" escape="false"/>
+                            <h:outputText value="Dispatch Reason:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.dispatchReason)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'EVENT_NOTIFICATION'}">
+                            <f:facet name="header">
+                                Event Notification #{ine:highlighter(controller.querySearch,match.name)}
+                            </f:facet>
+                            <h:outputText value="Type:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.eventType)}" escape="false"/>
+                            <h:outputText value="Options:" />
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.options)}" escape="false"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'contract'}">
+                            <f:facet name="header" rendered="#{not empty match.serviceAgreements}">
+                                Contract #{ine:highlighter(controller.querySearch,match.name)}
+                            </f:facet>
+                            <h:outputText value="Type"/>
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.typeName)}" escape="false"/>
+                            <h:outputText value="Service Agreements:" rendered="#{not empty match.serviceAgreements}"/>
+                            <h:panelGrid columns="1" cellpadding="5" rendered="#{not empty match.serviceAgreements}">
+                                <ui:repeat value="#{match.serviceAgreements}" var="sa">
+                                    <h:outputText value="#{ine:highlighter(controller.querySearch,sa)}"  escape="false"/><br/>
+                                </ui:repeat>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'contractEntity'}">
+                            <f:facet name="header">
+                                Contract Entity #{ine:highlighter(controller.querySearch,match.businessName)}
+                            </f:facet>
+                            <h:outputText value="DBA:"/>
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.dba)}" escape="false"/>
+                            <h:outputText value="Sector:"/>
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.sector)}" escape="false"/>
+                            <h:outputText value="Taxid:"/>
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.taxId)}" escape="false"/>
+                            <p:column/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" cellpadding="5" rendered="${match.getType() eq 'invoice'}">
+                            <f:facet name="header">
+                                Invoice #{ine:highlighter(controller.querySearch,match.invoiceNumber)}
+                            </f:facet>
+                            <h:outputText value="Description:"/>
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.description)}" escape="false"/>
+                            <h:outputText value="Serice Agreement:"/>
+                            <h:outputText value="#{ine:highlighter(controller.querySearch,match.serviceAgreement)}" escape="false"/>
+                            <h:outputText value="Due Date:"/>
+                            <h:outputText value="#{match.dueDate}" converter="localDateConverter"/>
+                            <h:outputText value="Payment Date:"/>
+                            <h:outputText value="#{match.paymentDate}" converter="localDateConverter"/>
+                            <h:outputText value="Total:"/>
+                            <clx:MoneyOutputComponent value="#{match.total}"/>
+                        </h:panelGrid>
+                    </f:facet>
+                    <p:column style="border:0;width: 12px;padding: 0px"></p:column>
+                    <p:column style="text-align: center;border:0;padding: 5px 0px 5px 0px;width: 30px" ><i class="material-icons Fs20 hardblue">#{match.icon}</i></p:column>
+                    <p:column style="border: 0;padding: 2px 0px 5px 10px;"><h:outputText value="#{currencyConfigController.formatCurrency(match)}" /> </p:column>
+                </p:autoComplete>
+                <p:commandButton icon="ui-icon-search" action="#{searchController.search()}" update="all-content" process="@form"
+                                 style="float: left;margin-left: 10px;margin-top: 5px;" id="generalSearchButton"/>
+            </li>
+        </ul>
+        </h:form>
+
+        <ul class="topbar-menu fadeInDown animated">
+            <li role="menuitem">
+                <a href="#">
+                    <i class="topbar-icon fa fa-fw fa-power-off"/>
+                </a>
+                <ul class="animated">
+                    <li role="menuitem">
+                        <p:commandLink action="#{loginController.logout}" process="@this">
+                            <i class="fa fa-fw fa-sign-out"/>Log Out
+                        </p:commandLink>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="topbar-icon fa fa-fw fa-user"/>
+                    <span>#{identity.account.firstName} #{identity.account.lastName}</span>
+                </a>
+                <ul class="animated">
+                    <li role="menuitem">
+                        <a href="PasswordChange.jsf">
+                            <i class="fa fa-fw fa-lock"/>
+                            <span>Password change</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+</ui:composition>

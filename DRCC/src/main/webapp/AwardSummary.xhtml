@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <c:set var="controller" value="#{awardSummaryController}"/>
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration" url="#"/>
+                <p:menuitem value="#{awardSummaryController.iso.name}" url="#"/>
+                <p:menuitem value="Award Summary" outcome="AwardSummary">
+                    <f:param name="o" value="#{parameterEncoderService.encode(awardSummaryController.iso.id)}"/>
+                </p:menuitem>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:calendar id="tradeDateStart" value="#{controller.tradeDateFrom}" pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                    required="true"/>
+                        <p:outputLabel value="Trade Date" for="tradeDateStart"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:calendar id="tradeDateEnd" value="#{controller.tradeDateTo}" pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                    required="true"/>
+                        <p:outputLabel value="to" for="tradeDateEnd"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Resource Type" for="resourceTypeSearch"/>
+                        <p:selectOneMenu id="resourceTypeSearch" value="#{controller.productType}"
+                                         style="width: 145px;" autoWidth="false">
+                            <f:selectItems value="#{constantsProvider.productTypes}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:autoComplete id="resourceNameSearch" value="#{controller.resourceName}" completeMethod="#{controller.completeResource}" size="26"/>
+                        <p:outputLabel value="Resource ID" for="resourceNameSearch"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:commandButton value="Search" action="#{controller.search()}" id="search" update="@form"/>
+            </div>
+            <p:tabView id="statusTabView" scrollable="false" rendered="#{controller.render}">
+                <p:tab id="awards" title="Awards">
+                    <ui:include src="WEB-INF/include/award/AwardsTab.xhtml"/>
+                </p:tab>
+                <p:tab id="exceptions" title="Award Audit Exceptions">
+                    <ui:include src="WEB-INF/include/award/ExceptionTab.xhtml"/>
+                </p:tab>
+            </p:tabView>
+            <p:defaultCommand target="search"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

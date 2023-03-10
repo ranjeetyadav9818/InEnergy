@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <c:set var="controller" value="#{deviceDetailsController}"/>
+        <c:set var="inventoryType" value="#{deviceDetailsController.device.asset.assetProfile.networkType.name}"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Devices" outcome="AssetDeviceInventory">
+                    <f:param name="nt" value="#{parameterEncoderService.encode(controller.device.asset.assetProfile.networkType.id)}"/>
+                    <f:param name="n" value="#{parameterEncoderService.encode(controller.device.asset.assetProfile.networkType.commodityType)}"/>
+                </p:menuitem>
+                <p:menuitem value="Device #{controller.device.name}" url="#"/>
+            </p:breadCrumb>
+
+            <div class="card">
+                <h:panelGroup rendered="#{controller.editMode == false}">
+                    <p:carousel numVisible="2" circular="true" responsive="true" value="#{controller.entityDetails}"
+                                headerText="#{controller.device.name}" var="details" style="border: 0;">
+                        <i class="material-icons #{details.icon} Fs20 hardblue"/>
+                        <h:outputText value="#{details.name}" styleClass="Fs20 hardblue"/>
+                        <h:dataTable var="db" value="#{details.dataBeans}" style="border:0;" styleClass="ui-panelgrid-blank">
+                            <h:column style="border:0;">
+                                <h:outputText value="#{db.name}" style="border:0;"/>
+                            </h:column>
+                            <h:column style="border:0;">
+                                <h:outputText value="#{db.value}" style="border:0;"/>
+                            </h:column>
+                        </h:dataTable>
+                    </p:carousel>
+                    <p:commandButton action="#{controller.editDevice()}" value="Edit Device" update="form"/>
+                </h:panelGroup>
+
+                <ui:include src="WEB-INF/include/asset/InventoryForm.xhtml"/>
+            </div>
+
+            <p:tabView activeIndex="#{controller.tabIndex}" id="inventoryTab">
+                <c:set var="tabViewId" value="inventoryTab"/>
+                <p:tab title="Parties">
+                    <ui:include src="WEB-INF/include/asset/InventoryPartiesTab.xhtml"/>
+                </p:tab>
+                <p:tab title="Location">
+                    <ui:include src="WEB-INF/include/asset/InventoryLocationTab.xhtml"/>
+                </p:tab>
+                <p:tab title="Node Connections" id="connections">
+                    <ui:include src="WEB-INF/include/asset/DeviceDetailsLinks.xhtml"/>
+                </p:tab>
+                <p:tab title="Catalog Information Attributes">
+                    <c:set var="attributeslist" value="#{controller.device.asset.catalogAttributes}"/>
+                    <c:set var="editable" value="#{false}"/>
+                    <c:set var="tabIndex" value="#{2}"/>
+                    <ui:include src="WEB-INF/include/general/AttributeInstancesTab.xhtml"/>
+                </p:tab>
+                <p:tab title="Device Information Attributes">
+                    <c:set var="attributeslist" value="#{controller.device.deviceAttributes}"/>
+                    <c:set var="editable" value="#{true}"/>
+                    <c:set var="tabIndex" value="#{3}"/>
+                    <ui:include src="WEB-INF/include/general/AttributeInstancesTab.xhtml"/>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+    </ui:define>
+</ui:composition>

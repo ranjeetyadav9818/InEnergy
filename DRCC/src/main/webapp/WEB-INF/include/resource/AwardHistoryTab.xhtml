@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form>
+        <p:dataTable value="#{resourceDetailController.resource.awards}" var="award" widgetVar="awardTableA"
+                     reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="false" rowKey="#{award.uuid}" selectionMode="single">
+            <p:ajax event="rowSelect" listener="#{resourceDetailController.onAwardSelect}"/>
+
+            <p:column headerText="Trade date" filterable="false" sortBy="#{award.tradeDate}" >
+                <h:outputText value="#{award.tradeDate}" style="font-size: 12px;"><f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy"/></h:outputText>
+            </p:column>
+
+            <p:column headerText="Market Award Start Time" filterable="false" sortBy="#{award.startTime}">
+                <h:outputText value="#{award.startTime}" style="text-align: center; font-size: 12px;"><f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/></h:outputText>
+            </p:column>
+
+            <p:column headerText="Market Dispatch Duration" filterable="false" >
+                <h:outputText value="#{award.calculateDispatchTotalHours()}" style="font-size: 12px;"/>
+            </p:column>
+
+            <p:column headerText="ISO Award Capacity (MWH)" filterable="false">
+                <h:outputText value="#{award.resource.getCalculatedCapacityInMW()}" style="font-size: 12px;"><f:convertNumber pattern="###.##"/></h:outputText>
+
+            </p:column>
+
+            <p:column headerText="Dispatch Schedule Source" filterBy="#{award.resource.isoProduct.awardInstruction}" filterMatchMode="exact" style="font-size: 12px;">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('awardTableA').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false" style="width: 60%;font-size: 12px">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.awardInstructions}" var="ins" itemLabel="#{ins.name}" itemValue="#{ins}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{award.resource.isoProduct.awardInstruction.name}" style="font-size: 12px;"/>
+            </p:column>
+
+            <p:column headerText="Retail Dispatch Schedule Type" filterBy="#{award.type}" filterMatchMode="exact" style="font-size: 12px;">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('awardTableA').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false" style="width: 70%;font-size: 12px">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.dispatchScheduleTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{award.type.name}" style="font-size: 12px;"/>
+            </p:column>
+
+            <p:column headerText="Retail Dispatch Progress" filterable="false">
+                <p:tooltip for="retailDispatchRiskLow" value="Dispatch OK"/>
+                <h:outputText id="retailDispatchRiskLow" styleClass="icon-smile green" rendered="#{award.hasErrorEvents() eq false}"/>
+                <p:tooltip for="retailDispatchRiskLHigh" value="Dispatch with problems"/>
+                <h:outputText id="retailDispatchRiskLHigh" styleClass="icon-frown red" rendered="#{award.hasErrorEvents() eq true}"/>
+            </p:column>
+
+            <p:column headerText="Other Resources Impacted" filterable="false">
+                <h:outputText value="N"/>
+            </p:column>
+        </p:dataTable>
+    </h:form>
+
+</ui:composition>

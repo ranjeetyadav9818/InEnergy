@@ -1,0 +1,21 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-190-1" author="vm">
+        <renameColumn tableName="PROGRAM_DEMAND" oldColumnName="DEMAND_MINIMUN_TYPE" newColumnName="DEMAND_MIN_TYPE" columnDataType="VARCHAR(50)"/>
+    </changeSet>
+
+    <changeSet id="DES-190-2" author="vm">
+        <update tableName="PROGRAM_DEMAND">
+            <column name="DEMAND_MIN_TYPE" type="VARCHAR(5)"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="DES-190-3" author="vm">
+        <addColumn tableName="PROGRAM_DEMAND">
+            <column name="PROGRAM_SEASON_ID" type="BIGINT(20)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

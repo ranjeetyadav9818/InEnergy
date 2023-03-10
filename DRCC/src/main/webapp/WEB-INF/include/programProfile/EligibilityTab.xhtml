@@ -1,0 +1,264 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <div class="card card-w-title">
+        <div class="ContainerIndent"><h:outputText value="General Eligibility" styleClass="FontBold Fs18 hardblue"/></div>
+
+        <h4>SA Status</h4>
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.saStatusPickList}" var="saStatus"
+                    itemLabel="#{saStatus.value} = #{saStatus.text}" itemValue="#{saStatus}">
+            <f:facet name="sourceCaption">Ineligible</f:facet>
+            <f:facet name="targetCaption">Eligible</f:facet>
+        </p:pickList>
+
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.saStatusReviewException}" id="saStatusReviewException"/>
+        <p:outputLabel for="saStatusReviewException" value="Review exceptions"/>
+
+        <h4>Service Type</h4>
+        <p:selectOneMenu value="#{programProfileController.profile.serviceType}">
+            <f:selectItem itemLabel="N/A" itemValue=""/>
+            <f:selectItem itemLabel="Electric" itemValue="ELECTRIC"/>
+            <f:selectItem itemLabel="Gas" itemValue="Gas"/>
+        </p:selectOneMenu>
+        <div class="EmptyBox5"/>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.serviceTypeReviewException}" id="serviceTypeReviewException"/>
+        <p:outputLabel for="serviceTypeReviewException" value="Review exceptions"/>
+        <p:separator/>
+
+        <h4>Customer Type</h4>
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.eligibilityCustomerTypePickList}" var="custType"
+                    itemLabel="#{custType.text}" itemValue="#{custType}">
+            <f:facet name="sourceCaption">Not Selected</f:facet>
+            <f:facet name="targetCaption">Select</f:facet>
+        </p:pickList>
+        <div class="EmptyBox5"/>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.customerTypeReviewException}" id="customerTypeReviewException"/>
+        <p:outputLabel for="customerTypeReviewException" value="Review exceptions"/>
+        <p:separator/>
+
+        <h4>Rate Schedules</h4>
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.rateSchedulesPickList}" var="rate" itemLabel="#{rate.label}"
+                    itemValue="#{rate}"
+                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
+            <f:facet name="sourceCaption">Ineligible</f:facet>
+            <f:facet name="targetCaption">Eligible</f:facet>
+        </p:pickList>
+        <div class="EmptyBox5"/>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.rateScheduleReviewException}" id="rateScheduleReviewException"/>
+        <p:outputLabel for="rateScheduleReviewException" value="Review exceptions"/>
+        <p:separator/>
+
+        <h4>Premise Type</h4>
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.premiseTypesPickList}" var="premiseType"
+                    itemLabel="#{premiseType.label}"
+                    itemValue="#{premiseType}" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
+            <f:facet name="sourceCaption">Ineligible</f:facet>
+            <f:facet name="targetCaption">Eligible</f:facet>
+        </p:pickList>
+        <div class="EmptyBox5"/>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.premiseTypeReviewException}" id="premiseTypeReviewException"/>
+        <p:outputLabel for="premiseTypeReviewException" value="Review exceptions"/>
+        <p:separator/>
+
+        <h4>3rd Party DRP</h4>
+        <p:selectOneMenu value="#{programProfileController.profile.thirdPartyDRP}">
+            <f:selectItem itemLabel="N/A" itemValue=""/>
+            <f:selectItem itemLabel="Eligible" itemValue="ELIGIBLE"/>
+            <f:selectItem itemLabel="Ineligible" itemValue="INELIGIBLE"/>
+        </p:selectOneMenu>
+        <div class="EmptyBox5"/>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.thirdPartyDRPReviewException}" id="thirdPartyDRPReviewException"/>
+        <p:outputLabel for="thirdPartyDRPReviewException" value="Review exceptions"/>
+        <p:separator/>
+
+        <h4>Medical Baseline</h4>
+        <p:selectOneMenu value="#{programProfileController.profile.medicalBaseline}">
+            <f:selectItem itemLabel="N/A" itemValue=""/>
+            <f:selectItem itemLabel="Eligible" itemValue="ELIGIBLE"/>
+            <f:selectItem itemLabel="Ineligible" itemValue="INELIGIBLE"/>
+        </p:selectOneMenu>
+        <div class="EmptyBox5"/>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.medicalBaselineReviewException}" id="medicalBaselineReviewException"/>
+        <p:outputLabel for="medicalBaselineReviewException" value="Review exceptions"/>
+        <p:separator/>
+
+        <h4>Life Support</h4>
+        <p:selectOneMenu value="#{programProfileController.profile.lifeSupport}">
+            <f:selectItem itemLabel="N/A" itemValue=""/>
+            <f:selectItem itemLabel="Eligible" itemValue="ELIGIBLE"/>
+            <f:selectItem itemLabel="Ineligible" itemValue="INELIGIBLE"/>
+        </p:selectOneMenu>
+        <div class="EmptyBox5"/>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.lifeSupportReviewException}" id="lifeSupportReviewException"/>
+        <p:outputLabel for="lifeSupportReviewException" value="Review exceptions"/>
+        <p:separator/>
+
+        <h4>Rolling Usage Flag</h4>
+        <p:panelGrid columns="5" columnClasses="width60,,,," layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:inputSwitch value="#{programProfileController.profile.rollUseFlagResidential}"/>
+            Residential
+            <p:selectOneMenu value="#{programProfileController.profile.rollUseFlagResidentialSign}">
+                <f:selectItem escape="false" itemLabel="&gt;" itemValue="&gt;"/>
+                <f:selectItem escape="false" itemLabel="&lt;" itemValue="&lt;"/>
+                <f:selectItem itemLabel="=" itemValue="="/>
+            </p:selectOneMenu>
+            <p:inputNumber value="#{programProfileController.profile.rollUseFlagResidentialValue}" decimalPlaces="2"/>
+            then auto-unenroll
+
+            <p:inputSwitch value="#{programProfileController.profile.rollUseFlagCommercial}"/>
+            Commercial
+            <p:selectOneMenu value="#{programProfileController.profile.rollUseFlagCommercialSign}">
+                <f:selectItem escape="false" itemLabel="&gt;" itemValue="&gt;"/>
+                <f:selectItem escape="false" itemLabel="&lt;" itemValue="&lt;"/>
+                <f:selectItem itemLabel="=" itemValue="="/>
+            </p:selectOneMenu>
+            <p:inputNumber value="#{programProfileController.profile.rollUseFlagCommercialValue}" decimalPlaces="2"/>
+            then auto-unenroll
+        </p:panelGrid>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.rollUseFlagReviewException}" id="rollUseFlagReviewException"/>
+        <p:outputLabel for="rollUseFlagReviewException" value="Review exceptions"/>
+    </div>
+    <div class="EmptyBox20"/>
+
+    <div class="card card-w-title">
+        <h3>Equipment required</h3>
+        <p:panelGrid columns="5" columnClasses=",width60,," layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-checkbox">
+                <p:inputSwitch value="#{programProfileController.profile.equipmentRequired}" id="equipmentRequiredCheck"/>
+                <p:outputLabel value="Equipment required" for="equipmentRequiredCheck"/>
+            </h:panelGroup>
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Installed prior days to" for="installedPriorDays"/>
+                <p:selectOneMenu id="installedPriorDays" value="#{programProfileController.profile.equipmentInstallPriorTo}">
+                    <f:selectItem itemLabel="[Today]" itemValue="TODAY"/>
+                    <f:selectItem itemLabel="[5 days prior to today]" itemValue="DAYS_5_PRIOR_TODAY"/>
+                    <f:selectItem itemLabel="[Enrollment effective date]" itemValue="ENROLLMENT_DATE"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.equipmentRequiredReviewException}" id="equipmentRequiredReviewException"/>
+        <p:outputLabel value="Review exceptions" for="equipmentRequiredReviewException"/>
+    </div>
+
+    <div class="card card-w-title" jsf:id="iDdemands">
+        <h3 class="with-icon">Demand</h3>
+        <p:commandButton action="#{programProfileController.addDemand()}" process="@form" update=":form:#{tabViewId}:iDdemands" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <p:outputLabel rendered="#{empty programProfileController.profile.programDemands}">No demands defined yet</p:outputLabel>
+
+        <ui:repeat value="#{programProfileController.profile.programDemands}" var="demand" varStatus="demandIterStatus">
+            <p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Demand Minimum"/>
+                    <p:inputNumber label="Demand Minimum" value="#{demand.minValue}" maxValue="10000" decimalPlaces="2" required="true" size="8"/>
+                    <p:selectOneMenu value="#{demand.minUnit}" rendered="#{programProfileController.program.commodity eq 'Electricity' }">
+                        <f:selectItem itemLabel="kW" itemValue="KW"/>
+                        <f:selectItem itemLabel="MW" itemValue="MW"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu value="#{demand.minUnit}" rendered="#{programProfileController.program.commodity eq 'Gas' }">
+                        <f:selectItem itemLabel="Therms" itemValue="THERMS"/>
+                    </p:selectOneMenu>
+
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value=" from "/>
+                    <p:selectOneMenu value="#{demand.demandMinType}">
+                        <f:selectItems value="#{constantsProvider.demandMinTypes}" var="demandMinType" itemLabel="#{demandMinType.name}"
+                                       itemValue="#{demandMinType}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value=" season "/>
+                    <p:selectOneMenu value="#{demand.programSeason}" converter="programSeasonConverter">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{programProfileController.profile.seasons}" var="season" itemLabel="#{season.name}"
+                                       itemValue="#{season}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <p:outputLabel value="Time Horizon" style="padding-top: 6px; display: block;"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value=" month out of the last "/>
+                    <p:selectOneMenu value="#{demand.timeHorizon}" label="Time Horizon">
+                        <f:selectItems value="#{constantsProvider.months}" var="month" itemLabel="#{month.value}" itemValue="#{month.value}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value=" prior month"/>
+                    <p:selectOneMenu value="#{demand.priorMonths}">
+                        <f:selectItems value="#{constantsProvider.months}" var="month" itemLabel="#{month.value}" itemValue="#{month.value}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <p:commandButton action="#{programProfileController.removeDemand(demand)}" update="@form" icon="ui-icon-remove"/>
+            </p:panelGrid>
+        </ui:repeat>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.demandReviewException}" id="demandReviewException"
+                                 rendered="#{not empty programProfileController.profile.programDemands}"/>
+        <p:outputLabel value="Review exceptions" for="demandReviewException" rendered="#{not empty programProfileController.profile.programDemands}"/>
+    </div>
+
+    <div class="card card-w-title" jsf:id="multiplePart">
+        <h3 class="with-icon">Multiple Participation</h3>
+        <p:commandButton action="#{programProfileController.addMultipleParticipations()}" process="@form" update=":form:#{tabViewId}:multiplePart" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <p:outputLabel rendered="#{empty programProfileController.profile.programMultiParticipations}">No multiple participations defined yet</p:outputLabel>
+
+        <ui:repeat value="#{programProfileController.profile.programMultiParticipations}" var="multiPart" varStatus="multiPartIterStatus">
+            <h:panelGroup>
+                <p:separator rendered="#{not multiPartIterStatus.first}"/>
+                <p:selectOneMenu value="#{multiPart.optionId}">
+                    <f:selectItem itemLabel="All Options/Entire program" itemValue=""/>
+                    <f:selectItems value="#{programProfileController.profile.options}" var="option" itemLabel="#{option.name}" itemValue="#{option.uuid}"/>
+                </p:selectOneMenu>
+                <p:pickList converter="programPickListConverter" value="#{programProfileController.programPickListModel[multiPart.uuid]}" var="programPickList"
+                            itemLabel="#{programPickList.name}" itemValue="#{programPickList}" styleClass="ui-picklist-list-wrapper">
+                    <f:facet name="sourceCaption">Non-Eligible</f:facet>
+                    <f:facet name="targetCaption">Eligible</f:facet>
+                </p:pickList>
+            </h:panelGroup>
+            <div class="EmptyBox10"/>
+        </ui:repeat>
+        <p:selectBooleanCheckbox value="#{programProfileController.profile.multipleParticipationReviewException}" id="multipleParticipationReviewException"
+                                 rendered="#{not empty programProfileController.profile.programMultiParticipations}"/>
+        <p:outputLabel value="Review exceptions" for="multipleParticipationReviewException"
+                       rendered="#{not empty programProfileController.profile.programMultiParticipations}"/>
+    </div>
+
+    <div class="card card-w-title">
+        <h3>Eligibility Retry</h3>
+
+        <p:panelGrid columns="1" columnClasses=",width60" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Auto Recheck Eligibility Exceptions" for="autoRecheck"/>
+                <p:inputSwitch value="#{programProfileController.profile.eligibilityAutoRetry}" id="autoRecheck"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Days" for="eligibilityAutoRetryDays"/>
+                <p:selectOneMenu id="eligibilityAutoRetryDays" value="#{programProfileController.profile.eligibilityAutoRetryDays}">
+                    <f:selectItem itemLabel="1 day" itemValue="1"/>
+                    <f:selectItem itemLabel="2 days" itemValue="2"/>
+                    <f:selectItem itemLabel="3 days" itemValue="3"/>
+                    <f:selectItem itemLabel="4 days" itemValue="4"/>
+                    <f:selectItem itemLabel="5 days" itemValue="5"/>
+                </p:selectOneMenu>
+                Days to re-validate eligibility before manual intervention
+            </h:panelGroup>
+        </p:panelGrid>
+    </div>
+</ui:composition>

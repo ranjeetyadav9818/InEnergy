@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <j:useBean id="controller" class="com.inenergis.controller.customerData.EnergyContractDetailController" scope="session"/>
+
+    <p:commandButton value="Edit" update="@form" process="@form" action="#{controller.addContractDevices()}" rendered="#{not controller.showAddLocationTab}"/>
+    <p:commandButton value="Save" update="@form" process="@form" action="#{controller.saveContractDevices()}" rendered="#{controller.showAddLocationTab}"/>
+    <div class="card card-w-title" jsf:rendered="#{controller.showAddLocationTab}">
+        <p:dataTable id="dtAvailableDevices" value="#{controller.contractDevicesToAdd}" var="cdToAdd" reflow="true" rows="25"
+                     rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+            <p:column headerText="Location ID" styleClass="topAligned" filterBy="#{cdToAdd.device.uuid}" filterMatchMode="contains">
+                <h:outputText value="#{cdToAdd.device.uuid}"/>
+            </p:column>
+            <p:column headerText="Location Name" styleClass="topAligned" filterBy="#{cdToAdd.device.name}" filterMatchMode="contains">
+                <h:outputText value="#{cdToAdd.device.name}"/>
+            </p:column>
+            <p:column headerText="Power Source" styleClass="topAligned" filterBy="#{cdToAdd.device.powerSource}" filterMatchMode="contains">
+                <h:outputText value="#{cdToAdd.device.powerSource}"/>
+            </p:column>
+            <p:column headerText="Equipment ID" styleClass="topAligned" filterBy="#{cdToAdd.device.equipmentId}" filterMatchMode="contains">
+                <h:outputText value="#{cdToAdd.device.equipmentId}"/>
+            </p:column>
+            <p:column headerText="" style="width: 32px" class="showOnDesktop">
+                <p:commandButton update=":form:#{tabViewId}:dtAvailableDevices :form:#{tabViewId}:dtSelectedDevices"
+                                 process=":form:#{tabViewId}:dtAvailableDevices :form:#{tabViewId}:dtSelectedDevices"
+                                 action="#{controller.addContractDevice(cdToAdd)}" icon="ui-icon-add"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+
+    <div class="card card-w-title">
+        <p:dataTable id="dtSelectedDevices" value="#{controller.contract.contractDevices}" var="cdAdded" reflow="true" rows="25"
+                     rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false" editable="true"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+            <p:ajax event="rowEdit" listener="#{controller.onDeviceRowEdit}" />
+            <p:ajax event="rowEditCancel" listener="#{controller.onDeviceRowCancel}"/>
+
+            <p:column headerText="Location ID" styleClass="topAligned" filterBy="#{cdAdded.device.uuid}" filterMatchMode="contains">
+                <h:outputText value="#{cdAdded.device.uuid}"/>
+            </p:column>
+            <p:column headerText="Location Name" styleClass="topAligned" filterBy="#{cdAdded.device.name}" filterMatchMode="contains">
+                <h:outputText value="#{cdAdded.device.name}"/>
+            </p:column>
+            <p:column headerText="Power Source" styleClass="topAligned" filterBy="#{cdAdded.device.powerSource}" filterMatchMode="contains">
+                <h:outputText value="#{cdAdded.device.powerSource}"/>
+            </p:column>
+            <p:column headerText="Equipment ID" styleClass="topAligned" filterBy="#{cdAdded.device.equipmentId}" filterMatchMode="contains">
+                <h:outputText value="#{cdAdded.device.equipmentId}"/>
+            </p:column>
+            <p:column headerText="Estimated Capacity" styleClass="topAligned" filterBy="#{cdAdded.estimatedCapacity}" filterMatchMode="contains">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{cdAdded.estimatedCapacity}"/><h:outputText value="&#160;"/>
+                        <h:outputText value="#{cdAdded.estimatedCapacityUnit.name}"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:inputNumber decimalPlaces="0" maxValue="10000" size="4" maxlength="4" value="#{cdAdded.estimatedCapacity}" id="eCap"
+                                       style="margin-left: 20px;"/>
+                        <h:outputText value="&#160;"/>
+                        <p:selectOneMenu value="#{cdAdded.estimatedCapacityUnit}">
+                            <f:selectItems value="#{constantsProvider.electricalUnits}" var="unit" itemValue="#{unit}"
+                                           itemLabel="#{unit.name}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+            <p:column headerText="Ramp Rate" styleClass="topAligned" filterBy="#{cdAdded.rampRate}" filterMatchMode="contains">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{cdAdded.rampRate}"/>
+                        <h:outputText value="&#160;"/>
+                        <h:outputText value="#{cdAdded.rampRateUnit.name}"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:inputNumber decimalPlaces="0" maxValue="10000" size="4" maxlength="4" value="#{cdAdded.rampRate}" id="rRate" style="margin-left: 20px;"/>
+                        <p:selectOneMenu value="#{cdAdded.rampRateUnit}">
+                            <f:selectItems value="#{constantsProvider.minutesOrHoursOrDays}" var="unit" itemValue="#{unit}"
+                                           itemLabel="#{unit.name}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+            <p:column headerText="Available Hours" styleClass="topAligned" filterable="false">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{cdAdded.availableHoursFrom}"/><h:outputText value="&#160;"/>
+                        <h:outputText value="-&#160;" rendered="#{cdAdded.availableHoursFrom ne null}"/>
+                        <h:outputText value="#{cdAdded.availableHoursTo}"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:outputLabel value="From" for="heFrom" style="padding: 20px;"/>
+                        <p:selectOneMenu id="heFrom" value="#{cdAdded.availableHoursFrom}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.hourEnds}" var="he" itemValue="#{he}" itemLabel="#{he.name()}"/>
+                        </p:selectOneMenu>
+                        <br/>
+                        <p:outputLabel value="To" for="heTo" style="padding: 20px;"/>
+                        <p:selectOneMenu id="heTo" value="#{cdAdded.availableHoursTo}">
+                            <f:selectItem/>
+                            <f:selectItems value="#{constantsProvider.hourEnds}" var="he" itemValue="#{he}" itemLabel="#{he.name()}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+            <p:column style="width:32px;" class="showOnDesktop" rendered="#{controller.showAddLocationTab}">
+                <p:rowEditor/>
+            </p:column>
+            <p:column style="width:32px;" class="showOnDesktop" rendered="#{controller.showAddLocationTab}">
+                <p:commandButton update=":form:#{tabViewId}:dtAvailableDevices :form:#{tabViewId}:dtSelectedDevices"
+                                 process=":form:#{tabViewId}:dtAvailableDevices :form:#{tabViewId}:dtSelectedDevices"
+                                 action="#{controller.removeContractDevice(cdAdded)}" icon="ui-icon-remove"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+
+</ui:composition>

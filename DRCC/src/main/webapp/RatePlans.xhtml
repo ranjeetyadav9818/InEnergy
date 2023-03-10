@@ -1,0 +1,287 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <c:set var="controller" value="#{ratePlanController}"/>
+        <j:useBean id="ratePlan" class="com.inenergis.entity.program.RatePlan" scope="session"/>
+        <p:importEnum type="com.inenergis.model.AuthorizationRole" var="authRole"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Rate Plans" url="#"/>
+                <p:menuitem value="Search" url="#" rendered="#{not controller.editMode and controller.selectedProfile eq null}"/>
+                <p:menuitem value="Create/Update Rate Plan" url="#" rendered="#{controller.editMode and controller.selectedProfile eq null}"/>
+                <p:menuitem value="#{controller.selectedProfile.ratePlan.name}" url="#" rendered="#{controller.selectedProfile ne null}"/>
+                <p:menuitem value="#{controller.selectedProfile.name}" url="#" rendered="#{controller.selectedProfile ne null}"/>
+            </p:breadCrumb>
+
+            <h:panelGroup id="editPanel">
+                <div class="card" jsf:rendered="#{not controller.editMode and controller.selectedProfile eq null}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop10">
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="rateCodeId" value="#{controller.filterRateCodeId}"/>
+                            <label>Rate Code Id</label>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Sector:" for="sector"/>
+                            <p:selectOneMenu id="sector" converter="omnifaces.GenericEnumConverter" value="#{controller.filterRateCodeSector}">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{constantsProvider.rateCodeSectors}" var="sector" itemLabel="#{sector.name}"
+                                               itemValue="#{sector}"/>
+                                <p:ajax partialSubmit="true" process="@this"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Rate Status:" for="sector"/>
+                            <p:selectOneMenu id="status" value="#{controller.filterRateCodeStatus}">
+                                <f:selectItems value="#{constantsProvider.ratePlanStatuses}" var="status"
+                                               itemLabel="#{status.name}" itemValue="#{status}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton value="Search" action="#{controller.search()}" id="search" update="@form"/>
+                    <p:spacer width="10"/>
+                    <p:commandButton value="Clear" action="#{controller.clear}" id="clear" update="@form"/>
+                    <p:spacer width="10"/>
+                    <p:commandButton value="Create New Rate Plan" action="#{controller.add}" id="add" update="@form"/>
+                </div>
+
+                <div jsf:rendered="#{controller.selectedProfile ne null}" class="card">
+                    <h2>Profile "#{controller.selectedProfile.name}" for rate plan "#{controller.selectedProfile.ratePlan.name}"</h2>
+                    <p:tabView id="profileTabView">
+                        <p:tab id="GeneralTab" title="General" >
+                            <ui:include src="WEB-INF/include/ratePlanProfile/GeneralTab.xhtml"/>
+                        </p:tab>
+
+                        <p:tab id="TiersTab" title="Tiers">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/TiersTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="RatesTab" title="Rates">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/RatesTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="AncillaryTab" title="Ancillary fees">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/AncillaryFeesTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="RateCodeTab" title="Rate Code">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/RateCodeTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="ApplicabilityTab" title="Applicability &amp; Conditions">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/ApplicabilityAndConditionsTab.xhtml"/>
+                        </p:tab>
+
+                        <ui:remove>
+                        <p:tab id="ChargesTab" title="Charges">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/ChargesTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="CreditsTab" title="Credits &amp; Discounts">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/CreditsTab.xhtml"/>
+                        </p:tab>
+                        </ui:remove>
+
+                        <p:tab id="EquipmentsTab" title="Equipment">
+                            <ui:include src="WEB-INF/include/general/AssetCard.xhtml"/>
+                        </p:tab>
+                        <p:tab id="BillingTab" title="Billing Terms">
+                            <ui:include src="WEB-INF/include/ratePlanProfile/BillingTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="HistoryTab" title="History">
+                            <ui:include src="WEB-INF/include/programProfile/HistoryTab.xhtml"/>
+                        </p:tab>
+                    </p:tabView>
+
+                    <h:panelGroup>
+                        <div style="margin: 20px 0;">
+                            <p:commandButton process="@this" update="@form" value="Cancel" action="#{controller.cancelProfile()}"/>
+                            <p:spacer width="10"/>
+                            <p:commandButton process="@form" update="@form" value="Save" action="#{controller.saveProfile()}" rendered="#{not controller.viewModeOn}"/>
+                            <p:spacer width="10"/>
+                            <p:commandButton process="@form" update="@form" value="Save and close" action="#{controller.saveProfileAndClose()}" rendered="#{not controller.viewModeOn}"/>
+                        </div>
+                    </h:panelGroup>
+                </div>
+
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{controller.editMode}">
+                <div class="card card-w-title">
+                    <h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20" id="gridId">
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Commodity Type"/>
+                            <p:selectOneMenu converter="omnifaces.GenericEnumConverter" value="#{controller.ratePlan.commodityType}" required="true">
+                                <f:selectItems value="#{constantsProvider.comodityTypes}" var="status" itemLabel="#{status.name}"
+                                               itemValue="#{status}"/>
+                                <p:ajax event ="itemSelect" update="form"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield" style="padding-bottom: 20px;">
+                            <p:inputText required="true" id="ratePlanName" value="#{controller.ratePlan.name}"/>
+                            <p:outputLabel value="Rate Plan Name:" for="ratePlanName"/>
+                        </h:panelGroup>
+                        <h:panelGroup/>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Sector:" for="addSector"/>
+                            <p:selectOneMenu id="addSector" converter="omnifaces.GenericEnumConverter" value="#{controller.ratePlan.sector}"  rendered="#{controller.ratePlan.commodityType eq 'Electricity' or controller.ratePlan.commodityType eq null}">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{constantsProvider.rateCodeSectors}" var="sector" itemLabel="#{sector.name}"
+                                               itemValue="#{sector}"/>
+                                <p:ajax partialSubmit="true" process="@this"/>
+                            </p:selectOneMenu>
+                            <p:selectOneMenu id="gasSector" converter="omnifaces.GenericEnumConverter" value="#{controller.ratePlan.gasSector}"  rendered="#{controller.ratePlan.commodityType eq 'Gas'}">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{constantsProvider.gasRateCodeSectors}" var="sector" itemLabel="#{sector.name}"
+                                               itemValue="#{sector}"/>
+                                                                <p:ajax partialSubmit="true" process="@this"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Status:" for="addStatus"/>
+                            <p:selectOneMenu id="addStatus" converter="omnifaces.GenericEnumConverter" value="#{controller.ratePlan.status}" required="true">
+                                <f:selectItems value="#{constantsProvider.ratePlanStatuses}" var="status" itemLabel="#{status.name}"
+                                               itemValue="#{status}"/>
+                                <p:ajax partialSubmit="true" process="@this"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-calendar" style="margin-top: 20px;">
+                            <p:calendar id="planEndDate" value="#{controller.ratePlan.endDate}" pattern="MM/dd/yyyy" size="28"
+                                        placeholder="mm/dd/yyyy" showButtonPanel="true" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}">
+                            </p:calendar>
+                            <p:outputLabel value="Rate End Date" for="planEndDate"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <p:commandButton value="Save" action="#{controller.save()}" process="@form" update="@form"/>
+                    <p:spacer width="10"/>
+                    <p:commandButton value="Cancel" action="#{controller.clear()}" process="@this" update="@form"/>
+                </div>
+            </h:panelGroup>
+
+            <div class="card" >
+
+                <p:dataTable id="ratePlans" value="#{controller.lazyRatePlanDataModel}" rowExpandMode="single"
+                             widgetVar="custTableA" lazy="true" var="ratePlan" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{ratePlan.uuid}">
+                    <j:useBean id="ratePlan" class="com.inenergis.entity.program.RatePlan" scope="session"/>
+
+
+                    <p:column style="width:16px">
+                        <p:rowToggler />
+                    </p:column>
+                    <p:column headerText="Rate Plan Name">
+                        <h:outputText value="#{ratePlan.name}"/>
+                    </p:column>
+
+                    <p:column headerText="Rate Plan ID">
+                        <h:outputText value="#{ratePlan.id}"/>
+                    </p:column>
+
+                    <p:column headerText="Rate Code ID">
+                        <h:outputText value="#{ratePlan.getActiveProfile().buildRateCodeId()}"/>
+                    </p:column>
+
+                    <p:column headerText="Sector" width="230">
+                        <h:outputText value="#{ratePlan.sector.name}" rendered="#{ratePlan.commodityType eq 'Electricity'}"/>
+                        <h:outputText value="#{ratePlan.gasSector.name}" rendered="#{ratePlan.commodityType eq 'Gas'}"/>
+                    </p:column>
+
+                    <p:column headerText="Rate Status">
+                        <h:outputText value="#{ratePlan.status.name}"/>
+                    </p:column>
+
+                    <p:column headerText="Profile End Date">
+                        <h:outputText value="#{ratePlan.endDate}">
+                            <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Commodity">
+                        <h:outputText value="#{ratePlan.commodityType}"/>
+                    </p:column>
+
+                    <p:column headerText="Action">
+                            <p:commandButton value="Update" actionListener="#{controller.update(ratePlan)}" update="@form"
+                                             rendered="#{controller.selectedProfile eq null and not controller.editMode}"/>
+                    </p:column>
+
+                    <p:rowExpansion>
+                        <p:outputPanel id="profilesExpansion">
+                            <h4>
+                                Profiles <p:spacer width="10"/>
+                                <p:commandButton process="@this" update="profilesExpansion" icon="ui-icon-plus" action="#{controller.addProfile(ratePlan)}"
+                                                 rendered="#{controller.selectedProfile eq null}"/>
+                            </h4>
+                            <p:outputPanel rendered="#{controller.newProfile ne null}" style="padding: 15px">
+                                <h:panelGroup styleClass="md-inputfield">
+                                    <p:inputText required="true" id="profileName" value="#{controller.newProfile.name}"/>
+                                    <p:outputLabel value="Rate Schedule Title" for="profileName"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="md-inputfield-calendar">
+                                    <p:calendar id="effectiveStart" value="#{controller.newProfile.effectiveStartDate}"
+                                                pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                                timeZone="America/Los_Angeles" mask="true"
+                                                binding="${profileStartDateNew}" mindate="01/01/2000" required="true"/>
+                                    <p:outputLabel value="Effective Start Date" for="effectiveStart"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="md-inputfield-calendar">
+                                    <p:calendar id="effectiveEnd" value="#{controller.newProfile.effectiveEndDate}"
+                                                pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                                timeZone="America/Los_Angeles" mask="true"
+                                                mindate="#{profileStartDateNew.value}">
+                                        <f:attribute name="startDate" value="#{profileStartDateNew}"/>
+                                        <f:validator validatorId="endDateRangeValidator"/>
+                                    </p:calendar>
+                                    <p:outputLabel value="Effective End Date" for="effectiveEnd"/>
+                                </h:panelGroup>
+
+                                <p:commandButton value="Save" action="#{controller.saveNewProfile(ratePlan)}" process="@form" update="profilesExpansion,profilesTable"/>
+                                <p:spacer width="15"/>
+                                <p:commandButton value="Cancel" action="#{controller.cancelNewProfile()}" process="@this" update="profilesExpansion"/>
+                            </p:outputPanel>
+                        </p:outputPanel>
+
+                        <p:dataTable value="#{ratePlan.profiles}" var="profile" id="profilesTable">
+                            <p:column headerText="Profile Name">
+                                <h:outputText value="#{profile.name}"/>
+                            </p:column>=
+                            <p:column headerText="Start Date">
+                                <h:outputText value="#{profile.effectiveStartDate}">
+                                    <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="End Date">
+                                <h:outputText value="#{profile.effectiveEndDate}">
+                                    <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Action">
+                                <p:commandButton value="Update" actionListener="#{controller.editProfile(profile)}" process="@this" update="@form"
+                                                 rendered="#{authorizationChecker.authorized(authRole.RATE_PROFILE_EDIT_MODE) and controller.selectedProfile eq null and not controller.editMode}"/>
+                                <p:spacer width="15" rendered="#{authorizationChecker.authorized(authRole.RATE_PROFILE_EDIT_MODE)}"/>
+                                <p:commandButton  value="View" actionListener="#{controller.viewProfile(profile)}" process="@this" update="@form"
+                                                 rendered="#{authorizationChecker.authorized(authRole.RATE_PROFILE_VIEW_MODE) and controller.selectedProfile eq null and not controller.editMode}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

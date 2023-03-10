@@ -1,0 +1,9 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-180" author="vm">
+        <dropNotNullConstraint tableName="ENERGY_CONTRACT_COMMODITY" columnName="COMMODITY_SUB_PROGRAM_ID" columnDataType="bigint(20) unsigned"/>
+    </changeSet>
+</databaseChangeLog>

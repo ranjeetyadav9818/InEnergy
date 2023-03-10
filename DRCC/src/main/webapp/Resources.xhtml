@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration" url="#"/>
+                <p:menuitem value="#{resourceController.iso.name}" url="#"/>
+                <p:menuitem value="Resources" outcome="Resources">
+                    <f:param name="o" value="#{parameterEncoderService.encode(resourceController.iso.id)}"/>
+                </p:menuitem>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:autoComplete id="resourceNameSearch"
+                                        value="#{resourceController.resourceName}" completeMethod="#{resourceController.completeResource}"
+                                        size="26"/>
+                        <p:outputLabel value="Resource ID" for="resourceNameSearch"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="#{msg['data.mapping.sublap']}" for="sublapSearch"/>
+                        <p:selectOneMenu id="sublapSearch" value="#{resourceController.subLap}" converter="subLapConverter"
+                                         style="width: 200px;" autoWidth="false">
+                            <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                            <f:selectItems value="#{resourceController.subLapList}" var="subLap" itemValue="#{subLap}"
+                                           itemLabel="#{subLap.name} (#{subLap.code})"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Registration Review" for="registrationReviewSearch"/>
+                        <p:selectOneMenu id="registrationReviewSearch" value="#{resourceController.registrationReview}"
+                                         converter="omnifaces.GenericEnumConverter"
+                                         style="width: 100px;" autoWidth="false">
+                            <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                            <f:selectItems value="#{resourceController.registrationReviews}" var="registrationReview" itemLabel="#{registrationReview.name}"
+                                           itemValue="#{registrationReview}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Resource Type" for="resourceTypeSearch"/>
+                        <p:selectOneMenu id="resourceTypeSearch" value="#{resourceController.productType}"
+                                         style="width: 145px;" autoWidth="false">
+                            <f:selectItems value="#{resourceController.productTypes}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="LSE" for="lseSearch"/>
+                        <p:selectOneMenu id="lseSearch" value="#{resourceController.lse}" converter="lseConverter"
+                                         style="width: 200px;" autoWidth="false">
+                            <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                            <f:selectItems value="#{resourceController.lseList}" var="lse"
+                                           itemValue="#{lse}" itemLabel="#{lse.name} (#{lse.code})"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <p:commandButton value="Search" action="#{resourceController.search()}" id="search" update="@form"/>
+                <p:spacer width="15"/>
+                <p:commandButton value="Clear" action="#{resourceController.clear()}" id="clear" update="@form"/>
+            </div>
+
+            <div class="ContainerIndent">
+                <div class="Container100">
+                    <p:tabView id="statusTabView" scrollable="false" rendered="#{resourceController.render}">
+                        <p:tab id="resourceSummary" title="Resource Summary">
+                            <ui:include src="WEB-INF/include/resource/SummaryTab.xhtml"/>
+                        </p:tab>
+                        <p:tab id="exceptions" title="Exceptions">
+                            <ui:include src="WEB-INF/include/resource/ExceptionTab.xhtml"/>
+                        </p:tab>
+                    </p:tabView>
+                </div>
+            </div>
+            <p:defaultCommand target="search"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,21 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="calendar-timeline-fix" author="antonio.lopez">
+        <dropForeignKeyConstraint baseTableName="TIME_OF_USE" constraintName="FK_MASTER_SEASON_MASTER_SEASON_CALENDAR"/>
+        <addForeignKeyConstraint baseTableName="TIME_OF_USE" baseColumnNames="TIME_OF_USE_CALENDAR_ID"
+                                 constraintName="FK_TIME_OF_USE_TO_CALENDAR"
+                                 referencedTableName="TIME_OF_USE_CALENDAR"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="calendar-timeline-fix-2" author="antonio.lopez">
+        <dropForeignKeyConstraint baseTableName="TIME_OF_USE_HOUR" constraintName="FK_MASTER_SEASON_HOUR"/>
+        <addForeignKeyConstraint baseTableName="TIME_OF_USE_HOUR" baseColumnNames="TIME_OF_USE_ID"
+                                 constraintName="FK_TIME_OF_USE_HOUR_TO_TOU"
+                                 referencedTableName="TIME_OF_USE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+</databaseChangeLog>

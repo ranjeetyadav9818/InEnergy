@@ -1,0 +1,96 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form>
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="LSEs"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+
+                <p:outputPanel id="vsmDiv">
+                    <h:panelGroup rendered="#{not lsesController.creatingLse}">
+                        <p:commandButton id="addButton" process="@this" update="@form" value="Add LSE" action="#{lsesController.add}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{lsesController.creatingLse}">
+                        <h3>Add Lse</h3>
+                        <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="name" value="#{lsesController.lse.name}" required="true"/>
+                                <p:outputLabel value="Name:" for="name"/>
+                            </h:panelGroup>
+                            
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="code" value="#{lsesController.lse.code}" required="true" maxlength="5"/>
+                                <p:outputLabel value="Code:" for="code"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Market:" for="iso"/>
+                                <p:selectOneMenu id="iso" required="true" label="Market" converter="isoConverter" value="#{lsesController.lse.iso}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{lsesController.isoList}" var="iso" itemValue="#{iso}" itemLabel="#{iso.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{lsesController.save()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="5"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{lsesController.cancel()}" process="@this" update="@form"/>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </div>
+            <div class="card">
+                <p:outputPanel id="vsmDivT">
+                    <!-- Filters & Results -->
+                    <p:dataTable id="dmTable" value="#{lsesController.lseList}" widgetVar="mappingWidget" editable="true" var="lse"
+                                 reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{lse.id}"
+                                 selection="#{lsesController.selectedLse}" selectionMode="single">
+
+                        <p:ajax event="rowEdit" listener="#{lsesController.onRowEdit}"/>
+                        <p:ajax event="rowEditCancel" listener="#{lsesController.onRowCancel}"/>
+
+                        <p:column headerText="Name" filterBy="#{lse.name}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{lse.name}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{lse.name}" label="Name" maxlength="250"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Code" filterBy="#{lse.code}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{lse.code}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{lse.code}" label="Code" maxlength="5"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Market" filterBy="#{lse.iso.name}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{lse.iso.name}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu converter="isoConverter" value="#{lse.iso}">
+                                        <f:selectItems value="#{lsesController.isoList}" var="iso" itemLabel="#{iso.name}" itemValue="#{iso}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

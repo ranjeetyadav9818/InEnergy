@@ -1,0 +1,17 @@
+<div class="ui-g" style="background-color: #BBDEFB; position: sticky;top: 0px;left: 0px;z-index: 100">
+  <div class="ui-g-1 nopad" style="background-color: #1976d2; text-align: center;">
+    <img src="/assets/images/Inenergis_Logo.png" width="35" style="margin-top: 12px">
+  </div>
+  <div class="ui-g-11 nopad">
+    <div class="ui-g-2">
+      <div style="float: left;padding-top: 8px;">Hi {{customerName}}</div>
+    </div>
+    <div class="ui-g-8">
+      <div style="float: left;padding-top: 8px; padding-right: 10px;">Service Agreement:</div>
+      <p-dropdown *ngIf="serviceAgreements" [options]="serviceAgreements" [(ngModel)]="selectedServiceAgreement"></p-dropdown>
+    </div>
+    <div class="ui-g-2">
+      <p-splitButton label="Profile" icon="fa fa-user-o" (onClick)="goToProfile()" [model]="items"></p-splitButton>
+    </div>
+  </div>
+</div>

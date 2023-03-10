@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Rate Programs" outcome="RatePlans"/>
+                <p:menuitem value="Bulk upload"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <h3>Upload a csv for the bulk creation of rate enrollments</h3>
+                <p:fileUpload value="#{rateBulkUploadController.file}" fileUploadListener="#{rateBulkUploadController.submit}" update="growl" fileLimit="1"
+                              allowTypes="/(\.|\/)(csv)$/"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

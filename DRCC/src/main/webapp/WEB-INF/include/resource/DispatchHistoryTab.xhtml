@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form>
+        <p:dataTable value="#{resourceDetailController.resource.impactedResources}" var="impactedResource"
+                     widgetVar="custTableDispatchHistory"
+                     reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="false" rowKey="#{impactedResource.uuid}" selectionMode="single">
+            <p:ajax event="rowSelect" listener="#{resourceDetailController.onEventSelect}"/>
+            <p:column headerText="Program" styleClass="topAligned" filterBy="#{impactedResource.event.program.name}">
+                <h:outputText value="#{impactedResource.event.program.name}"/>
+            </p:column>
+
+            <p:column headerText="Event ID" styleClass="topAligned" filterBy="#{impactedResource.event.externalEventId}">
+                <h:outputText value="#{impactedResource.event.externalEventId}"/>
+            </p:column>
+
+            <p:column headerText="Event Date" styleClass="topAligned">
+                <h:outputText value="#{impactedResource.event.startDate}">
+                    <f:convertDateTime pattern="MM/dd/yyyy"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Event Start Time" styleClass="topAligned">
+                <h:outputText value="#{impactedResource.event.startDate}">
+                    <f:convertDateTime type="time" pattern="h:mm aa" timeZone="America/Los_Angeles"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Event End Time" styleClass="topAligned">
+                <h:outputText value="#{impactedResource.event.endDate}">
+                    <f:convertDateTime type="time" pattern="h:mm aa" timeZone="America/Los_Angeles"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Dispatch Level" filterBy="#{impactedResource.event.dispatchLevel}" filterMatchMode="exact" styleClass="topAligned">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('custTableDispatchHistory').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false"
+                                     style="width: 60%;font-size: 12px">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.dispatchLevels}" var="dispatchLevel" itemLabel="#{msg[dispatchLevel.id]}"
+                                       itemValue="#{dispatchLevel}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{msg[impactedResource.event.dispatchLevel.id]}"/>
+            </p:column>
+
+            <p:column headerText="SA Count" styleClass="topAligned">
+                <h:outputText value="#{impactedResource.event.saCount}"/>
+            </p:column>
+
+            <p:column headerText="Dispatch Reason" filterBy="#{impactedResource.event.dispatchReason}" filterMatchMode="exact" styleClass="topAligned">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('custTableDispatchHistory').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false"
+                                     style="width: 60%;font-size: 12px">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.dispatchReasons}" var="dispatchReason" itemLabel="#{dispatchReason.name}"
+                                       itemValue="#{dispatchReason}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{impactedResource.event.dispatchReason.name}"/>
+            </p:column>
+
+            <p:column headerText="Event Status" filterBy="#{impactedResource.event.status}" filterMatchMode="exact" styleClass="topAligned">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('custTableDispatchHistory').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false"
+                                     style="width: 60%;font-size: 12px">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.eventStatuses}" var="eventStatus" itemLabel="#{eventStatus.name}"
+                                       itemValue="#{eventStatus}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{impactedResource.event.status.name}"/>
+            </p:column>
+        </p:dataTable>
+    </h:form>
+
+</ui:composition>

@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="CurrencySettings" url="#"/>
+        </p:breadCrumb>
+
+        <c:set var="controller" value="#{generalSettingsController}"/>
+
+        <div class="card card-w-title">
+            <h2>Currency Settings</h2>
+                <h:form id="formCurrencySettings">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" id="idGrid" style="padding-left: 50px">
+                        <p:column/>
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Currency" for="currency"/>
+                            <p:selectOneMenu id="currency" converter="currencyConfigConverter" value="#{controller.currentValue}" required="true"
+                                             style="width: 157px;"
+                                             autoWidth="false">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{controller.list}" var="currentValue" itemLabel="#{currentValue.name} - #{currentValue.locale.toLanguageTag()}" itemValue="#{currentValue}"/>
+                                <p:ajax listener="#{controller.update()}" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+            </div>
+    </ui:define>
+</ui:composition>

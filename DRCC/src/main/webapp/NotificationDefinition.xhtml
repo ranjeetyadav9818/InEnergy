@@ -1,0 +1,58 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formND">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Configure Alerts" outcome="NotificationDefinition"/>
+            </p:breadCrumb>
+
+            <div class="card">
+
+                <!-- Filters & Results -->
+                <p:dataTable id="ndTable" value="#{notificationDefinitionController.list}" widgetVar="ownerWidget" editable="true" var="nd"
+                             reflow="true" rows="25"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{nd.id}">
+
+                    <p:ajax event="rowEdit" listener="#{notificationDefinitionController.onRowEdit}"/>
+                    <p:ajax event="rowEditCancel" listener="#{notificationDefinitionController.onRowCancel}"/>
+
+                    <p:column headerText="Alert ID" filterBy="#{nd.id}">
+                        <h:outputText value="#{nd.id}"/>
+                    </p:column>
+
+                    <p:column headerText="Business Owner" filterBy="#{nd.businessOwner.name}">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{nd.businessOwner.name}"/></f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{nd.businessOwner}" required="true" autoWidth="false" style="width: 200px;" converter="businessOwnerConverter">
+                                    <f:selectItem itemLabel="Select" noSelectionOption="false"/>
+                                    <f:selectItems value="#{notificationDefinitionController.businessOwners}" var="bo"
+                                                   itemValue="#{bo}" itemLabel="#{bo.name}"/>
+                                </p:selectOneMenu></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Alert Description" filterBy="#{nd.description}">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{nd.description}"/></f:facet>
+                            <f:facet name="input"><p:inputTextarea rows="5" cols="51" value="#{nd.description}" label="Alert Description" maxlength="255"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="width:32px" class="showOnDesktop">
+                        <p:rowEditor/>
+                    </p:column>
+                </p:dataTable>
+
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui">
+    <c:set var="controller" value="#{programProfileController}"/>
+    <j:useBean id="controller" type="com.inenergis.controller.program.ProgramProfileController"/>
+    <div class="card card-w-title" jsf:id="equipmentCatalogItems">
+
+        <h3 class="with-icon">Items</h3>
+
+        <p:commandButton action="#{controller.addEquipment()}" process="@form" update=":form:#{tabViewId}:equipmentCatalogItems" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <p:spacer width="10"/>
+
+        <p:outputLabel rendered="#{empty controller.profile.programProfileAssets}">No equipment defined yet.</p:outputLabel>
+
+        <c:forEach items="#{controller.profile.programProfileAssets}" var="profileAsset" varStatus="assetStatus">
+
+            <p:separator rendered="#{not assetStatus.first}"/>
+
+            <p:panelGrid layout="grid" columns="4" styleClass="ui-panelgrid-blank form-group" style="margin-top: 15px">
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Grid Type" for="gridType"/>
+                    <p:selectOneMenu id="gridType" rendered="#{controller.program.commodity eq 'Electricity'}" label="Network Type" converter="networkTypeConverter"
+                                     value="#{profileAsset.networkType}" required="true">
+                        <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                        <f:selectItems itemDisabled = "#{gridType.commodityType eq 'GAS'}" value="#{controller.eleNetworkTypes}" var="gridType" itemLabel="#{gridType.name}" itemValue="#{gridType}"/>
+                        <p:ajax listener="#{controller.loadProfilesByGrid(profileAsset)}" update=":form:#{tabViewId}:equipmentCatalogItems"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="gridType" rendered="#{controller.program.commodity eq 'Gas' }" label="Network Type" converter="networkTypeConverter"
+                                     value="#{profileAsset.networkType}" required="true">
+                        <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                        <f:selectItems itemDisabled = "#{gridType.commodityType eq 'ELECTRICITY'}" value="#{controller.gasNetworkTypes}" var="gridType" itemLabel="#{gridType.name}" itemValue="#{gridType}"/>
+                        <p:ajax listener="#{controller.loadProfilesByGrid(profileAsset)}" update=":form:#{tabViewId}:equipmentCatalogItems"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Asset Type Profile:" for="assetProfile"/>
+                    <p:selectOneMenu id="assetProfile" label="Asset Type Profile" converter="assetProfileConverter" value="#{profileAsset.assetProfile}" required="true">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{profileAsset.assetProfilesByGrid}" var="asset" itemLabel="#{asset.name}" itemValue="#{asset}"/>
+                        <p:ajax listener="#{controller.loadCatalogAssetsByProfile(profileAsset)}" update=":form:#{tabViewId}:equipmentCatalogItems"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Catalog Item:" for="item"/>
+                    <p:selectOneMenu id="item" converter="assetConverter" label="Catalog Item" value="#{profileAsset.asset}" required="true">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{profileAsset.assetsByFilter}" var="catalog" itemLabel="#{catalog.name}" itemValue="#{catalog}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:commandButton action="#{controller.removeEquipment(profileAsset)}" process="@form" update=":form:#{tabViewId}:equipmentCatalogItems" icon="ui-icon-remove">
+                        <o:skipValidators/>
+                    </p:commandButton>
+                </h:panelGroup>
+
+            </p:panelGrid>
+
+        </c:forEach>
+
+    </div>
+
+</ui:composition>

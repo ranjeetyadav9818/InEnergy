@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <div class="card card-w-title">
+        <h3>Enroller Sources</h3>
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.enrollerSources}" var="enroller"
+                    itemLabel="#{enroller.label}" itemValue="#{enroller}">
+            <f:facet name="sourceCaption">Non-Eligible</f:facet>
+            <f:facet name="targetCaption">Eligible</f:facet>
+        </p:pickList>
+    </div>
+    <div class="EmptyBox20"/>
+
+    <div class="card card-w-title">
+        <h3>Enrollment Attributes</h3>
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.enrollmentAttributes}" var="attribute"
+                    itemLabel="#{attribute.label}" itemValue="#{attribute}">
+            <f:facet name="sourceCaption">Available Attributes</f:facet>
+            <f:facet name="targetCaption">Min. Attributes to Use</f:facet>
+        </p:pickList>
+    </div>
+
+    <div class="card card-w-title" jsf:id="enrollmentNotif">
+        <h3 class="with-icon">Enrollment notifications</h3>
+        <p:commandButton action="#{programProfileController.addEnrollmentNotification()}" process="@form" update=":form:#{tabViewId}:enrollmentNotif" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <p:outputLabel rendered="#{empty programProfileController.profile.enrollmentNotifications}">No enrollment notifications defined yet</p:outputLabel>
+
+        <ui:repeat value="#{programProfileController.profile.enrollmentNotifications}" var="notification" varStatus="enrollmentNotificationsStatusRepeat">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Enrollment source:" for="enrollmentNotificationSource"/>
+                    <p:selectOneMenu id="enrollmentNotificationSource" value="#{notification.enrollerString}">
+                        <f:selectItem itemLabel="All enroller types" itemValue="ALL_ENROLLERS"/>
+                        <f:selectItems value="#{programProfileController.enrollersAsString()}" var="e"
+                                       itemLabel="#{programProfileController.getEnrollmentLabel(e)}"
+                                       itemValue="#{e}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Application Receipt:" for="enrollmentApplicationReceipt"/>
+                    <p:selectOneMenu id="enrollmentApplicationReceipt" value="#{notification.receipt}">
+                        <f:selectItem itemLabel="Email" itemValue="EMAIL"/>
+                        <f:selectItem itemLabel="Paper" itemValue="PAPER"/>
+                        <f:selectItem itemLabel="Both" itemValue="BOTH"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Enrollment Status:" for="enrollmentStatus"/>
+                    <p:selectOneMenu id="enrollmentStatus" value="#{notification.status}">
+                        <f:selectItem itemLabel="Email" itemValue="EMAIL"/>
+                        <f:selectItem itemLabel="Paper" itemValue="PAPER"/>
+                        <f:selectItem itemLabel="Both" itemValue="BOTH"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Enrollment Final Decision:" for="enrollmentFinalDecission"/>
+                    <p:selectOneMenu id="enrollmentFinalDecission" value="#{notification.finalDecission}">
+                        <f:selectItem itemLabel="Email" itemValue="EMAIL"/>
+                        <f:selectItem itemLabel="Paper" itemValue="PAPER"/>
+                        <f:selectItem itemLabel="Both" itemValue="BOTH"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+            </p:panelGrid>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title">
+        <h3>Customer Data Attribute Changes</h3>
+        <p:panelGrid columns="2" id="cdwNotifyPanel" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Notify:" for="cdwChangeNotify"/>
+                <p:selectOneMenu id="cdwChangeNotify" value="#{programProfileController.profile.cdwNotifyType}">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="Program DRMS" itemValue="PROGRAM_DRMS"/>
+                    <f:selectItem itemLabel="Default Business Owner" itemValue="DEFAULT_BUSINESS_OWNER"/>
+                    <p:ajax update="cdwNotifyPanel"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{programProfileController.profile.cdwNotifyType eq 'PERSON_EMAIL'}">
+                <p:inputText id="cdwEmail" value="#{programProfileController.profile.cdwNotifyEmail}" required="true"
+                />
+                <p:outputLabel value="Email:" for="cdwEmail"/>
+            </h:panelGroup>
+        </p:panelGrid>
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.cdwAttributes}" var="attribute" itemLabel="#{attribute.label}"
+                    itemValue="#{attribute}"
+                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
+            <f:facet name="sourceCaption">Available Attributes</f:facet>
+            <f:facet name="targetCaption">Attributes to Notify On</f:facet>
+        </p:pickList>
+    </div>
+
+    <div class="card card-w-title" jsf:id="firmServiceLevel">
+        <h3>Firm Service Level</h3>
+        <p:panelGrid columns="3" columnClasses="width120,," layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Time Horizon prior months" for="timeHorizon"/>
+                <p:selectOneMenu id="timeHorizon" value="#{programProfileController.profile.flsTimeHorizon}">
+                    <f:selectItems value="#{constantsProvider.months}" var="month" itemLabel="#{month.value}" itemValue="#{month.value}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+
+        <p:panelGrid columns="3" columnClasses="width120,," styleClass="topAligned">
+            <p:outputLabel value="Essential Customer"/>
+            <p:selectManyMenu value="#{programProfileController.essentialCustomers}" converter="omnifaces.GenericEnumConverter">
+                <f:selectItems value="#{constantsProvider.essentialCustomerTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+            </p:selectManyMenu>
+        </p:panelGrid>
+
+        <p:separator/>
+
+        <h3 class="with-icon">Essential Customer FSL Rule</h3>
+        <p:commandButton value="Season" action="#{programProfileController.addFSLRuleSeason(true)}" process="@form" update=":form:#{tabViewId}:firmServiceLevel" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+        <p:spacer width="10"/>
+        <p:commandButton value="Load Reduction" action="#{programProfileController.addFSLRuleLoadReduction(true)}" process="@form" update=":form:#{tabViewId}:firmServiceLevel" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <p:panelGrid columns="5">
+            <c:set value="#{programProfileController.profile.getEssentialFSLRules()}" var="currentRules"/>
+            <c:forEach items="#{currentRules}" var="rule" varStatus="ruleIterStatus">
+                <ui:include src="FslRule.xhtml"/>
+            </c:forEach>
+        </p:panelGrid>
+
+        <p:separator/>
+
+        <div class="ContainerIndent">
+            <h4>Non-Essential Customer FSL Rule
+                <p:commandLink action="#{programProfileController.addFSLRuleSeason(false)}" update="@form"><i class="icon-plus-circled"/>Season</p:commandLink>
+                <p:commandLink action="#{programProfileController.addFSLRuleLoadReduction(false)}" update="@form"><i
+                        class="icon-plus-circled"/>Load Reduction</p:commandLink>
+            </h4>
+        </div>
+        <p:panelGrid columns="5">
+            <c:set value="#{programProfileController.profile.getNonEssentialFSLRules()}" var="currentRules"/>
+            <c:forEach items="#{currentRules}" var="rule" varStatus="ruleIterStatus">
+                <ui:include src="FslRule.xhtml"/>
+            </c:forEach>
+        </p:panelGrid>
+    </div>
+</ui:composition>

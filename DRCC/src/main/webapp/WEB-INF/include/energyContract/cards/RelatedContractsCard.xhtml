@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Related Contracts</h3>
+
+        <h:panelGroup id="relatedContracts">
+            <p:commandButton action="#{energyContractController.addRelatedContract()}" update="relatedContracts" process="relatedContracts"
+                             icon="ui-icon-add" rendered="#{readonly == false}">
+                <o:skipValidators/>
+            </p:commandButton>
+            <p:spacer width="10"/>
+            <p:outputLabel rendered="#{empty energyContractController.energyContract.relatedContracts}">No related contracts defined yet</p:outputLabel>
+
+            <ui:repeat value="#{energyContractController.energyContract.relatedContracts}" var="relatedContract">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Contract Type" for="relatedContractType"/>
+                        <p:selectOneMenu id="relatedContractType" label="Contract Type" value="#{relatedContract.type}" required="true"
+                                         binding="#{contractType}" disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.relatedContractTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                            <p:ajax update="relatedContractName" process="@this"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:autoComplete id="relatedContractName" value="#{relatedContract.relatedEnergyContract}" required="true" size="26"
+                                        converter="energyContractConverter" readonly="#{readonly}" label="Related Contract Name"
+                                        var="energyContract" itemValue="#{energyContract}" itemLabel="#{energyContract.name}"
+                                        completeMethod="#{energyContractController.completeContract}" disabled="#{relatedContract.type == null}">
+                            <f:attribute name="contractType" value="#{relatedContract}"/>
+                        </p:autoComplete>
+                        <p:outputLabel value="Contract Name:" for="relatedContractName"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton action="#{energyContractController.removeRelatedContract(relatedContract)}"
+                                         update=":form:#{tabViewId}:relatedContracts" process="@this"
+                                         icon="ui-icon-remove" rendered="#{readonly == false}">
+                            <o:skipValidators/>
+                        </p:commandButton>
+                    </h:panelGroup>
+                    <p:spacer/>
+                    <p:spacer/>
+                </p:panelGrid>
+            </ui:repeat>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="relatedContracts" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="relatedContracts" process="relatedContracts" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

@@ -1,0 +1,17 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+    <div class="card card-w-title" jsf:id="asociatedAssets">
+
+        <h3>Associated Assets</h3>
+            <p:pickList converter="assetConverter" value="#{controller.assetsPickList}" var="asset"
+                        itemLabel="#{asset.name}" itemValue="#{asset}" disabled="#{controller.viewModeOn}">
+                <f:facet name="sourceCaption">Available</f:facet>
+                <f:facet name="targetCaption">Selected</f:facet>
+            </p:pickList>
+    </div>
+</ui:composition>

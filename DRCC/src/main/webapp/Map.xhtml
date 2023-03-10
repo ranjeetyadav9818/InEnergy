@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formCL">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Service map" outcome="Map"/>
+            </p:breadCrumb>
+
+            <div class="ui-g dashboard">
+            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                <p:panel header="People enrolled by program" styleClass="ui-shadow-content ">
+                    <p >
+                        <p:selectOneMenu value="#{mapController.program}" converter="programConverter" style="margin-left: 20px">
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{mapController.getPrograms()}" var="program" itemLabel="#{program.name}" itemValue="#{program}"/>
+                        </p:selectOneMenu>
+                        <p:spacer width="20"/>
+                        <p:commandButton value="Submit" process="@form" update="@form" actionListener="#{mapController.search()}"/>
+                    </p>
+                </p:panel>
+            </div>
+            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                <p:panel header="Show #{msg['data.mapping.sublaps']}" styleClass="ui-shadow-content ">
+                    <p style="margin-left: 20px">
+                        <p:commandButton value="Submit" process="@form" update="@form" actionListener="#{mapController.showSublaps()}"/>
+                    </p>
+                </p:panel>
+            </div>
+            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                <p:panel header="Show temperature forecast" styleClass="ui-shadow-content ">
+                    <p style="margin-left: 20px">
+                        <p:commandButton value="Show temperature" process="@form" update="@form" actionListener="#{mapController.showTemperature()}"/>
+                    </p>
+                </p:panel>
+            </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-3">
+                    <p:panel header="People with bidding risks by program" styleClass="ui-shadow-content ">
+                        <p >
+                            <p:selectOneMenu value="#{mapController.program2}" converter="programConverter" style="margin-left: 20px">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{mapController.getPrograms()}" var="program" itemLabel="#{program.name}" itemValue="#{program}"/>
+                            </p:selectOneMenu>
+                            <p:spacer width="20"/>
+                            <p:commandButton value="show" process="@form" update="@form" actionListener="#{mapController.showRisks()}"/>
+                        </p>
+                    </p:panel>
+                </div>
+            <div class="ui-g-12 ui-md-6 ui-lg-12">
+                <p:gmap type="MAP" center="37.7914762,-122.3941337" zoom="7" style="width:100%;height:600px" model="#{mapController.model}" streetView="true">
+                    <p:ajax event="overlaySelect" listener="#{mapController.onMarkerSelect}" />
+                    <p:gmapInfoWindow id="infoWindow" rendered="#{mapController.marker ne null}">
+                        <h4>SA: #{mapController.marker.title}</h4>
+                        <h:outputLabel value="#{mapController.marker.data.serviceAgreement.account.person.customerName}"/>
+                        <br/>
+                        <h:outputLabel value="#{mapController.marker.data.enrollmentStatus} since "/>
+                        <h:outputLabel value="#{mapController.marker.data.effectiveStartDate}">
+                            <f:convertDateTime timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}" pattern="MM/dd/yyyy"/>
+                        </h:outputLabel>
+                        <br/>
+                    </p:gmapInfoWindow>
+                </p:gmap>
+            </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

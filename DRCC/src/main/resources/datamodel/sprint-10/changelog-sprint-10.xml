@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet author="egamas" id="DES-21-1.sql">
+        <sqlFile path="DES-21-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-21-2.sql">
+        <sqlFile path="DES-21-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-87.sql">
+        <sqlFile path="DES-87.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-21-3.sql">
+        <sql>ALTER TABLE `RATE_CODE_SECTORS` RENAME `SECTORS_FOR_RATE_CODE`;</sql>
+    </changeSet>
+    <changeSet id="DES-80" author="vm">
+        <sqlFile path="DES-80.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DES-82" author="vm">
+        <sqlFile path="DES-82.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-83.sql">
+        <sqlFile path="DES-83.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-26.sql">
+        <sqlFile path="DES-26.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-81-1.sql">
+        <sqlFile path="DES-81-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-81-2.sql">
+        <sql>ALTER TABLE `RATE_CODE_PROFILE` CHANGE `ORDER` `ORDER_NUMBER` bigint(20) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="egamas" id="DES-84-1.sql">
+        <sqlFile path="DES-84-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-26-1.sql">
+        <sqlFile path="DES-26-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-27">
+        <sql>ALTER TABLE `WORK_PLAN` MODIFY COLUMN `TYPE` varchar(55) NOT NULL; </sql>
+    </changeSet>
+    <changeSet author="egamas" id="DES-27-2">
+        <sqlFile path="DES-27-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-82-1.sql">
+        <sqlFile path="DES-82-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-82-2.sql">
+        <sqlFile path="DES-82-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamasAndVictor" id="DES-28.sql">
+        <sqlFile path="DES-28.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="egamasAndVictor" id="DES-28-1.sql">
+        <sqlFile path="DES-28-1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="egamasAndVictor" id="DES-28-2.sql">
+        <sqlFile path="DES-28-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="egamasAndVictor" id="DES-28-3.sql">
+        <sqlFile path="DES-28-3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="egamasAndVictor" id="DES-28-4.sql">
+        <sqlFile path="DES-28-4.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="egamasAndVictor" id="DES-28-5.sql">
+        <sqlFile path="DES-28-5.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+</databaseChangeLog>

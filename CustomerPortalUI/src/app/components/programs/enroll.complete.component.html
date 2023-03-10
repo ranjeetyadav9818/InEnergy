@@ -1,0 +1,22 @@
+<button pButton (click)="cancelButton($event)" label="Finish" style="float: left"></button>
+<hr/>
+<h3>Enroll Application Result</h3>
+<div *ngIf="this.finalEnroll?.id " style="text-align: left;font-size:16px">
+  <h4 *ngIf="this.finalEnroll?.messages?.length === 0">Congratulations. You Have applied for the program enrollment
+    successfully!</h4>
+  <h4 *ngIf="this.finalEnroll?.messages?.length > 0">The enrollment process can not be done due to the following
+    errors:</h4>
+  <div style="padding-left: 20px" *ngIf="this.finalEnroll?.messages?.length > 0">
+    <div *ngFor="let message of this.finalEnroll?.messages"><span class="error-text">{{message}}</span></div>
+  </div>
+  <p></p>
+  <div style="padding-left: 20px">
+    <b>Program Name: </b>{{this.finalEnroll.name}}<br/>
+    <b>Program Type: </b>{{this.finalEnroll.programType}}<br/>
+  </div>
+  <div style="padding-left: 20px" *ngIf="this.finalEnroll?.messages?.length === 0">
+    <b>Enrollment Status: </b>{{this.finalEnroll.enrollmentStatus}}<br/>
+  </div>
+</div>
+<div>
+</div>

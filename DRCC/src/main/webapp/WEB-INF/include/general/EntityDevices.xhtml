@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page" xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <j:useBean id="controller" class="com.inenergis.controller.customerData.ContractEntityDetailController"/>
+    <p:dataTable id="dtAvailableDevices" value="#{controller.entity.devices}" var="device" reflow="true" rows="25"
+                 rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false" editable="true"  style="text-align: center"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+        <p:ajax event="rowEdit" listener="#{controller.onDeviceRowEdit}"/>
+        <p:ajax event="rowEditCancel" listener="#{controller.onRowCancel}"/>
+        <p:column headerText="Location ID" styleClass="topAligned" filterBy="#{device.uuid}" filterMatchMode="contains">
+            <h:outputText value="#{device.uuid}"/>
+        </p:column>
+        <p:column headerText="Location Name" styleClass="topAligned" filterBy="#{device.name}" filterMatchMode="contains">
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText value="#{device.name}"/>
+                </f:facet>
+                <f:facet name="input">
+                    <p:inputText value="#{device.name}" maxlength="55"/>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Power Source" styleClass="topAligned" filterBy="#{device.powerSource}" filterMatchMode="contains">
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText value="#{device.powerSource}"/>
+                </f:facet>
+                <f:facet name="input">
+                    <p:outputLabel value="Power Source" for="powerSource"/>
+                    <p:selectOneMenu id="powerSource" value="#{device.powerSource}" style="margin-left: 20px;">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.powerSources}"
+                                       var="powerSource" itemLabel="#{powerSource.value}" itemValue="#{powerSource.value}"/>
+                    </p:selectOneMenu>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column headerText="Equipment ID" styleClass="topAligned" filterBy="#{device.equipmentId}" filterMatchMode="contains">
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText value="#{device.equipmentId}"/>
+                </f:facet>
+                <f:facet name="input">
+                    <p:inputText value="#{device.equipmentId}" maxlength="55"/>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column style="width:32px;" class="showOnDesktop">
+            <p:rowEditor/>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

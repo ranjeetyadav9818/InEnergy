@@ -1,0 +1,33 @@
+<p-dataScroller [value]="invoices" [rows]="invoices.length" class="data-scroller-transparent">
+  <ng-template let-invoice pTemplate="item">
+    <p-panel class="no-header" *ngIf="invoice.id != null">
+      <b>Invoice {{invoice.invoiceNumber}}</b><br/>
+      <i>{{invoice.date | date:'MM-dd-yyyy'}}</i>
+      <div class="ui-g">
+        <div class="ui-g-3"><b>Total: {{invoice.total / 100 | currency:'USD':true}}</b></div>
+        <div class="ui-g-2">
+          <i class="fa fa-bolt blue-text" aria-hidden="true" style="margin-right: 3px"> </i>
+          {{invoice.totalConsumption / 100}} kWh
+        </div>
+        <div class="ui-g-5 green-text" *ngIf="invoice.paymentDate != null">
+          <i class="fa fa-check" aria-hidden="true" style="margin-right: 3px"> </i>
+          Paid on {{invoice.paymentDate | date:'MM-dd-yyyy'}}
+        </div>
+        <div class="ui-g-5 error-text" *ngIf="invoice.paymentDate == null">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 3px"> </i>
+          Payment due
+        </div>
+        <div class="ui-g-2"><a href="#" >View PDF</a></div>
+      </div>
+    </p-panel>
+    <p-panel class="no-header" *ngIf="invoice.year != null">
+      <div class="ui-g">
+        <div class="ui-g-12 center-text blue-text">
+          <h1><i class="fa fa-clock-o" aria-hidden="true" style="margin-right: 3px"> </i><br/>
+          Invoices on {{invoice.year}}</h1>
+        </div>
+      </div>
+    </p-panel>
+    <hr/>
+  </ng-template>
+</p-dataScroller>

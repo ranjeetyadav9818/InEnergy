@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+
+    <p:panelGrid columns="4">
+        <p:column>Program:</p:column>
+        <p:column>#{controller.event.program.name}</p:column>
+        <p:column>Event start time:</p:column>
+        <p:column>
+            <h:outputText value="#{controller.event.startDate}">
+                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+            </h:outputText>
+        </p:column>
+        <p:column>Dispatch Reason:</p:column>
+        <p:column>#{controller.event.dispatchReason.name}</p:column>
+        <p:column>Event end time:</p:column>
+        <p:column>
+            <h:outputText value="#{controller.event.endDate}"><f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/></h:outputText>
+        </p:column>
+        <p:column>Dispatch level:</p:column>
+        <p:column>#{controller.event.dispatchLevel.name}</p:column>
+        <p:column>DRMS:</p:column>
+        <p:column>InterAct</p:column>
+        <p:column>SA's Impacted:</p:column>
+        <p:column>#{controller.event.impactedCustomers.size()}</p:column>
+        <p:column>Event ID:</p:column>
+        <p:column>#{controller.event.externalEventId}</p:column>
+        <p:column>Resources impacted:</p:column>
+        <p:column>#{controller.event.getImpactedResources().size()}</p:column>
+        <p:column>Status:</p:column>
+        <p:column>#{controller.event.status.name}</p:column>
+        <p:column>Cancel reason:</p:column>
+        <p:column>#{controller.event.cancelReason.name}</p:column>
+        <p:column>Error reason:</p:column>
+        <p:column>#{controller.event.errorReason}</p:column>
+
+        <p:column>Created on:</p:column>
+        <p:column>
+            <h:outputText value="#{controller.event.createdOn}">
+                <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="America/Los_Angeles"/>
+            </h:outputText>
+        </p:column>
+
+        <p:column>Created by:</p:column>
+        <p:column><h:outputText value="#{controller.event.createdBy}"/></p:column>
+    </p:panelGrid>
+    <p:panel rendered="#{controller.event.status eq 'SUBMITTED' and controller.event.isCompleted() eq false}">
+        <p:panelGrid columns="1"><h3>Dispatch cancellation</h3></p:panelGrid>
+        <p:panelGrid columns="2">
+            <p:outputLabel value="Password"/>
+            <p:password value="#{controller.cancelPassword}"/>
+            <p:outputLabel value="Cancel Reason"/>
+            <p:selectOneMenu value="#{controller.event.cancelReason}" converter="omnifaces.GenericEnumConverter">
+                <f:selectItem noSelectionOption="true"/>
+                <f:selectItems value="#{constantsProvider.dispatchCancelReasons}" var="reason" itemLabel="#{reason.name}" itemValue="#{reason}"/>
+            </p:selectOneMenu>
+            <p:column/>
+            <p:commandButton value="Cancel Dispatch" action="#{controller.cancelDispatch()}" update="@form"/>
+        </p:panelGrid>
+    </p:panel>
+    <p:panel rendered="#{controller.event.status eq 'ERROR'}">
+        <p:panelGrid columns="1"><h3>Dispatch Again</h3></p:panelGrid>
+        <p:panelGrid columns="2">
+            <p:outputLabel value="Password"/>
+            <p:password value="#{controller.cancelPassword}"/>
+            <p:column/>
+            <p:commandButton value="Redispatch" action="#{controller.reDispatch()}" update="@form"/>
+        </p:panelGrid>
+    </p:panel>
+    <p:dialog header="Dates to Change" widgetVar="eventDateChanged" modal="true" resizable="false" closeOnEscape="true"
+              visible="#{controller.showEventDateChangedDialog eq true}" style="padding: 5px">
+        <p:panelGrid columns="1">Start Date and End Date are going to be modified</p:panelGrid>
+        <p:panelGrid columns="4" style="width: 100%;background-color: white">
+            <p:outputLabel value="Start date" for="startDateId"/>
+            <h:outputText value="#{controller.event.startDate}" id="startDateId">
+                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+            </h:outputText>
+
+            <p:outputLabel value="to" for="newStartDateId"/>
+            <h:outputText value="#{controller.newStartDate}" id="newStartDateId">
+                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+            </h:outputText>
+
+            <p:outputLabel value="End date" for="endDateId"/>
+            <h:outputText value="#{controller.event.endDate}" id="endDateId">
+                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+            </h:outputText>
+
+            <p:outputLabel value="to" for="newEndDateId"/>
+            <h:outputText value="#{controller.newEndDate}" id="newEndDateId">
+                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+            </h:outputText>
+        </p:panelGrid>
+        <p:panelGrid columns="2">
+            <p:commandButton value="Submit" action="#{controller.acceptNewDatesForReDispatch()}" update="@form"/>
+            <p:commandButton value="Cancel" action="#{controller.cancelReDispatch()}" update="@form"/>
+        </p:panelGrid>
+    </p:dialog>
+</ui:composition>

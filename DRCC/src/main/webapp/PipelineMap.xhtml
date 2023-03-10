@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formCL">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="#{pipelineMapController.commodityType.name} map" url="#"/>
+            </p:breadCrumb>
+
+            <p:gmap type="MAP" center="#{pipelineMapController.mapCenterLat},#{pipelineMapController.mapCenterLong}" id="pipelineMap"
+                    zoom="#{pipelineMapController.zoom}" style="width:100%;height:450px" model="#{pipelineMapController.mapModel}" streetView="true">
+                <p:ajax event="overlaySelect" listener="#{pipelineMapController.onOverlaySelect}"/>
+                <p:gmapInfoWindow id="infoWindow" rendered="#{pipelineMapController.marker ne null}">
+                    <h4>#{pipelineMapController.marker.data.id} - #{pipelineMapController.marker.title}</h4>
+                </p:gmapInfoWindow>
+            </p:gmap>
+
+            <p:outputPanel class="card card-w-title" style="margin-top: 20px" id="infoPanel">
+                <h2>Pipelines</h2>
+                <p:outputPanel rendered="#{pipelineMapController.newDeviceLine eq null}" style="margin: 20px">
+                    <p:commandButton value="New" update="infoPanel" actionListener="#{pipelineMapController.addDeviceLine()}" />
+                </p:outputPanel>
+                <p:outputPanel rendered="#{pipelineMapController.newDeviceLine ne null}" style="margin: 20px">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="true" id="lineName" value="#{pipelineMapController.newDeviceLine.name}"/>
+                        <p:outputLabel value="Name:" for="lineName"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber required="true" id="startLat" value="#{pipelineMapController.newDeviceLine.startLatitude}" minValue="-90" maxValue="90" decimalPlaces="6"/>
+                        <p:outputLabel value="Start point latitude:" for="startLat"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber required="true" id="startLon" value="#{pipelineMapController.newDeviceLine.startLongitude}" minValue="-180" maxValue="180" decimalPlaces="6"/>
+                        <p:outputLabel value="Start point longitude:" for="startLon"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber required="true" id="endLat" value="#{pipelineMapController.newDeviceLine.endLatitude}" minValue="-90" maxValue="90" decimalPlaces="6"/>
+                        <p:outputLabel value="End point latitude:" for="endLat"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber required="true" id="endLon" value="#{pipelineMapController.newDeviceLine.endLongitude}" minValue="-180" maxValue="180" decimalPlaces="6"/>
+                        <p:outputLabel value="End point longitude:" for="endLon"/>
+                    </h:panelGroup>
+                    <p:commandButton value="Add" update="@form" actionListener="#{pipelineMapController.createDeviceLine()}"/>
+                    <p:commandButton value="Cancel" update="infoPanel" actionListener="#{pipelineMapController.cancelDeviceLine()}" style="margin-left: 20px" process="@this"/>
+                </p:outputPanel>
+                <p:dataTable value="#{pipelineMapController.deviceLines}" id="deviceLines" lazy="false" var="line" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{line.uuid}" expandedRow="#{line.uuid == pipelineMapController.selectedLine.uuid}">
+                    <p:column headerText="Name">
+                        <h:outputText value="#{line.name}"/>
+                    </p:column>
+                    <p:column headerText="Start">
+                        <h:outputText value="#{line.startLatitude}, #{line.startLongitude}"/>
+                    </p:column>
+                    <p:column headerText="End">
+                        <h:outputText value="#{line.endLatitude}, #{line.endLongitude}"/>
+                    </p:column>
+                    <p:column headerText="Actions" >
+                        <p:commandButton value="Delete" icon="ui-icon-delete" actionListener="#{pipelineMapController.deleteLine(line)}" update="@form"/>
+                    </p:column>
+                    <p:column style="width:16px">
+                        <p:rowToggler/>
+                    </p:column>
+                    <p:rowExpansion>
+                        <h4>Devices</h4>
+                        <p:outputPanel rendered="#{pipelineMapController.deviceToAdd eq null}" style="margin: 20px">
+                            <p:commandButton value="New" update="deviceLines" actionListener="#{pipelineMapController.addDevice(line)}" />
+                        </p:outputPanel>
+                        <p:outputPanel rendered="#{pipelineMapController.deviceToAdd ne null}" id="newDevicePanel" style="margin: 20px">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputNumber required="true" id="deviceId" value="#{pipelineMapController.deviceToAdd}" minValue="1" decimalPlaces="0"/>
+                                <p:outputLabel value="Device id:" for="deviceId"/>
+                            </h:panelGroup>
+                            <p:commandButton value="Add" update="@form" actionListener="#{pipelineMapController.newDevice(line)}"/>
+                            <p:commandButton value="Cancel" update="deviceLines" actionListener="#{pipelineMapController.cancelDeviceFromLine()}" style="margin-left: 20px" process="@this"/>
+                        </p:outputPanel>
+                        <p:dataTable value="#{line.devices}" lazy="false" var="device" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false" rowKey="#{device.uuid}">
+                            <p:column headerText="Name">
+                                <h:outputText value="#{device.name}"/>
+                            </p:column>
+                            <p:column headerText="Position">
+                                <h:outputText value="#{device.latitude}, #{device.longitude}"/>
+                            </p:column>
+                            <p:column headerText="Actions" >
+                                <p:commandButton value="Delete" icon="ui-icon-delete" actionListener="#{pipelineMapController.deleteDeviceFromLine(device,line)}" update="@form"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </p:outputPanel>
+        </h:form>
+    </ui:define>
+</ui:composition>

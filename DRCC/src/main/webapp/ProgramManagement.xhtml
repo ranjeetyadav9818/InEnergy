@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="#{programManagementController.program.name} program" outcome="ProgramManagement">
+                    <f:param name="o" value="#{parameterEncoderService.encode(programManagementController.program.id)}"/>
+                </p:menuitem>
+                <p:menuitem value="Program Management"/>
+            </p:breadCrumb>
+            <div class="card">
+                <p:carousel numVisible="4" circular="true" responsive="true" value="#{programManagementController.programDetails}" var="programDetails">
+                    <i class="material-icons #{programDetails.icon} Fs20 hardblue TexAlCenter"/>
+                    <h:outputText class="Fs20 hardblue" value="#{programDetails.name}"/>
+                    <h:dataTable var="db" value="#{programDetails.dataBeans}" style="border:0;">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+            </div>
+            <div class="EmptyBox10"></div>
+                <p:tabView dynamic="true" scrollable="true">
+                    <p:tab title="Program Participants">
+                        <p:dataTable value="#{programManagementController.participantsLazyModel}" lazy="true" var="participant" reflow="true" rows="25"
+                                     rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false">
+                            <p:column headerText="SA ID" filterBy="#{participant.serviceAgreement.serviceAgreementId}"
+                                      sortBy="#{participant.serviceAgreement.serviceAgreementId}">
+                                <h:outputText value="#{participant.serviceAgreement.serviceAgreementId}"/>
+                            </p:column>
+                            <p:column headerText="UUID" filterBy="#{participant.serviceAgreement.saUuid}" sortBy="#{participant.serviceAgreement.saUuid}">
+                                <h:outputText value="#{participant.serviceAgreement.saUuid}"/>
+                            </p:column>
+                            <p:column headerText="Application ID" filterBy="#{participant.id}" sortBy="#{participant.id}">
+                                <p:link href="ApplicationEnrollment.xhtml?o=#{parameterEncoderService.encode(participant.id)}" value="#{participant.id}"/>
+                            </p:column>
+                            <p:column headerText="Customer Name" filterBy="#{participant.serviceAgreement.account.person.customerName}"
+                                      sortBy="#{participant.serviceAgreement.account.person.customerName}">
+                                <h:outputText value="#{participant.serviceAgreement.account.person.customerName}"/>
+                            </p:column>
+                            <p:column headerText="Service Address" filterable="false" sortable="false">
+                                <h:outputText value="#{participant.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1}"/>
+                            </p:column>
+                            <p:column headerText="City" filterable="false" sortable="false">
+                                <h:outputText value="#{participant.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr}"/>
+                            </p:column>
+                            <p:column headerText="Aggregator" filterBy="#{participant.aggregator.name}" sortBy="#{participant.aggregator.name}">
+                                <h:outputText value="#{participant.aggregator.name}"/>
+                            </p:column>
+                            <p:column headerText="Effective date" sortBy="#{participant.effectiveStartDate}">
+                                <h:outputText value="#{participant.effectiveStartDate}">
+                                    <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Unenroll date" sortBy="#{participant.effectiveEndDate}">
+                                <h:outputText value="#{participant.effectiveEndDate}">
+                                    <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Status" filterBy="#{participant.enrollmentStatus}" sortBy="#{participant.enrollmentStatus}">
+                                <h:outputText value="#{participant.enrollmentStatus}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="Enrollments in Progress">
+                        <p:dataTable value="#{programManagementController.enrollmentsIPLazyModel}" lazy="true" var="participant" reflow="true" rows="25"
+                                     rowsPerPageTemplate="25,50,100"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorAlwaysVisible="false">
+                            <p:column headerText="SA ID" filterBy="#{participant.serviceAgreement.serviceAgreementId}"
+                                      sortBy="#{participant.serviceAgreement.serviceAgreementId}">
+                                <h:outputText value="#{participant.serviceAgreement.serviceAgreementId}"/>
+                            </p:column>
+                            <p:column headerText="UUID" filterBy="#{participant.serviceAgreement.saUuid}" sortBy="#{participant.serviceAgreement.saUuid}">
+                                <h:outputText value="#{participant.serviceAgreement.saUuid}"/>
+                            </p:column>
+                            <p:column headerText="Application ID" filterBy="#{participant.id}" sortBy="#{participant.id}">
+                                <p:link href="ApplicationEnrollment.xhtml?o=#{parameterEncoderService.encode(participant.id)}" value="#{participant.id}"/>
+                            </p:column>
+                            <p:column headerText="Application Date" sortBy="#{participant.effectiveStartDate}">
+                                <h:outputText value="#{participant.effectiveStartDate}">
+                                    <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Customer Name" filterBy="#{participant.serviceAgreement.account.person.customerName}"
+                                      sortBy="#{participant.serviceAgreement.account.person.customerName}">
+                                <h:outputText value="#{participant.serviceAgreement.account.person.customerName}"/>
+                            </p:column>
+                            <p:column headerText="Service Address" filterable="false" sortable="false">
+                                <h:outputText value="#{participant.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1}"/>
+                            </p:column>
+                            <p:column headerText="City" filterable="false" sortable="false">
+                                <h:outputText value="#{participant.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr}"/>
+                            </p:column>
+                            <p:column headerText="Enrollment channel" filterBy="#{participant.enrollmentChannel}" sortBy="#{participant.enrollmentChannel}">
+                                <h:outputText value="#{participant.enrollmentChannel}"/>
+                            </p:column>
+                            <p:column headerText="Status" filterBy="#{participant.enrollmentStatus}" sortBy="#{participant.enrollmentStatus}">
+                                <h:outputText value="#{participant.enrollmentStatus}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                </p:tabView>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

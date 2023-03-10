@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="manufacturers">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Manufacturers"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <h3><p:commandButton value="Add" update="@form" action="#{manufacturerController.add()}"/></h3>
+
+                <h:panelGroup rendered="#{manufacturerController.addingNew}">
+                    <div style="margin-bottom: 20px;">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText value="#{manufacturerController.manufacturer.name}" required="true" id="name"/>
+                                <p:outputLabel value="Manufacturer Name:" for="name"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText value="#{manufacturerController.manufacturer.pointOfContact}" required="true" id="pointOfContact"/>
+                                <p:outputLabel value="Point of contact:" for="pointOfContact"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText value="#{manufacturerController.manufacturer.phone}" required="true" id="phone"/>
+                                <p:outputLabel value="Phone:" for="phone"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                        <h:panelGroup rendered="#{manufacturerController.addingNew}">
+                            <p:commandButton id="save" value="#{msg['save']}" action="#{manufacturerController.save()}" process="@form" update="@form"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton id="cancel" value="#{msg['cancel']}" action="#{manufacturerController.cancel()}" process="@this" update="@form"/>
+                        </h:panelGroup>
+                    </div>
+                </h:panelGroup>
+
+                <p:dataTable value="#{manufacturerController.list}" var="manufacturer"
+                             reflow="true" rows="25"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false">
+
+                    <p:column headerText="Id">
+                        <h:outputText value="#{manufacturer.id}"/>
+                    </p:column>
+                    <p:column headerText="Manufacturer Name">
+                        <h:outputText value="#{manufacturer.name}"/>
+                    </p:column>
+                    <p:column headerText="Point of contact">
+                        <h:outputText value="#{manufacturer.pointOfContact}"/>
+                    </p:column>
+                    <p:column headerText="Phone">
+                        <h:outputText value="#{manufacturer.phone}"/>
+                    </p:column>
+                </p:dataTable>
+                <div style="margin-top: 20px;">
+                    *If you want to update or change these values please contact an administrator
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

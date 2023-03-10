@@ -1,0 +1,13 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="ancillary_fees_grouping.xml" author="egamas">
+        <addColumn tableName="RATE_ANCILLARY_FEE">
+            <column name="GROUP_ID" type="INTEGER unsigned default 0"/>
+        </addColumn>
+        <addColumn tableName="RATE_CONSUMPTION_FEE">
+            <column name="GROUP_ID" type="INTEGER unsigned default 0"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

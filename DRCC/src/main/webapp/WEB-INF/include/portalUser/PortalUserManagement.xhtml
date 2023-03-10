@@ -1,0 +1,214 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page">
+    <c:set var="controller" value="#{userManagementController}"/>
+
+    <div class="card card-w-title" jsf:rendered="#{agreementPointMapList.selectedServiceAgreement ne null }">
+        <h3>Portal User Management</h3>
+        <p:panelGrid columns="1" styleClass="form-group" rendered="#{controller.newPortalUser eq null}">
+            <h:column>
+                <p:commandButton action="#{controller.addUser(agreementPointMapList.selectedServiceAgreement)}" update="@(.ui-tabs-panel:visible)" process="@this" value="Add"/>
+            </h:column>
+        </p:panelGrid>
+
+        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group " rendered="#{controller.newPortalUser ne null}">
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText required="true" id="userName" value="#{controller.newPortalUser.name}" size="50" maxlength="50" label="User"/>
+                <label>Name</label>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText required="false" id="phone" value="#{controller.newPortalUser.phone}" size="50" maxlength="50" label="Phone"/>
+                <label>Phone</label>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText required="false" id="email" value="#{controller.newPortalUser.email}" size="60" maxlength="100" label="Email"/>
+                <label>Email</label>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:password required="false" id="passwordNew" value="#{controller.newPortalUser.passwordNew}"
+                            size="50" maxlength="50" label="New Password"/>
+                <label>Password</label>
+            </h:panelGroup>
+
+        </h:panelGrid>
+
+        <p:panelGrid columns="1" styleClass="form-group" rendered="#{controller.newPortalUser ne null}">
+            <h:column>
+                <p:commandButton action="#{controller.saveUser(agreementPointMapList.selectedServiceAgreement)}" update="@form" value="Save"/>
+
+
+                <p:spacer width="10"/>
+                <p:commandButton action="#{controller.cancelNewlUser}"
+                                 update="@form" process="@this" value="Cancel"/>
+            </h:column>
+        </p:panelGrid>
+
+        <p:dataTable widgetVar="custTable" value="#{agreementPointMapList.selectedServiceAgreement.portalUsers}"
+                     lazy="false" var="user" editable="true"
+                     reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="false" rowKey="#{user.uuid}"
+                     rendered="#{not empty agreementPointMapList.selectedServiceAgreement.portalUsers}">
+
+            <p:ajax event="rowEdit" listener="#{controller.editUser(user)}"/>
+            <p:ajax event="rowEditCancel"/>
+
+            <p:column headerText="Name">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{user.name}"/></f:facet>
+                    <f:facet name="input"><p:inputTextarea rows="1" cols="50" value="#{user.name}"/></f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="Phone">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{user.phone}"/></f:facet>
+                    <f:facet name="input"><p:inputTextarea rows="1" cols="50" value="#{user.phone}"/></f:facet>
+                </p:cellEditor>
+            </p:column>
+
+
+            <p:column headerText="Email">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{user.email}"/></f:facet>
+                    <f:facet name="input"><p:inputTextarea rows="1" cols="60" value="#{user.email}"/></f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="New Password">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <p:outputLabel value="****"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:password required="false" id="newPasswordInTable" value="#{user.passwordNew}" size="50" maxlength="50" label="New Password" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column style="width: 32px" class="showOnDesktop">
+                <p:rowEditor/>
+            </p:column>
+
+            <p:column style="width: 66px" class="showOnDesktop">
+                <p:commandButton action="#{controller.removeUser(user, agreementPointMapList.selectedServiceAgreement)}" update="@form" process="@this"
+                                 value="Delete"/>
+            </p:column>
+
+        </p:dataTable>
+
+    </div>
+
+
+
+    <div class="card card-w-title" jsf:rendered="#{ gasAgreementPointMapList.selectedServiceAgreement ne null }">
+        <h3>Portal User Management</h3>
+        <p:panelGrid columns="1" styleClass="form-group" rendered="#{controller.newPortalUser eq null}">
+            <h:column>
+                <p:commandButton action="#{controller.addUser(agreementPointMapList.selectedServiceAgreement)}" update="@(.ui-tabs-panel:visible)" process="@this" value="Add"/>
+            </h:column>
+        </p:panelGrid>
+
+        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group " rendered="#{controller.newPortalUser ne null}">
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText required="true" id="userNameG" value="#{controller.newPortalUser.name}" size="50" maxlength="50" label="User"/>
+                <label>Name</label>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText required="false" id="phoneG" value="#{controller.newPortalUser.phone}" size="50" maxlength="50" label="Phone"/>
+                <label>Phone</label>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText required="false" id="emailG" value="#{controller.newPortalUser.email}" size="60" maxlength="100" label="Email"/>
+                <label>Email</label>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield">
+                <p:password required="false" id="passwordNewG" value="#{controller.newPortalUser.passwordNew}"
+                            size="50" maxlength="50" label="New Password"/>
+                <label>Password</label>
+            </h:panelGroup>
+
+        </h:panelGrid>
+
+        <p:panelGrid columns="1" styleClass="form-group" rendered="#{controller.newPortalUser ne null}">
+            <h:column>
+                <p:commandButton action="#{controller.saveUser(gasAgreementPointMapList.selectedServiceAgreement)}" update="@form" value="Save"/>
+
+
+                <p:spacer width="10"/>
+                <p:commandButton action="#{controller.cancelNewlUser}"
+                                 update="@form" process="@this" value="Cancel"/>
+            </h:column>
+        </p:panelGrid>
+
+        <p:dataTable widgetVar="custTable" value="#{gasAgreementPointMapList.selectedServiceAgreement.portalUsers}"
+                     lazy="false" var="user" editable="true"
+                     reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="false" rowKey="#{user.uuid}"
+                     rendered="#{not empty gasAgreementPointMapList.selectedServiceAgreement.portalUsers}">
+
+            <p:ajax event="rowEdit" listener="#{controller.editUser(user)}"/>
+            <p:ajax event="rowEditCancel"/>
+
+            <p:column headerText="Name">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{user.name}"/></f:facet>
+                    <f:facet name="input"><p:inputTextarea rows="1" cols="50" value="#{user.name}"/></f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="Phone">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{user.phone}"/></f:facet>
+                    <f:facet name="input"><p:inputTextarea rows="1" cols="50" value="#{user.phone}"/></f:facet>
+                </p:cellEditor>
+            </p:column>
+
+
+            <p:column headerText="Email">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{user.email}"/></f:facet>
+                    <f:facet name="input"><p:inputTextarea rows="1" cols="60" value="#{user.email}"/></f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="New Password">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <p:outputLabel value="****"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:password required="false" id="newPasswordInTableG" value="#{user.passwordNew}" size="50" maxlength="50" label="New Password" />
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column style="width: 32px" class="showOnDesktop">
+                <p:rowEditor/>
+            </p:column>
+
+            <p:column style="width: 66px" class="showOnDesktop">
+                <p:commandButton action="#{controller.removeUser(user,gasAgreementPointMapList.selectedServiceAgreement)}" update="@form" process="@this"
+                                 value="Delete"/>
+            </p:column>
+
+        </p:dataTable>
+
+    </div>
+
+</ui:composition>

@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <c:set var="controller" value="#{assetProfileDetailController}"/>
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Asset Type Profile" outcome="AssetTypeProfile">
+                    <f:param name="n" value="#{parameterEncoderService.encode(controller.profile.networkType.commodityType.name())}"/>
+                </p:menuitem>
+                <p:menuitem value="Profile #{controller.profile.name} Details" outcome="AssetProfileDetail">
+                    <f:param name="o" value="#{parameterEncoderService.encode(controller.profile.id)}"/>
+                </p:menuitem>
+            </p:breadCrumb>
+            <div class="card">
+                <p/>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Network Type" for="networkType"/>
+                    <p:selectOneMenu id="networkType" label="Network Type" converter="networkTypeConverter"
+                                     value="#{controller.profile.networkType}" disabled="true">
+                        <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.networkTypes}" var="gridType" itemLabel="#{gridType.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{controller.profile.name}" id="profileName" disabled="true"/>
+                    <p:outputLabel value="Asset Type Profile" for="profileName"/>
+                </h:panelGroup>
+            </div>
+            <div class="ContainerIndent">
+                <p:tabView dynamic="true" id="catalogDeviceTab" scrollable="true" activeIndex="#{controller.activeIndex}">
+                    <p:tab id="catalogTab" title="Catalog Information" rendered="#{controller.profile.assetProfileType ne 'CONNECTION'}">
+                        <ui:include src="WEB-INF/include/asset/CatalogInformationTab.xhtml" />
+                    </p:tab>
+                    <p:tab id="deviceTab" title="Device Configuration" rendered="#{controller.profile.assetProfileType ne 'CONNECTION'}">
+                        <ui:include src="WEB-INF/include/asset/DeviceConfigurationTab.xhtml" />
+                    </p:tab>
+                    <p:tab id="connectionAttributesTab" title="Connection Attributes" rendered="#{controller.profile.assetProfileType eq 'CONNECTION'}">
+                        <ui:include src="WEB-INF/include/asset/ConnectionAttributesTab.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

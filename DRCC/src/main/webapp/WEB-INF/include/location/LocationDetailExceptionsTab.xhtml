@@ -1,0 +1,77 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <p:dataTable value="#{locationSubmissionDetailController.locationSubmissionStatus.exceptions}" id="TbExceptionDet" widgetVar="custTableD" var="excep"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false">
+        <p:column headerText="SA ID" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}"/>
+        </p:column>
+        <p:column headerText="UU ID" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.saUuid}">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.saUuid}"/>
+        </p:column>
+        <p:column headerText="Customer"
+                  filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}"/>
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.businessName}"/>
+        </p:column>
+        <p:column headerText="Service Address" styleClass="topAligned"
+                  filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}" filterable="false">
+            <h:outputText
+                    value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1} "/>
+        </p:column>
+        <p:column headerText="City" styleClass="topAligned"
+                  filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}"
+                  filterable="false">
+            <h:outputText
+                    value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr} "/>
+        </p:column>
+        <p:column headerText="Program"
+                  filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.program.name}">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.program.name}"/>
+        </p:column>
+        <p:column headerText="Exception" filterBy="#{excep.type}">
+            <h:outputText value="#{excep.type}"/>
+        </p:column>
+        <p:column headerText="Effective Data" filterBy="#{excep.dateAdded}" filterable="false" styleClass="topAligned">
+            <h:outputText value="#{excep.dateAdded}"/>
+        </p:column>
+        <p:column headerText="Disposit." filterBy="#{excep.markedRetry}">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('custTableD').filter()" autoWidth="false" style="width: 50px;">
+                    <f:converter converterId="javax.faces.Boolean"/>
+                    <f:selectItem itemLabel="All" itemValue=""/>
+                    <f:selectItem itemLabel="REV." itemValue="true"/>
+                    <f:selectItem itemLabel="NOT R." itemValue="false"/>
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{excep.formatDisposition()}"/>
+        </p:column>
+        <p:column headerText="Action" field="editable" styleClass="topAligned">
+            <p:commandLink action="#{locationSubmissionDetailController.reprocessException(excep)}" process="@this" update="@form" value="Mark As Reviewed"
+                           rendered="#{!excep.markedRetry and !excep.disputed()}"/>
+
+            <p:commandLink update="@form" value="Mark As Non-Registrable"
+                           actionListener="#{locationSubmissionDetailController.prepareMarkAsNonRegistrable(excep)}"
+                           rendered="#{excep.disputed()}"/>
+            <div jsf:rendered="#{excep.disputed()}"><br/></div>
+            <p:commandLink action="#{locationSubmissionDetailController.markAsReprocess(excep)}" process="@this" update="@form" value="Reprocess to Market"
+                           rendered="#{excep.disputed()}"/>
+        </p:column>
+    </p:dataTable>
+    <p:outputPanel styleClass="MarginTop20" rendered="#{locationSubmissionDetailController.showReason}">
+        <h:panelGroup styleClass="md-inputfield">
+            <p:inputTextarea value="#{locationSubmissionDetailController.nonRegistrableReason}" id="textAreaNonRegistrableReason"/>
+            <h:outputLabel value="Non-registrable reason" for="textAreaNonRegistrableReason"/>
+        </h:panelGroup>
+        <p:commandButton value="Save" action="#{locationSubmissionDetailController.markAsNonRegistrable()}" update="@form"/>
+        <p:spacer width="15"/>
+        <p:commandButton value="Cancel" action="#{locationSubmissionDetailController.cancelMarkAsNonRegistrable}" update="@form"/>
+    </p:outputPanel>
+</ui:composition>

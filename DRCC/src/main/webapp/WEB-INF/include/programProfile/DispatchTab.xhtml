@@ -1,0 +1,270 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <div class="card card-w-title">
+        <h3>Dispatch General</h3>
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="DRMS:" for="drms"/>
+                <p:selectOneMenu id="drms" value="#{programProfileController.profile.drms}">
+                    <f:selectItem noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.drmss}" var="drms" itemValue="#{drms}" itemLabel="#{drms.name}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+
+        <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.dispatchLevelPickList}" var="dispatchLevel"
+                    itemLabel="#{msg[dispatchLevel.id]}" itemValue="#{dispatchLevel}" showSourceFilter="true" showTargetFilter="true"
+                    filterMatchMode="contains">
+            <f:facet name="sourceCaption">Available Dispatch Level</f:facet>
+            <f:facet name="targetCaption">Defined Dispatch Level</f:facet>
+        </p:pickList>
+
+        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Aggregator Dispatch:" for="aggregatorDispatch"/>
+                <p:selectOneMenu id="aggregatorDispatch" value="#{programProfileController.profile.aggregatorDispatchType}">
+                    <f:selectItems value="#{constantsProvider.aggregatorDispatchTypes}" var="agt" itemValue="#{agt}" itemLabel="#{agt.name}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+        </p:panelGrid>
+    </div>
+
+    <div class="card card-w-title" jsf:id="eventDurations">
+        <h3>Event Durations
+            <p:commandButton action="#{programProfileController.addEventDuration()}" update=":form:#{tabViewId}:eventDurations" icon="ui-icon-add" process="@form">
+                <o:skipValidators/>
+            </p:commandButton>
+        </h3>
+        <p:outputLabel rendered="#{empty programProfileController.profile.eventDurations}">No event durations defined yet</p:outputLabel>
+        <ui:repeat value="#{programProfileController.profile.eventDurations}" var="eventDuration" varStatus="edStatus">
+            <p:separator rendered="#{not edStatus.first}"/>
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Option" for="idOption"/>
+                    <p:selectOneMenu value="#{eventDuration.option}" id="idOption" converter="omnifaces.GenericEnumConverter" label="Event Duration Option">
+                        <f:selectItems value="#{programProfileController.filterProgramOptions()}" var="opt" itemValue="#{opt}" itemLabel="#{opt.name}"/>
+                        <p:ajax listener="#{programProfileController.filterProgramProducts(eventDuration)}" update="idProduct"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Product" for="idProduct" />
+                    <p:selectOneMenu value="#{eventDuration.product}" id="idProduct" converter="programProductConverter" label="Event Duration Product">
+                        <f:selectItems value="#{eventDuration.optionProducts}" var="prod" itemValue="#{prod}" itemLabel="#{prod.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <p:column/>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Minimum Duration Per Event" for="minDuration" />
+                    <p:inputNumber id="minDuration" value="#{eventDuration.minDuration}" decimalPlaces="0" minValue="0" maxValue="9999" required="true"/>
+                    <p:selectOneMenu id="minDurationUnits" value="#{eventDuration.minDurationUnits}" label="Minimum Duration Per Event">
+                        <f:selectItems value="#{constantsProvider.minutesOrHours}" var="unit" itemValue="#{unit}" itemLabel="#{unit.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Maximum Duration Per Event" for="maxDuration" />
+                    <p:inputNumber id="maxDuration" value="#{eventDuration.maxDuration}" decimalPlaces="0" minValue="0" maxValue="9999" required="true"/>
+                    <p:selectOneMenu id="maxDurationUnits" value="#{eventDuration.maxDurationUnits}" label="Maximum Duration Per Event">
+                        <f:selectItems value="#{constantsProvider.minutesOrHours}" var="unit" itemValue="#{unit}" itemLabel="#{unit.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <p:column/>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Max Event Hours/Year" for="maxEventHoursPerYear" />
+                    <p:inputNumber id="maxEventHoursPerYear" value="#{eventDuration.maxEventHoursPerYear}" decimalPlaces="0" minValue="0" maxValue="9999"
+                                   required="true" label="Max Event Hours/Year"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Max Event Hours/Month" for="maxEventHoursPerMonth"  />
+                    <p:inputNumber id="maxEventHoursPerMonth" value="#{eventDuration.maxEventHoursPerMonth}" decimalPlaces="0" minValue="0" maxValue="9999"
+                                   required="true" label="Max Event Hours/Month"/>
+                </h:panelGroup>
+                <p:column/>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Max Event Hours/Day" for="maxEventHoursPerDay"  />
+                    <p:inputNumber id="maxEventHoursPerDay" value="#{eventDuration.maxEventHoursPerDay}" decimalPlaces="0" minValue="0" maxValue="9999"
+                                   required="true" label="Max Event Hours/Day"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Min Lead Time to Shed Load" for="minLoadTimeToShedLoad"/>
+                    <p:inputNumber id="minLoadTimeToShedLoad" value="#{eventDuration.minLeadTimeToShedLoad}" decimalPlaces="0" minValue="0" maxValue="9999"
+                                   required="true" label="Min Lead Time to Shed Load"/>
+                    <p:selectOneMenu id="minLoadTimeToShedLoadUnits" value="#{eventDuration.minLeadTimeToShedLoadUnits}" label="Min Lead Time to Shed Load unit">
+                        <f:selectItems value="#{constantsProvider.minutesOrHours}" var="unit" itemValue="#{unit}" itemLabel="#{unit.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <p:commandButton action="#{programProfileController.removeEventDuration(eventDuration)}" update="@form" process="@this" icon="ui-icon-remove"/>
+            </p:panelGrid>
+
+            <div class="EmptyBox10"></div>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title">
+        <h3>Dispatch Reason Event Count Mapping</h3>
+
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:pickList converter="omnifaces.GenericEnumConverter" value="#{programProfileController.dispatchReasonPickList}" var="dispatchReason"
+                        itemLabel="#{dispatchReason.name}" itemValue="#{dispatchReason}" showSourceFilter="true" showTargetFilter="true"
+                        filterMatchMode="contains">
+                <f:facet name="sourceCaption">Dispatch Reason</f:facet>
+                <f:facet name="targetCaption">Count Towards Event Maximums</f:facet>
+            </p:pickList>
+        </p:panelGrid>
+    </div>
+
+    <div class="card card-w-title" jsf:id="drmsMappId">
+        <h3 class="with-icon">DRMS Program ID Mapping</h3>
+        <p:commandButton action="#{programProfileController.addDRMSProgramMapping()}" process="@form" update=":form:#{tabViewId}:drmsMappId" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <div class="ContainerIndent">
+            <p:outputLabel rendered="#{empty programProfileController.profile.drmsProgramMappings}">No mappings defined yet</p:outputLabel>
+        </div>
+
+        <ui:repeat value="#{programProfileController.profile.drmsProgramMappings}" var="mapping">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Dispatch Level:" for="dispatchLevel"/>
+                    <p:selectOneMenu id="dispatchLevel" value="#{mapping.dispatchLevel}">
+                        <f:selectItem itemValue="" itemLabel="Any"/>
+                        <f:selectItems value="#{constantsProvider.dispatchLevels}" var="dispatchLevel" itemValue="#{dispatchLevel}"
+                                       itemLabel="#{msg[dispatchLevel.id]}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Dispatch Reason:" for="dispatchReason"/>
+                    <p:selectOneMenu id="dispatchReason" value="#{mapping.dispatchReason}">
+                        <f:selectItem itemValue="" itemLabel="Any"/>
+                        <f:selectItems value="#{constantsProvider.dispatchReasons}" var="dispatchReason" itemValue="#{dispatchReason}"
+                                       itemLabel="#{dispatchReason.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText id="drmsProgramId" value="#{mapping.drmsProgramId}" required="true"/>
+                    <p:outputLabel value="DRMS Program ID:" for="drmsProgramId"/>
+                </h:panelGroup>
+
+                <p:commandButton action="#{programProfileController.removeDrmsProgramMapping(mapping)}" update="@form" process="@this" icon="ui-icon-remove"/>
+            </p:panelGrid>
+            <div class="EmptyBox10"></div>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title" jsf:id="sublapProgramMapping">
+        <h3 class="with-icon">#{msg['data.mapping.sublap']} Program ID Mapping</h3>
+        <p:commandButton action="#{programProfileController.addSublapProgramMapping}" process="@form" update=":form:#{tabViewId}:sublapProgramMapping" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <div class="ContainerIndent">
+            <p:outputLabel rendered="#{empty programProfileController.profile.sublapProgramMappings}">No mappings defined yet</p:outputLabel>
+        </div>
+        <ui:repeat value="#{programProfileController.profile.sublapProgramMappings}" var="sublapProgramMapping">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="#{msg['data.mapping.sublap']}:" for="sublap"/>
+                    <p:selectOneMenu id="sublap" value="#{sublapProgramMapping.subLap}" converter="subLapConverter">
+                        <f:selectItem itemValue="" itemLabel="Any"/>
+                        <f:selectItems value="#{programProfileController.subLaps}" var="subLap" itemValue="#{subLap}"
+                                       itemLabel="#{subLap.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="DRMS Program ID:" for="drmsProgramId2"/>
+                    <p:inputText id="drmsProgramId2" value="#{sublapProgramMapping.drmsProgramId}" required="true"/>
+                </h:panelGroup>
+
+                <p:commandButton action="#{programProfileController.removeSublapProgramMapping(sublapProgramMapping)}" update="@form" process="@this"
+                                 icon="ui-icon-remove"/>
+            </p:panelGrid>
+        </ui:repeat>
+    </div>
+
+    <div class="card card-w-title" jsf:id="customerNotifications">
+        <h3 class="with-icon">Customer Notifications</h3>
+        <p:commandButton action="#{programProfileController.addCustomerNotification}" process="@form" update=":form:#{tabViewId}:customerNotifications" icon="ui-icon-add">
+            <o:skipValidators/>
+        </p:commandButton>
+
+        <p:outputLabel rendered="#{empty programProfileController.profile.customerNotifications}">No event durations defined yet</p:outputLabel>
+
+        <ui:repeat value="#{programProfileController.profile.customerNotifications}" var="customerNotification">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Option" for="customerNotificationOption"/>
+                    <p:selectOneMenu id="customerNotificationOption" value="#{customerNotification.eventDurationOption}">
+                        <f:selectItems value="#{constantsProvider.eventDurationOptions}" var="option" itemValue="#{option}" itemLabel="#{option.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Notification Lead Time prior to event" for="notificationLeadTime"/>
+                    <p:inputNumber id="notificationLeadTime" value="#{customerNotification.notificationLeadTime}"
+                                   decimalPlaces="0" minValue="0" maxValue="9999" required="true"/>
+                    <p:selectOneMenu id="notificationLeadTimeUnits" value="#{customerNotification.notificationLeadTimeUnits}">
+                        <f:selectItems value="#{constantsProvider.minutesOrHoursOrDays}" var="unit" itemValue="#{unit}" itemLabel="#{unit.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Latest Notification Delivered By" for="lastNotificationDeliveredBy"/>
+                    <p:selectOneMenu id="lastNotificationDeliveredBy" value="#{customerNotification.lastNotificationDeliveredBy}">
+                        <f:selectItem itemLabel="Select a Time" noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.timeValuesEvery30Min}" var="time"
+                                       itemValue="#{time.toSecondOfDay()}" itemLabel="#{time.format(constantsProvider.timeFormatter)}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <p:commandButton action="#{programProfileController.removeCustomerNotification(customerNotification)}"
+                                 update="@form" process="@this" icon="ui-icon-remove"/>
+
+            </p:panelGrid>
+
+            <h:panelGroup style="padding-bottom: 20px;display: block;">
+                Notification Distribution Source
+                <p:commandButton action="#{programProfileController.addNotificationDuplicationSource(customerNotification)}"
+                                 process="@form" update=":form:#{tabViewId}:customerNotifications" icon="ui-icon-add">
+                    <o:skipValidators/>
+                </p:commandButton>
+            </h:panelGroup>
+
+            <ui:repeat value="#{customerNotification.notificationDuplicationSources}" var="source">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Notification Type" for="notficationType"/>
+                        <p:selectOneMenu id="notficationType" value="#{source.notificationType}">
+                            <f:selectItem itemLabel="" noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.notificationTypes}" var="notificationType"
+                                           itemValue="#{notificationType}" itemLabel="#{notificationType.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Distributed By" for="distributedBy"/>
+                        <p:selectOneMenu id="distributedBy" value="#{source.distributedBy}">
+                            <f:selectItem itemLabel="" noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.vendors}" var="vendor"
+                                           itemValue="#{vendor}" itemLabel="#{vendor.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <p:commandButton action="#{programProfileController.removeNotificationDuplicationSource(customerNotification, source)}"
+                                     update="@form" process="@this" icon="ui-icon-remove"/>
+                </p:panelGrid>
+            </ui:repeat>
+        </ui:repeat>
+    </div>
+</ui:composition>

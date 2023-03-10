@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Energy Resource Programs"/>
+            </p:breadCrumb>
+
+            <div class="card" jsf:rendered="#{energyResourceProgramsController.newProgram eq false}">
+                <p:commandButton value="Create New Program" action="#{energyResourceProgramsController.createNewProgram}" process="@this" update="form"/>
+            </div>
+
+            <div class="card card-w-title" jsf:rendered="#{energyResourceProgramsController.newProgram eq true}">
+                <h1>Create Program</h1>
+
+                <p>
+                    <p:outputLabel value="Commodity:" />
+                    <p:selectOneMenu value="#{energyResourceProgramsController.program.commodity}" >
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.comodityTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                        <p:ajax event ="itemSelect" update="form"/>
+                    </p:selectOneMenu>
+                </p>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="name" value="#{energyResourceProgramsController.program.name}">
+                        <f:validator validatorId="uniqueEntityValidator"/>
+                        <f:attribute name="currentEntity" value="#{energyResourceProgramsController.program}"/>
+                        <f:attribute name="uniqueColumns" value="name"/>
+                        <f:attribute name="fields" value="{newValue}"/>
+                    </p:inputText>
+                    <p:outputLabel value="Program Name:" for="name"/>
+                </h:panelGroup>
+                <p>
+                    <p:outputLabel value="Program Active:" for="active" style="margin-top: 10px"/>
+                    <p:inputSwitch id="active" value="#{energyResourceProgramsController.program.active}"/>
+                </p>
+                <p:outputPanel id="programCapPanel">
+                    <p>
+                        <label>Program Cap:</label>
+
+                        <p:inputSwitch id="capActive" value="#{energyResourceProgramsController.program.capActive}" style="margin-top: 4px;">
+                            <p:ajax update="programCapPanel"/>
+                        </p:inputSwitch>
+                        <p:inputNumber id="capNumber" value="#{energyResourceProgramsController.program.capNumber}"
+                                       rendered="#{energyResourceProgramsController.program.capActive}"
+                                       required="#{energyResourceProgramsController.program.capActive}" style="margin-left: 8px;" maxValue="99999.99"/>
+                        <p:selectOneMenu id="capUnit" value="#{energyResourceProgramsController.program.capUnit}"
+                                         rendered="#{energyResourceProgramsController.program.capActive  and energyResourceProgramsController.program.commodity eq 'Electricity'}"
+                                         required="#{energyResourceProgramsController.program.capActive}">
+                            <f:selectItems value="#{constantsProvider.capUnits}" var="unit" itemLabel="#{unit.getLabel()}"
+                                           itemValue="#{unit}"/>
+                        </p:selectOneMenu>
+                        <p:selectOneMenu id="capUnitg" value="#{energyResourceProgramsController.program.gasCapUnit}"
+                                         rendered="#{energyResourceProgramsController.program.capActive and energyResourceProgramsController.program.commodity eq 'Gas'}"
+                                         required="#{energyResourceProgramsController.program.capActive}">
+                            <f:selectItems value="#{constantsProvider.gasCapUnits}" var="unit" itemLabel="#{unit.getName()}"
+                                           itemValue="#{unit}"/>
+                        </p:selectOneMenu>
+                    </p>
+                </p:outputPanel>
+
+                <p>
+                    <p:outputLabel value="Program Type" for="programType"/>
+                    <p:selectOneMenu id="programType" value="#{energyResourceProgramsController.program.programType}" required="true"
+                                     style="width: 220px;"
+                                     autoWidth="false">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.programTypes}" var="type" itemLabel="#{type.label}" itemValue="#{type}"/>
+                    </p:selectOneMenu>
+                </p>
+
+                <p:commandButton id="save" value="Save" action="#{energyResourceProgramsController.saveNewProgram()}" process="@form" update="@form"/>
+                <p:spacer width="5"/>
+                <p:commandButton id="cancel" value="Cancel" action="#{energyResourceProgramsController.cancelNewProgram()}" process="@this" update="@form"/>
+            </div>
+
+            <div class="card">
+                <p:dataTable value="#{energyResourceProgramsController.programs}" widgetVar="entityTable"
+                             lazy="true" var="program" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                             paginator="true" paginatorAlwaysVisible="false"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             rowKey="#{program.uuid}" selectionMode="single">
+
+                    <p:column headerText="Name" filterBy="#{program.name}" field="name">
+                        <h:outputText value="#{program.name}"/>
+                    </p:column>
+                    <p:column headerText="Actions">
+                        <p:button value="Profile" outcome="ProgramProfile.xhtml">
+                            <f:param name="o" value="#{parameterEncoderService.encode(program.id)}"/>
+                        </p:button>
+                        <p:spacer width="5"/>
+                        <p:button value="Program Management" outcome="ProgramManagement.xhtml">
+                            <f:param name="o" value="#{parameterEncoderService.encode(program.id)}"/>
+                        </p:button>
+                        <p:spacer width="5"/>
+                        <p:button value="Eligibility &amp; Enrollment" outcome="EligibilityEnrollment.xhtml">
+                            <f:param name="o" value="#{parameterEncoderService.encode(program.id)}"/>
+                        </p:button>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

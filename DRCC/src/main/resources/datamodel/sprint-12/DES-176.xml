@@ -1,0 +1,21 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-176-0" author="egamas">
+        <tagDatabase tag="PRE-DES-176-1" />
+    </changeSet>
+    <changeSet id="DES-176-1" author="egamas">
+        <addColumn tableName="RATE_PLAN_PROFILE">
+            <column name="POWER_SOURCE" type="varchar(55)"/>
+            <column name="SERVICE_TYPE" type="varchar(55)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="RATE_PLAN_PROFILE">
+                <column name="SERVICE_TYPE" type="varchar(55)"/>
+                <column name="POWER_SOURCE" type="varchar(55)"/>
+            </dropColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

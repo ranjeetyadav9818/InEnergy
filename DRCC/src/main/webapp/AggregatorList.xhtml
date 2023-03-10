@@ -1,0 +1,277 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formCL">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Aggregators" outcome="AggregatorList"/>
+            </p:breadCrumb>
+            <div class="card card-w-title">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="aggregatorName" value="#{aggregatorList.filterName}"/>
+                        <label>Aggregator Name</label>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="pocName" value="#{aggregatorList.filterPOCName}"/>
+                        <label>POC name</label>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="enp" value="#{aggregatorList.filterPOCPhone}"/>
+                        <label>ENP</label>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:commandButton value="Search" id="search" update="@form" action="#{aggregatorList.search()}"/>
+            </div>
+            <div class="card" jsf:rendered="#{aggregatorList.list ne null}">
+                <p:dataTable value="#{aggregatorList.list}" var="aggregator" reflow="true" rows="25" rowsPerPageTemplate="25,50,100" paginator="true"
+                             paginatorAlwaysVisible="false" selectionMode="single" widgetVar="wgAggregator"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+                    <p:ajax event="rowSelect" listener="#{aggregatorList.onAggregatorSelect}" update="@form"/>
+                    <p:column headerText="Name" filterBy="#{aggregator.name}">
+                        <h:outputText value="#{aggregator.name}"/>
+                    </p:column>
+                    <p:column headerText="Address" filterBy="#{aggregator.mailingAddress}">
+                        <h:outputText value="#{aggregator.mailingAddress}"/>
+                    </p:column>
+                    <p:column headerText="City" filterBy="#{aggregator.mailingCity}">
+                        <h:outputText value="#{aggregator.mailingCity}"/>
+                    </p:column>
+                    <p:column headerText="State" filterBy="#{aggregator.mailingState}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wgAggregator').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false" style="width: 60%;font-size: 12px">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.states}" var="state" itemLabel="#{state.label}" itemValue="#{state}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{aggregator.mailingState.label}"/>
+                    </p:column>
+                    <p:column headerText="Primary POC" filterBy="#{aggregator.primaryPOC}">
+                        <h:outputText value="#{aggregator.primaryPOC}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+            <div class="card card-w-title" jsf:rendered="#{aggregatorList.selectedAggregator ne null}">
+                <h1><h:outputText value="#{aggregatorList.selectedAggregator.name}"/></h1>
+                <c:set value="#{aggregatorList.aggregatorEditable?'false':'true'}" var="editDisabled"/>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{aggregatorList.selectedAggregator.name}" required="true" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Aggregator name:"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{aggregatorList.selectedAggregator.mailingAddress}" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Mailing address:"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{aggregatorList.selectedAggregator.mailingCity}" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Mailing city:"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Mailing state:" for="idState"/>
+                    <p:selectOneMenu id="idState" value="#{aggregatorList.selectedAggregator.mailingState}" disabled="#{editDisabled}"
+                                     required="true" style="width: 157px;" converter="omnifaces.GenericEnumConverter" autoWidth="false">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.states}" var="state" itemLabel="#{state.label}"
+                                       itemValue="#{state}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{aggregatorList.selectedAggregator.mailingZipCode}" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Mailing zip code:"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{aggregatorList.selectedAggregator.primaryPOC}" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Primary POC:"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputMask mask="(999) 999-9999" value="#{aggregatorList.selectedAggregator.primaryPOCPhone}" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Primary POC phone:"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{aggregatorList.selectedAggregator.website}" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Website:"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Status:"/>
+                    <p:selectOneMenu value="#{aggregatorList.selectedAggregator.status}" disabled="#{editDisabled}" styleClass="selectfield">
+                        <f:selectItem itemValue="Application submitted" itemLabel="Application submitted"/>
+                        <f:selectItem itemValue="Approved-active" itemLabel="Approved-active"/>
+                        <f:selectItem itemValue="Approved-inactive" itemLabel="Approved-inactive"/>
+                        <f:selectItem itemValue="Non-approved" itemLabel="Non-approved"/>
+                        <f:selectItem itemValue="Cancelled" itemLabel="Cancelled"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-calendar">
+                    <p:calendar id="aggregatorStartDateId" value="#{aggregatorList.selectedAggregator.effectiveStartDate}" pattern="MM/dd/yyyy"
+                                mask="true" placeholder="mm/dd/yyyy" binding="${aggregatorStartDate}" readonly="#{editDisabled}"/>
+                    <p:outputLabel value="Effective Start Date:" for="aggregatorStartDateId"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-calendar">
+                    <p:calendar id="aggregatorEndDateId" value="#{aggregatorList.selectedAggregator.effectiveEndDate}" pattern="MM/dd/yyyy"
+                                mask="true" placeholder="mm/dd/yyyy" mindate="#{aggregatorStartDate.value}" readonly="#{editDisabled}">
+                        <f:attribute name="startDate" value="#{aggregatorStartDate}"/>
+                        <f:validator validatorId="endDateRangeValidator"/>
+                    </p:calendar>
+                    <p:outputLabel value="Effective End Date:" for="aggregatorEndDateId"/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{not aggregatorList.aggregatorEditable}">
+                    <p:commandButton value="Modify" action="#{aggregatorList.modifyAggregator()}" update="@form"/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{aggregatorList.aggregatorEditable}">
+                    <p:commandButton value="Save" action="#{aggregatorList.saveAggregator()}" update="@form"/>
+                    <p:spacer width="10"/>
+                    <p:commandButton value="Cancel" action="#{aggregatorList.cancelAggregator()}" update="@form" process="@this"/>
+                </h:panelGroup>
+            </div>
+
+            <p:tabView rendered="#{aggregatorList.selectedAggregator ne null}">
+                <p:tab title="Portfolio">
+                    <p:dataTable value="#{aggregatorList.participantsLazyModel}" lazy="true" var="participant" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+                        <p:column headerText="SA ID" filterBy="#{participant.serviceAgreement.serviceAgreementId}"
+                                  sortBy="#{participant.serviceAgreement.serviceAgreementId}">
+                            <h:outputText value="#{participant.serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="UUID" filterBy="#{participant.serviceAgreement.saUuid}" sortBy="#{participant.serviceAgreement.saUuid}">
+                            <h:outputText value="#{participant.serviceAgreement.saUuid}"/>
+                        </p:column>
+                        <p:column headerText="Program" filterBy="#{participant.program.name}" sortBy="#{participant.program.name}">
+                            <h:outputText value="#{participant.program.name}"/>
+                        </p:column>
+                        <p:column headerText="Application ID" filterBy="#{participant.id}" sortBy="#{participant.id}">
+                            <p:link href="ApplicationEnrollment.xhtml?o=#{parameterEncoderService.encode(participant.id)}" value="#{participant.id}"/>
+                        </p:column>
+                        <p:column headerText="Customer Name" filterBy="#{participant.serviceAgreement.account.person.businessName}"
+                                  sortBy="#{participant.serviceAgreement.account.person.businessName}">
+                            <h:outputText value="#{participant.serviceAgreement.account.person.businessName}"/>
+                        </p:column>
+                        <p:column headerText="Service Address" filterable="false" sortable="false">
+                            <h:outputText value="#{participant.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1}"/>
+                        </p:column>
+                        <p:column headerText="City" filterable="false" sortable="false">
+                            <h:outputText value="#{participant.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr}"/>
+                        </p:column>
+                        <p:column headerText="Effective date" sortBy="#{participant.effectiveStartDate}">
+                            <h:outputText value="#{participant.effectiveStartDate}">
+                                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Unenroll date" sortBy="#{participant.effectiveEndDate}">
+                            <h:outputText value="#{participant.effectiveEndDate}">
+                                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Status" filterBy="#{participant.enrollmentStatus}" sortBy="#{participant.enrollmentStatus}">
+                            <h:outputText value="#{participant.enrollmentStatus}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Enrollments in Progress">
+                    <p:dataTable value="#{aggregatorList.enrollmentsIPLazyModel}" lazy="true" var="participant" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+                        <p:column headerText="SA ID" filterBy="#{participant.serviceAgreement.serviceAgreementId}"
+                                  sortBy="#{participant.serviceAgreement.serviceAgreementId}">
+                            <h:outputText value="#{participant.serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="UUID" filterBy="#{participant.serviceAgreement.saUuid}" sortBy="#{participant.serviceAgreement.saUuid}">
+                            <h:outputText value="#{participant.serviceAgreement.saUuid}"/>
+                        </p:column>
+                        <p:column headerText="Program" filterBy="#{participant.program.name}" sortBy="#{participant.program.name}">
+                            <h:outputText value="#{participant.program.name}"/>
+                        </p:column>
+                        <p:column headerText="Application ID" filterBy="#{participant.id}" sortBy="#{participant.id}">
+                            <p:link href="ApplicationEnrollment.xhtml?o=#{parameterEncoderService.encode(participant.id)}" value="#{participant.id}"/>
+                        </p:column>
+                        <p:column headerText="Application Date" sortBy="#{participant.effectiveStartDate}">
+                            <h:outputText value="#{participant.effectiveStartDate}">
+                                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Customer Name" filterBy="#{participant.serviceAgreement.account.person.businessName}"
+                                  sortBy="#{participant.serviceAgreement.account.person.businessName}">
+                            <h:outputText value="#{participant.serviceAgreement.account.person.businessName}"/>
+                        </p:column>
+                        <p:column headerText="Service Address" filterBy="#{participant.serviceAgreement.mailingAddress1}"
+                                  sortBy="#{participant.serviceAgreement.mailingAddress1}">
+                            <h:outputText value="#{participant.serviceAgreement.mailingAddress1}"/>
+                        </p:column>
+                        <p:column headerText="City" filterBy="#{participant.serviceAgreement.mailingCityUpr}"
+                                  sortBy="#{participant.serviceAgreement.mailingCityUpr}">
+                            <h:outputText value="#{participant.serviceAgreement.mailingCityUpr}"/>
+                        </p:column>
+                        <p:column headerText="Status" filterBy="#{participant.enrollmentStatus}" sortBy="#{participant.enrollmentStatus}">
+                            <h:outputText value="#{participant.enrollmentStatus}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Unenrollments in Progress">
+                    <p:dataTable value="#{aggregatorList.unenrollmentsIPLazyModel}" lazy="true" var="participant" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+                        <p:column headerText="SA ID" filterBy="#{participant.serviceAgreement.serviceAgreementId}"
+                                  sortBy="#{participant.serviceAgreement.serviceAgreementId}">
+                            <h:outputText value="#{participant.serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="UUID" filterBy="#{participant.serviceAgreement.saUuid}" sortBy="#{participant.serviceAgreement.saUuid}">
+                            <h:outputText value="#{participant.serviceAgreement.saUuid}"/>
+                        </p:column>
+                        <p:column headerText="Program" filterBy="#{participant.program.name}" sortBy="#{participant.program.name}">
+                            <h:outputText value="#{participant.program.name}"/>
+                        </p:column>
+                        <p:column headerText="Application ID" filterBy="#{participant.id}" sortBy="#{participant.id}">
+                            <p:link href="ApplicationEnrollment.xhtml?o=#{parameterEncoderService.encode(participant.id)}" value="#{participant.id}"/>
+                        </p:column>
+                        <p:column headerText="Unenroll date" sortBy="#{participant.effectiveEndDate}">
+                            <h:outputText value="#{participant.effectiveEndDate}">
+                                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Customer Name" filterBy="#{participant.serviceAgreement.account.person.businessName}"
+                                  sortBy="#{participant.serviceAgreement.account.person.businessName}">
+                            <h:outputText value="#{participant.serviceAgreement.account.person.businessName}"/>
+                        </p:column>
+                        <p:column headerText="Service Address" filterBy="#{participant.serviceAgreement.mailingAddress1}"
+                                  sortBy="#{participant.serviceAgreement.mailingAddress1}">
+                            <h:outputText value="#{participant.serviceAgreement.mailingAddress1}"/>
+                        </p:column>
+                        <p:column headerText="City" filterBy="#{participant.serviceAgreement.mailingCityUpr}"
+                                  sortBy="#{participant.serviceAgreement.mailingCityUpr}">
+                            <h:outputText value="#{participant.serviceAgreement.mailingCityUpr}"/>
+                        </p:column>
+                        <p:column headerText="Status" filterBy="#{participant.enrollmentStatus}" sortBy="#{participant.enrollmentStatus}">
+                            <h:outputText value="#{participant.enrollmentStatus}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Notes" id="notes">
+                    <c:set value="#{aggregatorList}" var="controller"/>
+                    <ui:include src="WEB-INF/include/general/NotesTab.xhtml"/>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+    </ui:define>
+</ui:composition>

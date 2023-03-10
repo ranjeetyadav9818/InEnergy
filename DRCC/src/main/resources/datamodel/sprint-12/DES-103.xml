@@ -1,0 +1,55 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="DES-103" author="antonio">
+        <createTable tableName="SUBLAP_POLYGON_COORDINATES">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="COORDINATE_ORDER" type="INTEGER(10)"/>
+            <column name="LONGITUDE" type="DECIMAL(16,12)"/>
+            <column name="LATITUDE" type="DECIMAL(16,12)"/>
+            <column name="SUBLAP_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="SUBLAP_ID"
+                                 baseTableName="SUBLAP_POLYGON_COORDINATES"
+                                 constraintName="fk_polygon-sublap"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SUBLAP"/>
+    </changeSet>
+    <changeSet id="San Francisco polygon" author="antonio">
+        <insert tableName="SUBLAP_POLYGON_COORDINATES">
+            <column name="UUID" valueComputed="UUID()"/>
+            <column name="COORDINATE_ORDER" valueNumeric="1"/>
+            <column name="LATITUDE" valueNumeric="37.8079182"/>
+            <column name="LONGITUDE" valueNumeric="-122.5469337"/>
+            <column name="SUBLAP_ID" valueNumeric="12"/>
+        </insert>
+        <insert tableName="SUBLAP_POLYGON_COORDINATES">
+            <column name="UUID" valueComputed="UUID()"/>
+            <column name="COORDINATE_ORDER" valueNumeric="2"/>
+            <column name="LATITUDE" valueNumeric="37.8122372"/>
+            <column name="LONGITUDE" valueNumeric="-122.3818247"/>
+            <column name="SUBLAP_ID" valueNumeric="12"/>
+        </insert>
+        <insert tableName="SUBLAP_POLYGON_COORDINATES">
+            <column name="UUID" valueComputed="UUID()"/>
+            <column name="COORDINATE_ORDER" valueNumeric="3"/>
+            <column name="LATITUDE" valueNumeric="37.6067682"/>
+            <column name="LONGITUDE" valueNumeric="-122.2905007"/>
+            <column name="SUBLAP_ID" valueNumeric="12"/>
+        </insert>
+        <insert tableName="SUBLAP_POLYGON_COORDINATES">
+            <column name="UUID" valueComputed="UUID()"/>
+            <column name="COORDINATE_ORDER" valueNumeric="4"/>
+            <column name="LATITUDE" valueNumeric="37.5999722"/>
+            <column name="LONGITUDE" valueNumeric="-122.5527997"/>
+            <column name="SUBLAP_ID" valueNumeric="12"/>
+        </insert>
+        <rollback>
+            DELETE FROM SUBLAP_POLYGON_COORDINATES;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

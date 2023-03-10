@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dataTable value="#{locationSubmissionDetailController.locationSubmissionStatus.getRegistrations()}" var="registration">
+        <p:column headerText="Resource ID" filterBy="#{registration.isoResource.name}" styleClass="topAligned">
+            <h:outputText value="#{registration.isoResource.name}"/>
+        </p:column>
+
+        <p:column headerText="Registration ID" filterBy="#{registration.isoRegistrationId}" styleClass="topAligned">
+            <h:outputText value="#{registration.isoRegistrationId}"/>
+        </p:column>
+
+        <p:column headerText="Active Start Date" styleClass="topAligned">
+            <h:outputText value="#{registration.activeStartDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="Active End Date" styleClass="topAligned">
+            <h:outputText value="#{registration.activeEndDate}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

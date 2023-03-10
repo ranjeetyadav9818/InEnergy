@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="File Processor Logs" outcome="FileProcessorLogs"/>
+        </p:breadCrumb>
+
+        <div class="card card-w-title">
+            <h:form id="formFileProcessor">
+                <div class="ContainerIndent">
+                    <p:dataTable value="#{fileProcessorLogController.lazyFileProcessorLogs}" id="TbFiles" widgetVar="custTableF" lazy="true" var="log"
+                                 reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{log.uuid}" selectionMode="single">
+                        <p:ajax event="rowSelect" listener="#{fileProcessorLogController.onSelectFile}" update="formFileProcessor"/>
+                        <p:column headerText="Received" filterable="false" style="width: 190px">
+                            <h:outputText value="#{log.processDate}"><f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a"
+                                                                                        timeZone="America/Los_Angeles"/></h:outputText>
+                        </p:column>
+                        <p:column headerText="File Name" filterBy="#{log.filename}" field="filename">
+                            <h:outputText value="#{log.filename}"/>
+                        </p:column>
+                        <p:column headerText="File Type" filterBy="#{log.fileType}" field="fileType" style="width: 150px">
+                            <h:outputText value="#{log.fileType}"/>
+                        </p:column>
+                        <p:column headerText="Completed" filterable="false" style="width: 190px">
+                            <h:outputText value="#{log.timeCompleted}"><f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a"
+                                                                                          timeZone="America/Los_Angeles"/></h:outputText>
+                        </p:column>
+                        <p:column headerText="Errors" filterable="false" style="width: 65px">
+                            <h:outputText value="#{log.fileProcessorErrors.size()}"/>
+                        </p:column>
+                        <p:column headerText="Pending Errors" filterable="false" style="width: 65px">
+                            <h:outputText value="#{log.fileProcessorPendingErrors()}"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+                <div class="ContainerIndent" jsf:rendered="#{fileProcessorLogController.selectedFile}">
+                    <h4 class="hardblue TexAlLeft">File Errors</h4>
+                    <p:dataTable value="#{fileProcessorLogController.lazyFileProcessorErrors}" id="TbErrors" widgetVar="custTableE" lazy="true" var="err"
+                                 reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{err.uuid}">
+                        <p:column headerText="Error" filterBy="#{err.error}" field="error">
+                            <h:outputText value="#{err.error}"/>
+                        </p:column>
+                        <p:column headerText="Resolved" filterBy="#{err.resolved}" field="resolved" style="width: 105px">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('custTableE').filter()">
+                                    <f:converter converterId="javax.faces.Boolean"/>
+                                    <f:selectItem itemLabel="All" itemValue=""/>
+                                    <f:selectItem itemLabel="Yes" itemValue="true"/>
+                                    <f:selectItem itemLabel="Not" itemValue="false"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <p:inputSwitch value="#{err.resolved}" style="margin-left: 22px !important;">
+                                <p:ajax listener="#{fileProcessorLogController.onSolveError(err.id)}" update="@form"/>
+                            </p:inputSwitch>
+                        </p:column>
+                        <p:column headerText="Row Data" filterBy="#{err.rowData}" filterable="false" style="width: 135px">
+                            <p:commandButton value="Download" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s">
+                                <p:fileDownload value="#{fileProcessorLogController.rowDataAsFile(err.uuid)}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

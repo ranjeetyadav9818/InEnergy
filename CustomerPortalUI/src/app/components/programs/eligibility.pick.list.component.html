@@ -1,0 +1,22 @@
+<div style="text-align: -webkit-center" [style.display]="activeIndex===0?'grid':'none'">
+  <div>
+    <button pButton (click)="cancelButton($event)" label="Cancel" style="float: left"></button>
+    <button pButton (click)="nextButton($event)" label="Check" style="float: right" [disabled]="userSelectedPrograms.length === 0"></button>
+  </div>
+  <h3>
+    Select the programs to check eligibility
+  </h3>
+  <hr/>
+  <p-pickList [source]="availablePrograms" [target]="userSelectedPrograms"
+              [sourceStyle]="{'width':'250px'}" [targetStyle]="{'width':'250px'}"
+              sourceHeader="Available" targetHeader="Selected">
+    <ng-template let-program pTemplate="item">
+      <div>
+        <div>
+          {{program.name}} - {{program.programType}}
+        </div>
+      </div>
+    </ng-template>
+  </p-pickList>
+  <hr/>
+</div>

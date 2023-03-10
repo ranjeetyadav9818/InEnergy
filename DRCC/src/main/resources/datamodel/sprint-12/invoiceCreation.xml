@@ -1,0 +1,82 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet context="ddl" id="pre-invoice-Creation-tag" author="egamas">
+        <tagDatabase tag="pre-invoice-Creation"/>
+    </changeSet>
+    <changeSet id="invoice-creation" author="egamas">
+
+        <createTable tableName="INVOICE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
+            <column name="SERVICE_AGREEMENT_ID" type="VARCHAR(10)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="INVOICE"
+                                 baseColumnNames="SERVICE_AGREEMENT_ID"
+                                 constraintName="FK_INVOICE_SERVICE_AGREEMENT"
+                                 referencedTableName="SERVICE_AGREEMENT"
+                                 referencedColumnNames="SERVICE_AGREEMENT_ID"/>
+    </changeSet>
+    <changeSet id="invoice-creation-2" author="egamas">
+        <addColumn tableName="INVOICE">
+            <column name="DUE_DATE" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="invoice-creation-3" author="egamas">
+        <addColumn tableName="INVOICE">
+            <column name="INVOICE_NUMBER" type="BIGINT(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="invoice-creation-5" author="egamas">
+        <modifyDataType tableName="INVOICE_LINE" columnName="TOTAL" newDataType="BIGINT(20)"/>
+    </changeSet>
+
+    <changeSet id="invoice-creation-6" author="egamas">
+        <modifyDataType tableName="INVOICE" columnName="DUE_DATE" newDataType="DATE"/>
+    </changeSet>
+    <changeSet id="invoice-creation-7" author="egamas">
+        <addColumn tableName="INVOICE_LINE">
+            <column name="SERVICE_POINT_ID" type="varchar(10) NOT NULL"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="invoice-creation-9" author="egamas">
+        <addColumn tableName="INVOICE_LINE">
+            <column name="RATE_PROFILE_CONS_FEE_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="RATE_PROFILE_ANC_FEE_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="INVOICE_LINE"
+                                 baseColumnNames="RATE_PROFILE_CONS_FEE_ID"
+                                 constraintName="FK_INV_LINE_RATE_CONSUMPTION_FEE"
+                                 referencedTableName="RATE_CONSUMPTION_FEE"
+                                 referencedColumnNames="ID"/>
+
+        <addForeignKeyConstraint baseTableName="INVOICE_LINE"
+                                 baseColumnNames="RATE_PROFILE_ANC_FEE_ID"
+                                 constraintName="FK_INV_LINE_RATE_ANCILLARY_FEE"
+                                 referencedTableName="RATE_ANCILLARY_FEE"
+                                 referencedColumnNames="ID"/>
+
+    </changeSet>
+
+    <changeSet id="invoice-creation-10" author="egamas">
+        <addColumn tableName="INVOICE">
+            <column name="TOTAL_CONSUMPTION" type="DECIMAL(18,6)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="invoice-creation-11" author="egamas">
+        <addColumn tableName="INVOICE">
+            <column name="PAID_DATE" type="DATE"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

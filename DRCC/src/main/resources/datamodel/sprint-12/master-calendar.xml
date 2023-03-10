@@ -1,0 +1,102 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="master-calendar" author="vm">
+        <createTable tableName="MASTER_SEASON_CALENDAR">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="TYPE" type="VARCHAR(255)"/>
+            <column name="DATE_FROM" type="DATETIME"/>
+            <column name="DATE_TO" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="master-calendar-1" author="vm">
+        <createTable tableName="MASTER_SEASON">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="MASTER_SEASON_CALENDAR_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="TOU" type="VARCHAR(55)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="MASTER_SEASON"
+                                 baseColumnNames="MASTER_SEASON_CALENDAR_ID"
+                                 constraintName="FK_MASTER_SEASON_MASTER_SEASON_CALENDAR"
+                                 referencedTableName="MASTER_SEASON_CALENDAR"
+                                 referencedColumnNames="ID"/>
+
+        <createTable tableName="MASTER_SEASON_DAY">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="DAY" type="SMALLINT(1)"/>
+            <column name="MASTER_SEASON_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="MASTER_SEASON_DAY"
+                                 baseColumnNames="MASTER_SEASON_ID"
+                                 constraintName="FK_MASTER_SEASON_DAY_MASTER_SEASON"
+                                 referencedTableName="MASTER_SEASON" referencedColumnNames="ID"/>
+
+        <createTable tableName="MASTER_SEASON_HOUR">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="HOUR" type="SMALLINT(2)"/>
+            <column name="MASTER_SEASON_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="MASTER_SEASON_HOUR"
+                                 baseColumnNames="MASTER_SEASON_ID"
+                                 constraintName="FK_MASTER_SEASON_HOUR"
+                                 referencedTableName="MASTER_SEASON"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="master-calendar-2" author="vm">
+        <renameTable oldTableName="MASTER_SEASON" newTableName="TIME_OF_USE"/>
+    </changeSet>
+    <changeSet id="master-calendar-3" author="vm">
+        <renameTable oldTableName="TIME_OF_USE_CALENDAR" newTableName="TIME_OF_USE_CALENDAR_TO_DELETE"/>
+        <renameTable oldTableName="MASTER_SEASON_CALENDAR" newTableName="TIME_OF_USE_CALENDAR"/>
+    </changeSet>
+    <changeSet id="master-calendar-4" author="vm">
+        <renameColumn tableName="TIME_OF_USE"
+                      oldColumnName="MASTER_SEASON_CALENDAR_ID"
+                      newColumnName="TIME_OF_USE_CALENDAR_ID"
+                      columnDataType="BIGINT(20) UNSIGNED"/>
+    </changeSet>
+    <changeSet id="master-calendar-5" author="vm">
+        <renameTable oldTableName="MASTER_SEASON_DAY" newTableName="TIME_OF_USE_DAY"/>
+        <renameTable oldTableName="MASTER_SEASON_HOUR" newTableName="TIME_OF_USE_HOUR"/>
+    </changeSet>
+    <changeSet id="master-calendar-6" author="vm">
+        <renameColumn tableName="TIME_OF_USE_DAY"
+                      oldColumnName="MASTER_SEASON_ID"
+                      newColumnName="TIME_OF_USE_ID"
+                      columnDataType="BIGINT(20) UNSIGNED"/>
+        <renameColumn tableName="TIME_OF_USE_HOUR"
+                      oldColumnName="MASTER_SEASON_ID"
+                      newColumnName="TIME_OF_USE_ID"
+                      columnDataType="BIGINT(20) UNSIGNED"/>
+    </changeSet>
+    <changeSet id="master-calendar-7" author="vm">
+        <renameColumn tableName="TIME_OF_USE_DAY"
+                      oldColumnName="DAY"
+                      newColumnName="DAY"
+                      columnDataType="VARCHAR(55)"/>
+    </changeSet>
+    <changeSet id="master-calendar-8" author="vm">
+        <dropForeignKeyConstraint baseTableName="TIME_OF_USE_DAY" constraintName="FK_MASTER_SEASON_DAY_MASTER_SEASON"/>
+        <addForeignKeyConstraint baseTableName="TIME_OF_USE_DAY"
+                                 baseColumnNames="TIME_OF_USE_ID"
+                                 constraintName="TIME_OF_USE_DAY_TIME_OF_USE"
+                                 referencedTableName="TIME_OF_USE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+</databaseChangeLog>

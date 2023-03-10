@@ -1,0 +1,27 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-187-1" author="egamas">
+        <addColumn tableName="ENERGY_CONTRACT_FEE_DETAIL">
+            <column name="DATE_FROM" type="DATETIME"/>
+            <column name="DATE_TO" type="DATETIME"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="ENERGY_CONTRACT_FEE_DETAIL" columnName="DATE_FROM"/>
+            <dropColumn tableName="ENERGY_CONTRACT_FEE_DETAIL" columnName="DATE_TO"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="DES-187-2" author="egamas">
+        <addColumn tableName="ENERGY_CONTRACT_CREDIT">
+            <column name="DATE_FROM" type="DATETIME"/>
+            <column name="DATE_TO" type="DATETIME"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="ENERGY_CONTRACT_CREDIT" columnName="DATE_FROM"/>
+            <dropColumn tableName="ENERGY_CONTRACT_CREDIT" columnName="DATE_TO"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

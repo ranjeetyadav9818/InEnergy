@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:outputPanel id="OPta">
+            <h:form id="formTA">
+                <p:breadCrumb>
+                    <p:menuitem value="Dashboard" outcome="dashboard"/>
+                    <p:menuitem value="Monitor Tasks and Alerts" outcome="MonitorAlerts"/>
+                </p:breadCrumb>
+
+                <div class="card card-w-title">
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Business Owner:" for="busOwn"/>
+                            <p:selectOneMenu id="busOwn" value="#{monitorController.businessOwner}" autoWidth="false" style="width: 109px;"
+                                             converter="businessOwnerConverter">
+                                <f:selectItem itemLabel="All" noSelectionOption="false"/>
+                                <f:selectItems value="#{taskController.businessOwners}" var="bo"
+                                               itemValue="#{bo}" itemLabel="#{bo.name}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <p:commandButton value="Search" id="search" update="@form" action="#{monitorController.search()}"/>
+                </div>
+
+                <div class="EmptyBox10"></div>
+
+                <p:outputPanel id="vsmDivT" class="ContainerIndent">
+                    <p:tabView id="awardDetailView" scrollable="false" rendered="#{monitorController.showTables}">
+                        <p:tab id="tasksTab" title="Tasks">
+                            <p:dataTable value="#{monitorController.lazyTaskInstanceDataModel}" id="taskInstanceTable" widgetVar="taskInstanceTable" lazy="true"
+                                         var="taskInstance" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                         paginator="true" paginatorAlwaysVisible="false" rowKey="#{taskInstance.uuid}" editable="true">
+
+                                <p:ajax event="rowEdit" listener="#{monitorController.onWorkflowEdit}"/>
+                                <p:ajax event="rowEditCancel" listener="#{monitorController.onWorkflowCancel}"/>
+
+                                <p:column headerText="Task Order" filterBy="#{taskInstance.order}" field="order">
+                                    <h:outputText value="#{taskInstance.order}"/>
+                                </p:column>
+
+                                <p:column headerText="Start Date" filterable="false">
+                                    <h:outputText value="#{taskInstance.start}">
+                                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Task Name" filterBy="#{taskInstance.task.name}" field="task.name">
+                                    <h:outputText value="#{taskInstance.task.name}"/>
+                                </p:column>
+
+                                <p:column headerText="Reference ID" filterBy="#{taskInstance.reference}" field="reference">
+                                    <h:outputText value="#{taskInstance.reference}"/>
+                                </p:column>
+
+                                <p:column headerText="Business Owner" filterBy="#{taskInstance.task.businessOwner.name}" field="task.businessOwner.name">
+                                    <h:outputText value="#{taskInstance.task.businessOwner.name}"/>
+                                </p:column>
+
+                                <p:column headerText="Current Status">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{taskInstance.status.text}"/></f:facet>
+                                        <f:facet name="input">
+                                            <h:outputText value="#{taskInstance.status.text}" rendered="#{taskInstance.status ne 'IN_PROCESS'}"/>
+                                            <p:selectOneMenu value="#{taskInstance.status}" required="true" autoWidth="false"
+                                                             style="width: 75px;margin-left: 4px;" converter="omnifaces.GenericEnumConverter"
+                                                             rendered="#{taskInstance.status eq 'IN_PROCESS'}">
+                                                <f:selectItems value="#{constantsProvider.taskInstanceModifiableStatuses}" var="status" itemValue="#{status}"
+                                                               itemLabel="#{status.text}"/>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+
+                                <p:column headerText="Est Due Date" field="actualEnd">
+                                    <h:outputText value="#{taskInstance.estimatedEnd}">
+                                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Notes">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{taskInstance.notes}"/></f:facet>
+                                        <f:facet name="input">
+                                            <p:inputTextarea value="#{taskInstance.notes}" label="Notes" style="width: 89px;margin-left: 4px;"
+                                                             maxlength="65535"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+
+
+                                <p:column headerText="Updated Date">
+                                    <h:outputText value="#{taskInstance.actualEnd}" field="actualEnd">
+                                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Change Status" style="text-align: center;">
+                                    <p:menuButton value="Modify" styleClass="smallButton" model="#{monitorController.userActions}"
+                                                  rendered="#{ taskInstance.status eq 'IN_PROCESS' }"/>
+                                </p:column>
+
+                                <p:column style="width:32px" class="showOnDesktop">
+                                    <p:rowEditor/>
+                                </p:column>
+
+                            </p:dataTable>
+                        </p:tab>
+                        <p:tab id="alertsTab" title="Alerts">
+                            <p:dataTable value="#{monitorController.lazyNotificationInstanceDataModel}" id="notInstanceTable" widgetVar="notInstanceTable"
+                                         lazy="true" var="notInstance"
+                                         reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                         paginator="true" paginatorAlwaysVisible="false" rowKey="#{notInstance.uuid}">
+
+                                <p:column headerText="Alert ID" filterBy="#{notInstance.id}" field="id">
+                                    <h:outputText value="#{notInstance.id}"/>
+                                </p:column>
+
+                                <p:column headerText="Created Date" filterable="false">
+                                    <h:outputText value="#{notInstance.created}">
+                                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Alert Name" filterBy="#{notInstance.type}" field="type" filterMatchMode="exact" styleClass="topAligned">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('notInstanceTable').filter()" converter="omnifaces.GenericEnumConverter" autoWidth="false"
+                                                         style="width: 70%;font-size: 12px">
+                                            <f:selectItem noSelectionOption="true"/>
+                                            <f:selectItems value="#{constantsProvider.NOTIFICATION_DEFINITION_IDS}" var="type" itemLabel="#{msg[type.id]}"
+                                                           itemValue="#{type}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{notInstance.type.description}"/>
+                                </p:column>
+
+                                <p:column headerText="Reference ID" filterBy="#{notInstance.reference}" field="reference">
+                                    <h:outputText value="#{notInstance.reference}"/>
+                                </p:column>
+
+                                <p:column headerText="Business Owner" filterBy="#{notInstance.businessOwner.name}" field="businessOwner.name">
+                                    <h:outputText value="#{notInstance.businessOwner.name}"/>
+                                </p:column>
+
+                                <p:column headerText="Updated Date">
+                                    <h:outputText value="#{notInstance.closed}" field="closed">
+                                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                                    </h:outputText>
+                                </p:column>
+
+                            </p:dataTable>
+                        </p:tab>
+                    </p:tabView>
+                </p:outputPanel>
+
+                <div class="EmptyBox20"></div>
+            </h:form>
+        </p:outputPanel>
+    </ui:define>
+</ui:composition>

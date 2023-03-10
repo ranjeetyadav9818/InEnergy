@@ -1,0 +1,193 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <c:set var="controller" value="#{newContractController}"/>
+        <h:form id="formE">
+
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="New Contract" url="#"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <h1>Entity</h1>
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="idBusName" maxlength="55" size="55" value="#{controller.entity.businessName}" required="true" label="Business Name"/>
+                        <label>Business Name</label>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="idDBA" maxlength="55" size="55" value="#{controller.entity.dba}" required="true" label="DBA"/>
+                        <label>DBA</label>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:autoComplete id="idParentCompany" value="#{controller.entity.parentCompany}" completeMethod="#{controller.completeParent}" size="26" var="parent"
+                                        converter="contractEntityConverter" label="Parent Business Name (DBA)"
+                                        itemLabel="#{parent ne null ? parent.businessName.concat(' ( ').concat(parent.dba).concat(' ) ')
+                                             : null}" itemValue="#{parent}"/>
+                        <p:outputLabel value="Parent Business Name (DBA)" for="idParentCompany"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Sector" for="idSector"/>
+                        <p:selectOneMenu id="idSector" converter="omnifaces.GenericEnumConverter" value="#{controller.entity.sector}"
+                                         style="width: 157px;" autoWidth="false">
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{constantsProvider.companySectors}" var="sector" itemLabel="#{sector.label}"
+                                           itemValue="#{sector}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="idTax" maxlength="55" size="55" value="#{controller.entity.taxId}"/>
+                        <label>Tax ID</label>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </div>
+            <div class="card card-w-title">
+                <h4>Address
+                    <p:commandButton action="#{controller.addAddress()}" update="@form" icon="ui-icon-add" process="@form"/>
+                </h4>
+                <c:forEach items="#{controller.entity.contractAddresses}" var="address" varStatus="status">
+                    <p:separator rendered="#{not status.first}"/>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="idAdd1" maxlength="255" size="55" value="#{address.address1}"/>
+                            <label>Address 1</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="idAdd2" maxlength="255" size="55" value="#{address.address2}"/>
+                            <label>Address 2</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="idCity" maxlength="255" size="55" value="#{address.city}"/>
+                            <label>City/Town</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Country" for="idCountry"/>
+                            <p:selectOneMenu id="idCountry" value="#{address.country}" converter="countryConverter"
+                                             required="true" style="width: 157px;" autoWidth="false" label="Country">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{controller.countries}" var="country" itemLabel="#{country.name}"
+                                               itemValue="#{country}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="State" for="idAddrType"/>
+                            <p:selectOneMenu id="idState" value="#{address.state}"
+                                             required="true" style="width: 157px;" converter="omnifaces.GenericEnumConverter" autoWidth="false" label="State">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{constantsProvider.states}" var="state" itemLabel="#{state.label}"
+                                               itemValue="#{state}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="idCounty" maxlength="255" size="55" value="#{address.county}"/>
+                            <label>County</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="idPostCode" maxlength="255" size="55" value="#{address.postCode}"/>
+                            <label>Postal Code</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Address Type" for="idAddrType"/>
+                            <p:selectOneMenu id="idAddrType" converter="omnifaces.GenericEnumConverter" value="#{address.addressType}"
+                                             required="true" style="width: 157px;" autoWidth="false" label="Address Type">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{constantsProvider.contractAddressTypes}" var="addrType" itemLabel="#{addrType.label}"
+                                               itemValue="#{addrType}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton action="#{controller.removeAddress(address)}" update="@form" icon="ui-icon-remove" process="@this"/>
+                </c:forEach>
+            </div>
+            <div class="card card-w-title">
+                <h4>Point of Contacts
+                    <p:commandButton action="#{controller.addPOC()}" update="@form" icon="ui-icon-add" process="@form"/>
+                </h4>
+                <c:set var="mailRegexp" value="#{constantsProvider.mailListRegexp}"/>
+                <c:forEach items="#{controller.entity.pointOfContacts}" var="poc" varStatus="pocStatus">
+                    <p:separator rendered="#{not pocStatus.first}"/>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="idName" maxlength="255" size="55" value="#{poc.name}" required="true" label="Name"/>
+                            <label>Name</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="idTitle" maxlength="255" size="55" value="#{poc.title}"/>
+                            <label>Title</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="POC Type" for="idPocType"/>
+                            <p:selectOneMenu id="idPocType" converter="omnifaces.GenericEnumConverter" value="#{poc.pocType}"
+                                             required="true" style="width: 157px;" autoWidth="false" label="POC Type">
+                                <f:selectItem noSelectionOption="false"/>
+                                <f:selectItems value="#{constantsProvider.pocTypes}" var="pocType" itemLabel="#{pocType.label}"
+                                               itemValue="#{pocType}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <p:column></p:column>
+                    </p:panelGrid>
+                    <h5>Add Phones
+                        <p:commandButton action="#{controller.addPhone(poc)}" update="@form" icon="ui-icon-add" process="@form"/>
+                    </h5>
+                    <c:forEach items="#{poc.pocPhones}" var="phone" varStatus="phoneStatus">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="idPhone" maxlength="55" value="#{phone.number}"/>
+                                <label>Phone</label>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Phone Type" for="idPhoneType"/>
+                                <p:selectOneMenu id="idPhoneType" converter="omnifaces.GenericEnumConverter" value="#{phone.type}"
+                                                 required="true" style="width: 157px;" autoWidth="false" label="Phone Type">
+                                    <f:selectItem noSelectionOption="false"/>
+                                    <f:selectItems value="#{constantsProvider.phoneTypes}" var="phoneType" itemLabel="#{phoneType.label}"
+                                                   itemValue="#{phoneType}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:commandButton action="#{controller.removePhone(poc, phone)}" update="@form" icon="ui-icon-remove" process="@this"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </c:forEach>
+                    <h5>Add Mails
+                        <p:commandButton action="#{controller.addEmail(poc)}" update="@form" icon="ui-icon-add" process="@form"/>
+                    </h5>
+                    <c:forEach var="email" items="#{poc.pocEmails}" varStatus="emailStatus">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="idEmail" maxlength="255" size="55" value="#{email.email}" validatorMessage="#{constantsProvider.emailValidationMessage}"
+                                             label="Email" required="true">
+                                    <f:validateRegex pattern="#{mailRegexp}" for="idEmail"/>
+                                </p:inputText>
+                                <label>Email</label>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:commandButton action="#{controller.removeEmail(poc,email)}" update="@form" icon="ui-icon-remove" process="@this"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </c:forEach>
+                    <p:commandButton action="#{controller.removePOC(poc)}" update="@form" icon="ui-icon-remove" process="@this"/>
+                </c:forEach>
+            </div>
+
+            <ui:include src="WEB-INF/include/energyContract/cards/EntityDevicesCard.xhtml"/>
+        <h:panelGroup>
+            <div style="margin: 20px 0;">
+                <p:commandButton process="@this" update="@form" value="Cancel" action="#{controller.cancel()}"/>
+                <p:spacer width="10"/>
+                <p:commandButton update="@form" process="@form" value="Save" action="#{controller.save()}"/>
+                <p:spacer width="10"/>
+                <p:commandButton update="@form" process="@form" value="Save and close" action="#{controller.saveAndClose()}"/>
+            </div>
+        </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

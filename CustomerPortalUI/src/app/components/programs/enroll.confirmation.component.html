@@ -1,0 +1,85 @@
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+
+
+  <div>
+    <button pButton (click)="cancelButton($event)" label="Go Back" style="float: left"></button>
+    <button *ngIf="selectedProgram" pButton type="submit" label="Enroll"
+            style="float: right"></button>
+  </div>
+  <div *ngIf="selectedProgram" style="text-align: center;font-size:16px">
+    <hr/>
+    <hr/>
+    <h4>Enroll Application Confirmation</h4>
+    <div style="text-align: left">
+      <h4>You are about to apply for a enrollment in the following program:</h4>
+      <div style="padding-left: 20px">
+        <b>Program Name: </b>{{selectedProgram.name}}<br/>
+        <b>Program Type: </b>{{selectedProgram.programType}}<br/>
+      </div>
+      <hr/>
+
+      <div *ngIf="finalEnrollResult?.servicePointsEligibility">
+
+        <div style="font-size: 14px">
+        <p-dataList [value]="finalEnrollResult?.servicePointsEligibility[0]?.enrollmentAttributeAdapters">
+            <p-header>Predefined Attributes:</p-header>
+                <ng-template let-attribute pTemplate="item">
+                  <div style="padding: 5px"  *ngIf="attribute.key == 'SAID'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.agreementPointMapPK.serviceAgreementId}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'UUID'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.uuid}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'CUSTOMER_NAME'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.customerName}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'BUSINESS_NAME'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.businessName}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'SERVICE_ADDRESS_1'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.serviceAddress1}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'SERVICE_ADDRESS_2'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.serviceAddress2}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'CITY'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.city}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'STATE'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.state}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'ZIP'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.zip}}</div>
+                  <div style="padding: 5px" *ngIf="attribute.key == 'METER_BADGE_NUMBER'"><b>{{attribute.value?attribute.value:''}}: </b> {{finalEnrollResult?.servicePointsEligibility[0]?.meterBadgeNumber}}</div>
+                </ng-template>
+          </p-dataList>
+        </div>
+
+        <hr/>
+        <div style="font-size: 14px">
+          <p-panel [toggleable]="false" [collapsed]="false">
+            <p-header>
+              <div style="text-align: center;">User attributes</div>
+            </p-header>
+
+            <div *ngFor="let attribute of finalEnrollResult?.servicePointsEligibility[0]?.enrollmentAttributeAdapters" [style.display]="attribute.key == 'THIRD_PARTY_NAME' || attribute.key == 'FSL' || attribute.key == 'AGGREGATOR_NAME'?'block':'none'">
+              <div class="ui-inputgroup" *ngIf="attribute.key == 'THIRD_PARTY_NAME'" style="padding: 5px" >
+                <span class="ui-inputgroup-addon" style="text-align: left; min-width: 150px">{{attribute.value}}</span>
+                <input pInputText placeholder="{{attribute.value?attribute.value:''}}" type="text" [(ngModel)]="thirdPartyName" name="thirdPartyNameNME"
+                       style="text-align: left; width: -webkit-fill-available; border-right-color: rgba(0, 0, 0, 0.15); border-right-style: solid; border-right-width: 1px;"/>
+                <hr/>
+              </div>
+              <div class="ui-inputgroup" *ngIf="attribute.key == 'FSL'" style="padding: 5px">
+                <span class="ui-inputgroup-addon" style="text-align: left; min-width: 150px">{{attribute.value}}</span>
+                <input pInputText placeholder="{{attribute.value?attribute.value:''}}" type="number" [(ngModel)]="fsl" name="fslName"
+                       style="text-align: left; width: -webkit-fill-available; border-right-color: rgba(0, 0, 0, 0.15); border-right-style: solid; border-right-width: 1px;"/>
+                <hr/>
+              </div>
+              <div *ngIf="(attribute.key == 'FSL') && (finalEnrollResult?.servicePointsEligibility[0]?.fslRange)" style="padding: 5px">
+                (acceptable range: {{finalEnrollResult?.servicePointsEligibility[0]?.fslRange.minKw}} kW - {{finalEnrollResult?.servicePointsEligibility[0]?.fslRange.maxKw}} kW, based on {{finalEnrollResult?.servicePointsEligibility[0]?.fslRange.dataAvailabilityAllMonths}} months)
+              </div>
+              <div class="ui-inputgroup" *ngIf="attribute.key == 'AGGREGATOR_NAME'" style="padding: 5px">
+                <span class="ui-inputgroup-addon" style="text-align: left; min-width: 150px">{{attribute.value}}</span>
+                <p-dropdown  [options]="aggregators" [(ngModel)]="selectedAggregator" name="selectedAggregator"
+                             [style]="{'border': '1px solid rgba(0,0,0,0.15)','width': '150px'}">
+                </p-dropdown>
+                <hr/>
+              </div>
+            </div>
+          </p-panel>
+        </div>
+
+        <div *ngIf="finalEnrollResult?.servicePointsEligibility[0]?.fslRange?.noDataWarning">
+          <hr/>
+          <span class="error-text">Warning: there is not enough data to evaluate all rules</span>
+        </div>
+      </div> <!-- for -->
+
+
+    </div> <!-- if -->
+
+  </div>
+</form>

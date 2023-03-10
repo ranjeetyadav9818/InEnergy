@@ -1,0 +1,22 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: maven:3.6.3-openjdk-8
+    steps:
+      - checkout
+      - run:
+          name: Installing private libs
+          command: ./installLibs.sh
+      - run:
+          name: Build and testing
+          command: mvn install -DskipLiquibase -DskipDBLiquibase
+      - store_test_results: # We use this timing data to optimize the future runs
+          path: DRCC/target/surefire-reports
+
+workflows:
+  version: 2
+  maven_test:
+    jobs:
+      - build-and-test

@@ -1,0 +1,215 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <c:set var="controller" value="#{bidController}"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Market Integration" url="#"/>
+            <p:menuitem value="#{bidController.iso.name}" url="#"/>
+            <p:menuitem value="Bid" outcome="Bid">
+                <f:param name="o" value="#{parameterEncoderService.encode(bidController.iso.id)}"/>
+            </p:menuitem>
+        </p:breadCrumb>
+
+        <h:form id="form">
+
+            <div class="card card-w-title">
+                <!-- Filter -->
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{controller.renderFilters}">
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:calendar id="tradeDate" value="#{controller.tradeDate}" pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy" required="true"/>
+                        <p:outputLabel value="Trade Date" for="tradeDate"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Resource Types" for="resourceTypeSearch"/>
+                        <p:selectOneMenu id="resourceTypeSearch" value="#{controller.resourceType}" required="true"
+                                         converter="omnifaces.GenericEnumConverter">
+                            <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                            <f:selectItems value="#{controller.resourceTypes}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="#{msg['data.mapping.sublap']}" for="sublapSearch"/>
+                        <p:selectOneMenu id="sublapSearch" value="#{controller.subLap}" converter="subLapConverter">
+                            <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                            <f:selectItems value="#{controller.subLapList}" var="subLap" itemValue="#{subLap}" itemLabel="#{subLap.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Status" for="statusSearch"/>
+                        <p:selectOneMenu id="statusSearch" value="#{controller.bidStatus}">
+                            <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.bidStatuses}" var="bidStatus" itemValue="#{bidStatus}" itemLabel="#{bidStatus.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                </p:panelGrid>
+
+                <p:commandButton value="Clear" action="#{controller.clear()}" id="clear" update="@form" process="@this"/>
+                <p:spacer width="10"/>
+                <p:commandButton value="Search" action="#{controller.search()}" id="search" update="@form"/>
+            </div>
+
+            <!-- Pop-up password dialog -->
+            <p:dialog header="You are about to submit changes" widgetVar="submitDialog" modal="true" resizable="false" closeOnEscape="true"
+                      visible="#{controller.showModal}" style="text-align: center" id="dialogId">
+                <p:panelGrid columns="2" style="margin-bottom: 10px">
+                    <p:outputLabel value="Password" for="bidPassword"/>
+                    <p:password value="#{controller.password}" autocomplete="off" id="bidPassword" placeholder="password"/>
+
+                    <p:outputLabel value="Cancel Reason" for="cancelReason" rendered="#{controller.cancelAction}"/>
+                    <p:selectOneMenu value="#{controller.cancelReason}" id="cancelReason" rendered="#{controller.cancelAction}">
+                        <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
+                        <f:selectItems value="#{constantsProvider.bidCancelReasons}" var="reason" itemLabel="#{reason}" itemValue="#{reason}"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <p:commandButton id="review" value="Submit" action="#{controller.save()}" update="@form" />
+                <script type="application/javascript">
+                    // Workaround for defaultCommand and infinite loop of POST requests https://github.com/primefaces/primefaces/issues/2448
+                    $.extend( $.ui.keyCode, {
+                        NUMPAD_ENTER: 108
+                    });
+                </script>
+                <p:defaultCommand target="review" scope="dialogId"/>
+            </p:dialog>
+
+            <p:dialog header="HE Capacity Details" widgetVar="heCapacityDetails" modal="true" resizable="false" width="90%">
+                <h:panelGroup rendered="#{controller.haCapacityNumberOfLocations > 0}">
+                    <h:outputText
+                            value="Forecasted capacity based on #{controller.haCapacityNumberOfLocationsWithMeterForecast}/#{controller.haCapacityNumberOfLocations} locations."/>
+                </h:panelGroup>
+                <p:dataTable id="currentDayBidTable" value="#{controller.capacityDetails}" var="group" style="margin-top: 10px;">
+                    <p:column headerText="Resource #{controller.heCapacityDetailsResource.name}" style="width:12%;text-align: left;padding-left: 10px;">
+                        <h:outputText value="#{group.uiName}"/>
+                    </p:column>
+
+                    <c:forEach begin="1" end="24" var="i">
+                        <p:column headerText="HE#{i}" style="padding-left: 5px;text-align: center;">
+                            <h:outputText value="#{group.getHourEnd(i)}" converter="bidCapacityInMwTwoPrecissionConverter"
+                                          rendered="#{group.type eq 'forecasted'}"/>
+                            <h:outputText styleClass="icon-bat1 red" rendered="#{group.type eq 'risk' and group.getHourEnd(i) eq 'High'}"/>
+                            <h:outputText styleClass="icon-bat4 green" rendered="#{group.type eq 'risk' and group.getHourEnd(i) eq 'Low'}"/>
+                        </p:column>
+                    </c:forEach>
+                </p:dataTable>
+            </p:dialog>
+
+
+            <div class="card card-w-title">
+                <h1>Bids</h1>
+                <p:toolbar style="margin-bottom: 10px">
+                    <f:facet name="left">
+                        <p:commandButton value="Bid All" id="bidAll" action="#{controller.setAction(null,'BID')}" update="@form"
+                                         rendered="#{controller.renderGeneralActions}"/>
+                        <p:spacer width="15" rendered="#{controller.renderGeneralActions}"/>
+                        <p:commandButton value="No Bid All" id="noBidAll" action="#{controller.setAction(null,'NO_BID')}" update="@form"
+                                         rendered="#{controller.renderGeneralActions}"/>
+                        <p:spacer width="15" rendered="#{controller.renderGeneralActions}"/>
+                        <p:commandButton value="Cancel All" id="cancelAll" action="#{controller.setAction(null,'CANCEL')}" update="@form"
+                                         rendered="#{controller.renderGeneralActions}"/>
+                    </f:facet>
+                    <f:facet name="right">
+                        <div style="margin-top: 3px">
+                            <p:outputLabel value="5 Station Weather Forecast Average: #{controller.forecastedTemperature}°F "
+                                           rendered="#{controller.forecastedTemperature ne null}"/>
+                            <p:outputLabel value="5 Station Weather Forecast Average: Unknown " rendered="#{controller.forecastedTemperature eq null}"/>
+                            <p:spacer width="15"/>
+                            Auto Bid:
+                            <h:outputText value="Active" rendered="#{controller.iso.activeProfile.products[0].autoBidLowRisk}"/>
+                            <h:outputText value="Inactive" rendered="#{not controller.iso.activeProfile.products[0].autoBidLowRisk}"/>
+                        </div>
+                    </f:facet>
+                </p:toolbar>
+                <!-- Filtered resources -->
+                <p:dataTable var="bid" value="#{controller.bids}">
+                    <p:column headerText="Actions" width="11%">
+                        <p:menuButton value="Modify" styleClass="smallButton" model="#{controller.actionButtons.get(bid)}"
+                                      rendered="#{bid.actions.size() > 0 and controller.isModifiableBid(bid)}"/>
+                    </p:column>
+
+                    <p:column headerText="Resource ID">
+                        <h:outputText value="#{bid.isoResource.id} - #{bid.isoResource.name}"/>
+                        <p:spacer width="5"/>
+                        <p:outputLabel styleClass="icon-edit" rendered="#{bid.scheduleModified}"/>
+                    </p:column>
+
+                    <p:column headerText="Schedule" width="12%">
+                        <h:panelGroup rendered="#{bid.status ne 'READY_TO_SUBMIT' and bid.status ne 'SUBMITTED' and bid.status ne 'OUTAGE'}">
+                            <p:commandLink rendered="#{bid.properties.scheduleType eq 'DEFAULT'}"
+                                           action="#{controller.modifySchedule(bid)}" update="@form">
+                                <i class="icon-cog"/>Default
+                            </p:commandLink>
+
+                            <p:commandLink rendered="#{bid.properties.scheduleType eq 'VIEW'}"
+                                           action="#{controller.modifySchedule(bid)}" update="@form">
+                                <i class="icon-cog"/>View
+                            </p:commandLink>
+
+                            <p:commandLink rendered="#{bid.properties.scheduleType eq 'CUSTOM'}"
+                                           action="#{controller.modifySchedule(bid)}" update="@form">
+                                <i class="icon-cog"/>Custom
+                            </p:commandLink>
+
+                        </h:panelGroup>
+                    </p:column>
+
+                    <p:column headerText="Bid Status">
+                        <h:outputText value=" #{bid.status.name}" styleClass="#{bid.status.getIcon()}"/>
+                    </p:column>
+
+                    <p:column headerText="Capacity Risk" width="6%" style="text-align: center;">
+                        <p:tooltip for="capacityRiskLow" value="Low Risk"/>
+                        <h:outputText id="capacityRiskLow" styleClass="ui-icon ui-icon-battery-full green" rendered="#{bid.properties.capacityRisk eq 'Low'}"/>
+
+                        <p:tooltip for="capacityRiskHigh" value="High Risk"/>
+                        <h:outputText id="capacityRiskHigh" styleClass="ui-icon ui-icon-battery-alert red" rendered="#{bid.properties.capacityRisk eq 'High'}"/>
+                    </p:column>
+
+                    <p:column headerText="HE Capacity Details" width="8%" style="text-align: center;">
+                        <h:outputText value=""/>
+                        <p:commandLink action="#{controller.calculateCapacityDetails(bid)}"
+                                       update="@form" oncomplete="PF('heCapacityDetails').show();">
+                            <i class="material-icons">remove_red_eye</i>
+                        </p:commandLink>
+                    </p:column>
+
+                    <p:column headerText="Resource Adequacy Potential (MWH)" width="8%">
+                        <h:outputText value="#{bid.properties.resourceAdequacyPotential}" converter="bidCapacityInMWConverter"/>
+                    </p:column>
+
+                    <p:column headerText="Program Risk" width="6%" style="text-align: center;">
+                        <p:tooltip for="programRiskLow" value="Low Risk"/>
+                        <h:outputText id="programRiskLow" styleClass="ui-icon ui-icon-arrow-downward green" rendered="#{bid.properties.programRisk eq 'Low'}"/>
+
+                        <p:tooltip for="programRiskHigh" value="High Risk"/>
+                        <h:outputText id="programRiskHigh" styleClass="ui-icon ui-icon-arrow-upward red" rendered="#{bid.properties.programRisk eq 'High'}"/>
+                    </p:column>
+
+                    <p:column headerText="Customer Fatigue Risk" width="8%" style="text-align: center;">
+                        <p:tooltip for="customerFatigueRiskLow" value="Low Risk"/>
+                        <h:outputText id="customerFatigueRiskLow" styleClass="ui-icon ui-icon-sentiment-satisfied green"
+                                      rendered="#{bid.properties.customerFatigueRisk eq 'Low'}"/>
+
+                        <p:tooltip for="customerFatigueRiskHigh" value="High Risk"/>
+                        <h:outputText id="customerFatigueRiskHigh" styleClass="ui-icon ui-icon-sentiment-dissatisfied red"
+                                      rendered="#{bid.properties.customerFatigueRisk eq 'High'}"/>
+                    </p:column>
+
+                    <p:column headerText="Available Market Hours" width="9%">
+                        <h:outputText value="#{bid.properties.availableMarketHours}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

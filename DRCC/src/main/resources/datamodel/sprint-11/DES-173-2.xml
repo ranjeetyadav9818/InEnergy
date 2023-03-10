@@ -1,0 +1,354 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="DES-173-2.xml" author="egamas">
+
+        <createTable tableName="COUNTRY">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="CODE" type="VARCHAR(2)"/>
+        </createTable>
+
+        <addColumn tableName="CONTRACT_ADDRESS">
+            <column name="COUNTRY_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="COUNTY" type="varchar(100)"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseColumnNames="COUNTRY_ID"
+                                 baseTableName="CONTRACT_ADDRESS"
+                                 constraintName="FK_CONTRACT_ADDR_COUNTRY"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="COUNTRY"/>
+
+        <renameColumn columnDataType="VARCHAR(55)"
+                      newColumnName="TITLE"
+                      oldColumnName="ROLE"
+                      tableName="POINT_OF_CONTACT"/>
+
+        <addColumn tableName="POINT_OF_CONTACT">
+            <column name="PHOHE_TYPE" type="varchar(55)"/>
+        </addColumn>
+
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Afghanistan"/><column name="CODE" type="varchar(2)" value= "AF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Åland Islands"/><column name="CODE" type="varchar(2)" value= "AX"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Albania"/><column name="CODE" type="varchar(2)" value= "AL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Algeria"/><column name="CODE" type="varchar(2)" value= "DZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="American Samoa"/><column name="CODE" type="varchar(2)" value= "AS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Andorra"/><column name="CODE" type="varchar(2)" value= "AD"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Angola"/><column name="CODE" type="varchar(2)" value= "AO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Anguilla"/><column name="CODE" type="varchar(2)" value= "AI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Antarctica"/><column name="CODE" type="varchar(2)" value= "AQ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Antigua and Barbuda"/><column name="CODE" type="varchar(2)" value= "AG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Argentina"/><column name="CODE" type="varchar(2)" value= "AR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Armenia"/><column name="CODE" type="varchar(2)" value= "AM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Aruba"/><column name="CODE" type="varchar(2)" value= "AW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Australia"/><column name="CODE" type="varchar(2)" value= "AU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Austria"/><column name="CODE" type="varchar(2)" value= "AT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Azerbaijan"/><column name="CODE" type="varchar(2)" value= "AZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bahamas"/><column name="CODE" type="varchar(2)" value= "BS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bahrain"/><column name="CODE" type="varchar(2)" value= "BH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bangladesh"/><column name="CODE" type="varchar(2)" value= "BD"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Barbados"/><column name="CODE" type="varchar(2)" value= "BB"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Belarus"/><column name="CODE" type="varchar(2)" value= "BY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Belgium"/><column name="CODE" type="varchar(2)" value= "BE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Belize"/><column name="CODE" type="varchar(2)" value= "BZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Benin"/><column name="CODE" type="varchar(2)" value= "BJ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bermuda"/><column name="CODE" type="varchar(2)" value= "BM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bhutan"/><column name="CODE" type="varchar(2)" value= "BT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bolivia, Plurinational State of"/><column name="CODE" type="varchar(2)" value= "BO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bonaire, Sint Eustatius and Saba"/><column name="CODE" type="varchar(2)" value= "BQ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bosnia and Herzegovina"/><column name="CODE" type="varchar(2)" value= "BA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Botswana"/><column name="CODE" type="varchar(2)" value= "BW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bouvet Island"/><column name="CODE" type="varchar(2)" value= "BV"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Brazil"/><column name="CODE" type="varchar(2)" value= "BR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="British Indian Ocean Territory"/><column name="CODE" type="varchar(2)" value= "IO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Brunei Darussalam"/><column name="CODE" type="varchar(2)" value= "BN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Bulgaria"/><column name="CODE" type="varchar(2)" value= "BG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Burkina Faso"/><column name="CODE" type="varchar(2)" value= "BF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Burundi"/><column name="CODE" type="varchar(2)" value= "BI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cambodia"/><column name="CODE" type="varchar(2)" value= "KH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cameroon"/><column name="CODE" type="varchar(2)" value= "CM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Canada"/><column name="CODE" type="varchar(2)" value= "CA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cape Verde"/><column name="CODE" type="varchar(2)" value= "CV"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cayman Islands"/><column name="CODE" type="varchar(2)" value= "KY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Central African Republic"/><column name="CODE" type="varchar(2)" value= "CF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Chad"/><column name="CODE" type="varchar(2)" value= "TD"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Chile"/><column name="CODE" type="varchar(2)" value= "CL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="China"/><column name="CODE" type="varchar(2)" value= "CN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Christmas Island"/><column name="CODE" type="varchar(2)" value= "CX"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cocos (Keeling) Islands"/><column name="CODE" type="varchar(2)" value= "CC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Colombia"/><column name="CODE" type="varchar(2)" value= "CO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Comoros"/><column name="CODE" type="varchar(2)" value= "KM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Congo"/><column name="CODE" type="varchar(2)" value= "CG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Congo, the Democratic Republic of the"/><column name="CODE" type="varchar(2)" value= "CD"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cook Islands"/><column name="CODE" type="varchar(2)" value= "CK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Costa Rica"/><column name="CODE" type="varchar(2)" value= "CR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Côte d'Ivoire"/><column name="CODE" type="varchar(2)" value= "CI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Croatia"/><column name="CODE" type="varchar(2)" value= "HR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cuba"/><column name="CODE" type="varchar(2)" value= "CU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Curaçao"/><column name="CODE" type="varchar(2)" value= "CW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Cyprus"/><column name="CODE" type="varchar(2)" value= "CY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Czech Republic"/><column name="CODE" type="varchar(2)" value= "CZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Denmark"/><column name="CODE" type="varchar(2)" value= "DK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Djibouti"/><column name="CODE" type="varchar(2)" value= "DJ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Dominica"/><column name="CODE" type="varchar(2)" value= "DM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Dominican Republic"/><column name="CODE" type="varchar(2)" value= "DO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Ecuador"/><column name="CODE" type="varchar(2)" value= "EC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Egypt"/><column name="CODE" type="varchar(2)" value= "EG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="El Salvador"/><column name="CODE" type="varchar(2)" value= "SV"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Equatorial Guinea"/><column name="CODE" type="varchar(2)" value= "GQ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Eritrea"/><column name="CODE" type="varchar(2)" value= "ER"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Estonia"/><column name="CODE" type="varchar(2)" value= "EE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Ethiopia"/><column name="CODE" type="varchar(2)" value= "ET"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Falkland Islands (Malvinas)"/><column name="CODE" type="varchar(2)" value= "FK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Faroe Islands"/><column name="CODE" type="varchar(2)" value= "FO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Fiji"/><column name="CODE" type="varchar(2)" value= "FJ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Finland"/><column name="CODE" type="varchar(2)" value= "FI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="France"/><column name="CODE" type="varchar(2)" value= "FR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="French Guiana"/><column name="CODE" type="varchar(2)" value= "GF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="French Polynesia"/><column name="CODE" type="varchar(2)" value= "PF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="French Southern Territories"/><column name="CODE" type="varchar(2)" value= "TF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Gabon"/><column name="CODE" type="varchar(2)" value= "GA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Gambia"/><column name="CODE" type="varchar(2)" value= "GM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Georgia"/><column name="CODE" type="varchar(2)" value= "GE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Germany"/><column name="CODE" type="varchar(2)" value= "DE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Ghana"/><column name="CODE" type="varchar(2)" value= "GH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Gibraltar"/><column name="CODE" type="varchar(2)" value= "GI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Greece"/><column name="CODE" type="varchar(2)" value= "GR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Greenland"/><column name="CODE" type="varchar(2)" value= "GL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Grenada"/><column name="CODE" type="varchar(2)" value= "GD"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Guadeloupe"/><column name="CODE" type="varchar(2)" value= "GP"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Guam"/><column name="CODE" type="varchar(2)" value= "GU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Guatemala"/><column name="CODE" type="varchar(2)" value= "GT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Guernsey"/><column name="CODE" type="varchar(2)" value= "GG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Guinea"/><column name="CODE" type="varchar(2)" value= "GN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Guinea-Bissau"/><column name="CODE" type="varchar(2)" value= "GW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Guyana"/><column name="CODE" type="varchar(2)" value= "GY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Haiti"/><column name="CODE" type="varchar(2)" value= "HT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Heard Island and McDonald Islands"/><column name="CODE" type="varchar(2)" value= "HM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Holy See (Vatican City State)"/><column name="CODE" type="varchar(2)" value= "VA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Honduras"/><column name="CODE" type="varchar(2)" value= "HN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Hong Kong"/><column name="CODE" type="varchar(2)" value= "HK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Hungary"/><column name="CODE" type="varchar(2)" value= "HU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Iceland"/><column name="CODE" type="varchar(2)" value= "IS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="India"/><column name="CODE" type="varchar(2)" value= "IN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Indonesia"/><column name="CODE" type="varchar(2)" value= "ID"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Iran, Islamic Republic of"/><column name="CODE" type="varchar(2)" value= "IR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Iraq"/><column name="CODE" type="varchar(2)" value= "IQ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Ireland"/><column name="CODE" type="varchar(2)" value= "IE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Isle of Man"/><column name="CODE" type="varchar(2)" value= "IM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Israel"/><column name="CODE" type="varchar(2)" value= "IL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Italy"/><column name="CODE" type="varchar(2)" value= "IT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Jamaica"/><column name="CODE" type="varchar(2)" value= "JM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Japan"/><column name="CODE" type="varchar(2)" value= "JP"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Jersey"/><column name="CODE" type="varchar(2)" value= "JE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Jordan"/><column name="CODE" type="varchar(2)" value= "JO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Kazakhstan"/><column name="CODE" type="varchar(2)" value= "KZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Kenya"/><column name="CODE" type="varchar(2)" value= "KE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Kiribati"/><column name="CODE" type="varchar(2)" value= "KI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Korea, Democratic People's Republic of"/><column name="CODE" type="varchar(2)" value= "KP"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Korea, Republic of"/><column name="CODE" type="varchar(2)" value= "KR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Kuwait"/><column name="CODE" type="varchar(2)" value= "KW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Kyrgyzstan"/><column name="CODE" type="varchar(2)" value= "KG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Lao People's Democratic Republic"/><column name="CODE" type="varchar(2)" value= "LA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Latvia"/><column name="CODE" type="varchar(2)" value= "LV"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Lebanon"/><column name="CODE" type="varchar(2)" value= "LB"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Lesotho"/><column name="CODE" type="varchar(2)" value= "LS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Liberia"/><column name="CODE" type="varchar(2)" value= "LR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Libya"/><column name="CODE" type="varchar(2)" value= "LY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Liechtenstein"/><column name="CODE" type="varchar(2)" value= "LI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Lithuania"/><column name="CODE" type="varchar(2)" value= "LT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Luxembourg"/><column name="CODE" type="varchar(2)" value= "LU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Macao"/><column name="CODE" type="varchar(2)" value= "MO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Macedonia, the Former Yugoslav Republic of"/><column name="CODE" type="varchar(2)" value= "MK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Madagascar"/><column name="CODE" type="varchar(2)" value= "MG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Malawi"/><column name="CODE" type="varchar(2)" value= "MW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Malaysia"/><column name="CODE" type="varchar(2)" value= "MY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Maldives"/><column name="CODE" type="varchar(2)" value= "MV"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Mali"/><column name="CODE" type="varchar(2)" value= "ML"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Malta"/><column name="CODE" type="varchar(2)" value= "MT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Marshall Islands"/><column name="CODE" type="varchar(2)" value= "MH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Martinique"/><column name="CODE" type="varchar(2)" value= "MQ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Mauritania"/><column name="CODE" type="varchar(2)" value= "MR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Mauritius"/><column name="CODE" type="varchar(2)" value= "MU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Mayotte"/><column name="CODE" type="varchar(2)" value= "YT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Mexico"/><column name="CODE" type="varchar(2)" value= "MX"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Micronesia, Federated States of"/><column name="CODE" type="varchar(2)" value= "FM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Moldova, Republic of"/><column name="CODE" type="varchar(2)" value= "MD"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Monaco"/><column name="CODE" type="varchar(2)" value= "MC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Mongolia"/><column name="CODE" type="varchar(2)" value= "MN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Montenegro"/><column name="CODE" type="varchar(2)" value= "ME"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Montserrat"/><column name="CODE" type="varchar(2)" value= "MS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Morocco"/><column name="CODE" type="varchar(2)" value= "MA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Mozambique"/><column name="CODE" type="varchar(2)" value= "MZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Myanmar"/><column name="CODE" type="varchar(2)" value= "MM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Namibia"/><column name="CODE" type="varchar(2)" value= "NA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Nauru"/><column name="CODE" type="varchar(2)" value= "NR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Nepal"/><column name="CODE" type="varchar(2)" value= "NP"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Netherlands"/><column name="CODE" type="varchar(2)" value= "NL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="New Caledonia"/><column name="CODE" type="varchar(2)" value= "NC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="New Zealand"/><column name="CODE" type="varchar(2)" value= "NZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Nicaragua"/><column name="CODE" type="varchar(2)" value= "NI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Niger"/><column name="CODE" type="varchar(2)" value= "NE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Nigeria"/><column name="CODE" type="varchar(2)" value= "NG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Niue"/><column name="CODE" type="varchar(2)" value= "NU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Norfolk Island"/><column name="CODE" type="varchar(2)" value= "NF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Northern Mariana Islands"/><column name="CODE" type="varchar(2)" value= "MP"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Norway"/><column name="CODE" type="varchar(2)" value= "NO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Oman"/><column name="CODE" type="varchar(2)" value= "OM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Pakistan"/><column name="CODE" type="varchar(2)" value= "PK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Palau"/><column name="CODE" type="varchar(2)" value= "PW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Palestine, State of"/><column name="CODE" type="varchar(2)" value= "PS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Panama"/><column name="CODE" type="varchar(2)" value= "PA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Papua New Guinea"/><column name="CODE" type="varchar(2)" value= "PG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Paraguay"/><column name="CODE" type="varchar(2)" value= "PY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Peru"/><column name="CODE" type="varchar(2)" value= "PE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Philippines"/><column name="CODE" type="varchar(2)" value= "PH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Pitcairn"/><column name="CODE" type="varchar(2)" value= "PN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Poland"/><column name="CODE" type="varchar(2)" value= "PL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Portugal"/><column name="CODE" type="varchar(2)" value= "PT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Puerto Rico"/><column name="CODE" type="varchar(2)" value= "PR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Qatar"/><column name="CODE" type="varchar(2)" value= "QA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Réunion"/><column name="CODE" type="varchar(2)" value= "RE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Romania"/><column name="CODE" type="varchar(2)" value= "RO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Russian Federation"/><column name="CODE" type="varchar(2)" value= "RU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Rwanda"/><column name="CODE" type="varchar(2)" value= "RW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saint Barthélemy"/><column name="CODE" type="varchar(2)" value= "BL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saint Helena, Ascension and Tristan da Cunha"/><column name="CODE" type="varchar(2)" value= "SH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saint Kitts and Nevis"/><column name="CODE" type="varchar(2)" value= "KN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saint Lucia"/><column name="CODE" type="varchar(2)" value= "LC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saint Martin (French part)"/><column name="CODE" type="varchar(2)" value= "MF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saint Pierre and Miquelon"/><column name="CODE" type="varchar(2)" value= "PM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saint Vincent and the Grenadines"/><column name="CODE" type="varchar(2)" value= "VC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Samoa"/><column name="CODE" type="varchar(2)" value= "WS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="San Marino"/><column name="CODE" type="varchar(2)" value= "SM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Sao Tome and Principe"/><column name="CODE" type="varchar(2)" value= "ST"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Saudi Arabia"/><column name="CODE" type="varchar(2)" value= "SA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Senegal"/><column name="CODE" type="varchar(2)" value= "SN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Serbia"/><column name="CODE" type="varchar(2)" value= "RS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Seychelles"/><column name="CODE" type="varchar(2)" value= "SC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Sierra Leone"/><column name="CODE" type="varchar(2)" value= "SL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Singapore"/><column name="CODE" type="varchar(2)" value= "SG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Sint Maarten (Dutch part)"/><column name="CODE" type="varchar(2)" value= "SX"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Slovakia"/><column name="CODE" type="varchar(2)" value= "SK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Slovenia"/><column name="CODE" type="varchar(2)" value= "SI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Solomon Islands"/><column name="CODE" type="varchar(2)" value= "SB"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Somalia"/><column name="CODE" type="varchar(2)" value= "SO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="South Africa"/><column name="CODE" type="varchar(2)" value= "ZA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="South Georgia and the South Sandwich Islands"/><column name="CODE" type="varchar(2)" value= "GS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="South Sudan"/><column name="CODE" type="varchar(2)" value= "SS"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Spain"/><column name="CODE" type="varchar(2)" value= "ES"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Sri Lanka"/><column name="CODE" type="varchar(2)" value= "LK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Sudan"/><column name="CODE" type="varchar(2)" value= "SD"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Suriname"/><column name="CODE" type="varchar(2)" value= "SR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Svalbard and Jan Mayen"/><column name="CODE" type="varchar(2)" value= "SJ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Swaziland"/><column name="CODE" type="varchar(2)" value= "SZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Sweden"/><column name="CODE" type="varchar(2)" value= "SE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Switzerland"/><column name="CODE" type="varchar(2)" value= "CH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Syrian Arab Republic"/><column name="CODE" type="varchar(2)" value= "SY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Taiwan, Province of China"/><column name="CODE" type="varchar(2)" value= "TW"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Tajikistan"/><column name="CODE" type="varchar(2)" value= "TJ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Tanzania, United Republic of"/><column name="CODE" type="varchar(2)" value= "TZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Thailand"/><column name="CODE" type="varchar(2)" value= "TH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Timor-Leste"/><column name="CODE" type="varchar(2)" value= "TL"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Togo"/><column name="CODE" type="varchar(2)" value= "TG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Tokelau"/><column name="CODE" type="varchar(2)" value= "TK"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Tonga"/><column name="CODE" type="varchar(2)" value= "TO"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Trinidad and Tobago"/><column name="CODE" type="varchar(2)" value= "TT"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Tunisia"/><column name="CODE" type="varchar(2)" value= "TN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Turkey"/><column name="CODE" type="varchar(2)" value= "TR"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Turkmenistan"/><column name="CODE" type="varchar(2)" value= "TM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Turks and Caicos Islands"/><column name="CODE" type="varchar(2)" value= "TC"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Tuvalu"/><column name="CODE" type="varchar(2)" value= "TV"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Uganda"/><column name="CODE" type="varchar(2)" value= "UG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Ukraine"/><column name="CODE" type="varchar(2)" value= "UA"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="United Arab Emirates"/><column name="CODE" type="varchar(2)" value= "AE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="United Kingdom"/><column name="CODE" type="varchar(2)" value= "GB"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="United States"/><column name="CODE" type="varchar(2)" value= "US"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="United States Minor Outlying Islands"/><column name="CODE" type="varchar(2)" value= "UM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Uruguay"/><column name="CODE" type="varchar(2)" value= "UY"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Uzbekistan"/><column name="CODE" type="varchar(2)" value= "UZ"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Vanuatu"/><column name="CODE" type="varchar(2)" value= "VU"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Venezuela, Bolivarian Republic of"/><column name="CODE" type="varchar(2)" value= "VE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Viet Nam"/><column name="CODE" type="varchar(2)" value= "VN"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Virgin Islands, British"/><column name="CODE" type="varchar(2)" value= "VG"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Virgin Islands, U.S."/><column name="CODE" type="varchar(2)" value= "VI"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Wallis and Futuna"/><column name="CODE" type="varchar(2)" value= "WF"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Western Sahara"/><column name="CODE" type="varchar(2)" value= "EH"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Yemen"/><column name="CODE" type="varchar(2)" value= "YE"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Zambia"/><column name="CODE" type="varchar(2)" value= "ZM"/></insert>
+        <insert tableName="COUNTRY"><column name="NAME" type="varchar(255)" value="Zimbabwe"/><column name="CODE" type="varchar(2)" value= "ZW"/></insert>
+
+    </changeSet>
+
+    <changeSet id="DES-173-3.xml" author="egamas">
+        <renameColumn columnDataType="VARCHAR(55)"
+                      newColumnName="POST_CODE"
+                      oldColumnName="ZIP"
+                      tableName="CONTRACT_ADDRESS"/>
+    </changeSet>
+
+    <changeSet id="DES-173-4.xml" author="egamas">
+        <createTable tableName="POC_PHONE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="POC_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="NUMBER" type="VARCHAR(55)"/>
+            <column name="TYPE" type="VARCHAR(55)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="POC_ID"
+                                 baseTableName="POC_PHONE"
+                                 constraintName="FK_CONTRACT_POC_PHONE"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="POINT_OF_CONTACT"/>
+
+        <createTable tableName="POC_EMAIL">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="POC_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="EMAIL" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="POC_ID"
+                                 baseTableName="POC_EMAIL"
+                                 constraintName="FK_CONTRACT_POC_EMAIL"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="POINT_OF_CONTACT"/>
+
+    </changeSet>
+
+    <changeSet id="DES-173-5.xml" author="egamas">
+        <dropColumn columnName="PHONE" tableName="POINT_OF_CONTACT"/>
+        <dropColumn columnName="EMAIL" tableName="POINT_OF_CONTACT"/>
+    </changeSet>
+
+    <changeSet id="development-quickFix.xml" author="egamas">
+        <addColumn tableName="ENERGY_CONTRACT_COMMODITY">
+            <column name="PRODUCT_TYPE" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

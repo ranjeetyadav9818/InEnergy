@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <o:importConstants type="com.inenergis.entity.genericEnum.PercentageHierarchyType" />
+
+        <h:form>
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Fees hierarchy (Taxes...)"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+
+                <p:outputPanel id="creationPanel">
+                    <h:panelGroup rendered="#{not percentageFeeHierarchyController.creatingFee}">
+                        <p:commandButton id="addButton" process="@this" update="@form" value="Add new entry" action="#{percentageFeeHierarchyController.add}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{percentageFeeHierarchyController.creatingFee}">
+                        <h3>Add new entry in the hierarchy</h3>
+                        <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="name" value="#{percentageFeeHierarchyController.fee.name}" required="true"/>
+                                <p:outputLabel value="Name:" for="name"/>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Type:" for="type"/>
+                                <p:selectOneMenu id="type" value="#{percentageFeeHierarchyController.fee.type}" converter="omnifaces.GenericEnumConverter">
+                                    <f:selectItems value="#{constantsProvider.feeHierarchyTypes}" var="type" itemValue="#{type}" itemLabel="#{type.name}"/>
+                                    <p:ajax update="creationPanel" event="change"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield" rendered="#{percentageFeeHierarchyController.fee.type ne PercentageHierarchyType.STATE }">
+                                <p:inputText id="area" value="#{percentageFeeHierarchyController.fee.area}" required="true"/>
+                                <p:outputLabel value="Area:" for="area"/>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield-select" rendered="#{percentageFeeHierarchyController.fee.type eq PercentageHierarchyType.STATE }">
+                                <p:outputLabel value="Area:" for="areaSelect"/>
+                                <p:selectOneMenu id="areaSelect"  required="true" value="#{percentageFeeHierarchyController.fee.area}">
+                                    <f:selectItems value="#{constantsProvider.states}" var="state" itemValue="#{state.label}" itemLabel="#{state.label}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Commodity:" for="commodity"/>
+                                <p:selectOneMenu id="commodity" required="true" value="#{percentageFeeHierarchyController.fee.commodity}" converter="omnifaces.GenericEnumConverter">
+                                    <f:selectItems value="#{constantsProvider.commodityTypes}" var="commodity" itemValue="#{commodity}" itemLabel="#{commodity.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputNumber id="percentage" value="#{percentageFeeHierarchyController.fee.percentage}" required="true" maxValue="999" decimalPlaces="7"/>
+                                <p:outputLabel value="Value:" for="percentage"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{percentageFeeHierarchyController.save()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="5"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{percentageFeeHierarchyController.cancel()}" process="@this" update="@form"/>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </div>
+            <div class="card">
+                <p:outputPanel id="vsmDivT">
+                    <!-- Filters & Results -->
+                    <p:dataTable value="#{percentageFeeHierarchyController.fees}" editable="true" var="fee" reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{fee.id}">
+
+                        <p:ajax event="rowEdit" listener="#{percentageFeeHierarchyController.onRowEdit}"/>
+
+                        <p:column headerText="Name" filterBy="#{fee.name}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{fee.name}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{fee.name}" required="true" label="Name" maxlength="250"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Type" filterBy="#{fee.type}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{fee.type.name}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu value="#{fee.type}" converter="omnifaces.GenericEnumConverter">
+                                        <f:selectItems value="#{constantsProvider.feeHierarchyTypes}" var="type" itemValue="#{type}" itemLabel="#{type.name}"/>
+                                        <p:ajax update="areaColumn" event="change"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Area" filterBy="#{fee.area}">
+                            <p:cellEditor  id="areaColumn">
+                                <f:facet name="output"><h:outputText value="#{fee.area}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:inputText value="#{fee.area}" required="true" label="Area" maxlength="250" rendered="#{fee.type ne PercentageHierarchyType.STATE}" />
+                                    <p:selectOneMenu required="true" value="#{fee.area}" rendered="#{fee.type eq PercentageHierarchyType.STATE}">
+                                        <f:selectItems value="#{constantsProvider.states}" var="state" itemValue="#{state.label}" itemLabel="#{state.label}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Commodity" filterBy="#{fee.commodity}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{fee.commodity.name}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu value="#{fee.commodity}" converter="omnifaces.GenericEnumConverter">
+                                        <f:selectItems value="#{constantsProvider.commodityTypes}" var="commodity" itemValue="#{commodity}" itemLabel="#{commodity.name}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Value" filterBy="#{fee.percentage}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{fee.percentage.multiply(100)}"/><h:outputText value="%"/></f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{fee.percentage}" required="true" maxValue="999" decimalPlaces="7"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+                    </p:dataTable>
+                </p:outputPanel>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

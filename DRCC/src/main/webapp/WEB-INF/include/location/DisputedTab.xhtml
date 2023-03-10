@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+>
+
+    <p:dataTable value="#{locationSubmissionController.lazyLocationSubmissionStatusDataModelDisputed}" id="TbDisputed" widgetVar="custTableDisp" lazy="true" var="locDisputed" reflow="true" rows="25" rowsPerPageTemplate="25,50,100" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{locDisputed.uuid}" selectionMode="single">
+        <p:ajax event="rowSelect" listener="#{locationSubmissionController.onSelectStatus}" update="form"/>
+        <p:column headerText="SA ID"  filterBy="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}" field="programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId" filterMatchMode="contains">
+            <h:outputText value="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}" />
+        </p:column>
+        <p:column headerText="UU ID" filterBy="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.saUuid}" field="programServiceAgreementEnrollment.serviceAgreement.saUuid" filterMatchMode="contains">
+            <h:outputText value="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.saUuid}"/>
+        </p:column>
+        <p:column headerText="Customer Name" filterBy="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}" field="programServiceAgreementEnrollment.serviceAgreement.account.person.customerName" filterMatchMode="contains">
+            <h:outputText value="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}"/>
+            <h:outputText value="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.account.person.businessName}"/>
+        </p:column>
+        <p:column headerText="Service Address" filterBy="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}" field="programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1} "/>
+        </p:column>
+        <p:column headerText="City" filterBy="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}" field="programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{locDisputed.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr} " />
+        </p:column>
+        <p:column headerText="Program" filterBy="#{locDisputed.programServiceAgreementEnrollment.program.name}" field="programServiceAgreementEnrollment.program.name" filterMatchMode="contains">
+            <h:outputText value="#{locDisputed.programServiceAgreementEnrollment.program.name}"/>
+        </p:column>
+        <p:column headerText="#{msg['data.mapping.sublap']}" filterBy="#{locDisputed.isoSublap}" field="isoSublap" filterMatchMode="contains">
+            <h:outputText value="#{locDisputed.isoSublap}"/>
+        </p:column>
+        <p:column headerText="LSE" filterBy="#{locDisputed.isoLse}" field="isoLse" filterMatchMode="contains">
+            <h:outputText value="#{locDisputed.isoLse}"/>
+        </p:column>
+        <p:column headerText="Market Submission Date" filterBy="#{locDisputed.isoSubmissionDate}" field="isoSubmissionDate" filterable="false" filterMatchMode="contains">
+            <h:outputText value="#{locDisputed.isoSubmissionDate}"/>
+        </p:column>
+        <p:column headerText="Commodity"  filterBy="#{pend.programServiceAgreementEnrollment.serviceAgreement.commodity}" field="programServiceAgreementEnrollment.serviceAgreement.commodity" filterMatchMode="contains">
+            <h:outputText value="#{pend.programServiceAgreementEnrollment.serviceAgreement.commodity}" />
+        </p:column>
+        <p:column headerText="Actions" width="110">
+            <p:menuButton value="Actions" >
+                <p:menuitem action="#{locationSubmissionController.prepareMarkAsNonRegistrable(locDisputed)}" process="@this" update="@form" value="Mark As Non-Registrable"/>
+                <p:menuitem action="#{locationSubmissionController.markAsReprocess(locDisputed)}" process="@this" update="@form" value="Reprocess to Market"/>
+            </p:menuButton>
+        </p:column>
+    </p:dataTable>
+    <p:outputPanel styleClass="MarginTop20" rendered="#{locationSubmissionController.showReason}">
+        <h:panelGroup styleClass="md-inputfield">
+            <p:inputTextarea value="#{locationSubmissionController.nonRegistrableReason}" id="textAreaNonRegistrableReason"/>
+            <h:outputLabel value="Non-registrable reason" for="textAreaNonRegistrableReason"/>
+        </h:panelGroup>
+        <p:commandButton value="Save" action="#{locationSubmissionController.markAsNonRegistrable()}" update="@form"/>
+        <p:spacer width="15"/>
+        <p:commandButton value="Cancel" action="#{locationSubmissionController.cancelMarkAsNonRegistrable}" update="@form"/>
+    </p:outputPanel>
+</ui:composition>

@@ -1,0 +1,94 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="ancillary_percentage_fees-1.xml" author="antonio.lopez">
+
+        <createTable tableName="RATE_ANCILLARY_PERCENTAGE_FEE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="PRICE" type="DECIMAL(12,6)"/>
+            <column name="ACTIVE" type="TINYINT(1) DEFAULT 1 NOT NULL"/>
+            <column name="SEASON_CALENDAR_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="RATE_PLAN_PROFILE_ID" type="BIGINT(20)"/>
+
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="RATE_ANCILLARY_PERCENTAGE_FEE" baseColumnNames="SEASON_CALENDAR_ID"
+                                 constraintName="FK_RATE_PERC_ANCILLARY_SEASON"
+                                 referencedTableName="TIME_OF_USE_CALENDAR"
+                                 referencedColumnNames="ID"/>
+
+        <addForeignKeyConstraint baseTableName="RATE_ANCILLARY_PERCENTAGE_FEE" baseColumnNames="RATE_PLAN_PROFILE_ID"
+                                 constraintName="FK_RATE_PERC_ANCILLARY_RATE_PLAN"
+                                 referencedTableName="RATE_PLAN_PROFILE"
+                                 referencedColumnNames="ID"/>
+
+
+        <addColumn tableName="INVOICE_LINE">
+            <column name="RATE_PROFILE_ANC_PERC_FEE_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="INVOICE_LINE" baseColumnNames="RATE_PROFILE_ANC_PERC_FEE_ID"
+                                 constraintName="FK_INV_LINE_PERC_FEE"
+                                 referencedTableName="RATE_ANCILLARY_PERCENTAGE_FEE"
+                                 referencedColumnNames="ID"/>
+
+
+        <dropColumn tableName="RATE_ANCILLARY_FEE" columnName="RATE_TYPE"/>
+    </changeSet>
+    <changeSet id="ancillary_percentage_fees-2.xml" author="antonio.lopez">
+        <addColumn tableName="RATE_ANCILLARY_PERCENTAGE_FEE">
+            <column name="PERCENTAGE_TYPE" type="VARCHAR(50)"/>
+        </addColumn>
+
+        <addColumn tableName="RATE_ANCILLARY_PERCENTAGE_FEE">
+            <column name="APPLICABILITY" type="VARCHAR(50)"/>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="ancillary_percentage_fees-3.xml" author="antonio.lopez">
+        <createTable tableName="APPLICABLE_FEES">
+            <column name="ANCILLARY_PERCENTAGE_FEE_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="FEE" type="VARCHAR(50)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="APPLICABLE_FEES" baseColumnNames="ANCILLARY_PERCENTAGE_FEE_ID"
+                                 constraintName="FK_APPLICABLE_FEE_PERC_ANCILLARY"
+                                 referencedTableName="RATE_ANCILLARY_PERCENTAGE_FEE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+
+
+
+    <changeSet id="ancillary_percentage_fees-4.xml" author="antonio.lopez">
+        <createTable tableName="PERCENTAGE_FEE_HIERARCHY">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="TYPE" type="VARCHAR(255)"/>
+            <column name="AREA" type="VARCHAR(255)"/>
+            <column name="PERCENTAGE_VALUE" type="DECIMAL(10,7)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="ancillary_percentage_fees-5.xml" author="antonio.lopez">
+        <addColumn tableName="RATE_ANCILLARY_PERCENTAGE_FEE">
+            <column name="DYNAMIC_FEE" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="ancillary_percentage_fees-6.xml" author="antonio.lopez">
+        <addColumn tableName="PERCENTAGE_FEE_HIERARCHY">
+            <column name="COMMODITY" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

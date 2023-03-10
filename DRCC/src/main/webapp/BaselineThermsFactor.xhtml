@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form id="FVSM">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Baseline Therms"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+
+                <p:outputPanel id="vsmDiv">
+                    <h:panelGroup rendered="#{not baselineThermsController.newBaselineTherms and baselineThermsController.baselineTherms eq null}">
+                        <p:commandButton id="addVSMButton" process="@this" update="FVSM:vsmDiv" value="Add Baseline Therms Factor"
+                                         action="#{baselineThermsController.add}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{baselineThermsController.newBaselineTherms}">
+                        <h3>Add Baseline Therms Factor</h3>
+
+                        <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                            <h:panelGroup styleClass="md-inputfield-calendar">
+                                <p:outputLabel value="Date:" for="billingDate"/>
+                                <p:calendar id="billingDate" value="#{baselineThermsController.baselineTherms.localDate}" pattern="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+                                            required="true"
+                                            converter="localDateConverter"/>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="code" value="#{baselineThermsController.baselineTherms.code}" required="true"/>
+                                <p:outputLabel value="Value" for="code"/>
+                            </h:panelGroup>
+
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{baselineThermsController.save()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="5"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{baselineThermsController.cancelThems()}" process="@this" update="FVSM:vsmDiv"/>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </div>
+            <div class="card card-w-title">
+                <p:outputPanel id="vsmDivT">
+
+                    <!-- Filters & Results -->
+                    <p:dataTable id="baTable" value="#{baselineThermsController.baselineThermsList}" widgetVar="mappingWidget" editable="true"
+                                 var="baselineTherms"
+                                 reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{baselineTherms.id}"
+                                 selection="#{baselineThermsController.selectedTherms}" selectionMode="single">
+
+                        <p:ajax event="rowEdit" listener="#{baselineThermsController.onRowEdit}"/>
+
+                        <p:column headerText="Value" filterBy="#{baselineTherms.code}" filterable="true">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{baselineTherms.code}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{baselineTherms.code}" label="Code" maxlength="100"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                          <p:column headerText="Date" filterBy="#{baselineTherms.localDate}" filterable="true" sortBy="#{baselineTherms.localDate}">
+                            <h:outputText value="#{baselineTherms.localDate}" converter="localDateConverter"/>
+                        </p:column>
+
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:contextMenu for="baTable" widgetVar="vsmMenu">
+                        <p:menuitem value="Delete" update="FVSM:vsmDivT" icon="ui-icon-trash-1"
+                                    actionListener="#{baselineThermsController.deleteTherms()}"/>
+                        <p:menuitem value="Hide" icon="ui-icon-close" onclick="PF('vsmMenu').hide()"/>
+                    </p:contextMenu>
+                </p:outputPanel>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

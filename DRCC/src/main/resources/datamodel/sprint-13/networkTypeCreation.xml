@@ -1,0 +1,177 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="networkTypeCreation0" author="egamas">
+        <tagDatabase tag="pre-networkTypeCreation0" />
+    </changeSet>
+
+    <changeSet id="networkTypeCreation1.xml" author="egamas">
+        <createTable tableName="NETWORK_TYPE">
+            <column name="ID" type="bigint(20) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="COMMODITY_TYPE" type="varchar(55)"/>
+            <column name="NAME" type="varchar(255)"/>
+        </createTable>
+
+        <addColumn tableName="ASSET_PROFILE">
+            <column name="NETWORK_TYPE_ID" type="bigint(20) unsigned">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="networkTypeCreation2.xml" author="egamas">
+        <insert
+                tableName="NETWORK_TYPE">
+            <column name="UUID" type="varchar(255)" value="372eadb6-c325-11e7-b6c0-1da1ce285b50"/>
+            <column name="NAME" type="VARCHAR(55)" value="Transmission"/>
+            <column name="COMMODITY_TYPE" type="VARCHAR(55)" value="ELECTRICITY"/>
+        </insert>
+
+        <insert
+                tableName="NETWORK_TYPE">
+            <column name="UUID" type="varchar(255)" value="76d45e52-c325-11e7-b6c0-1da1ce285b50"/>
+            <column name="NAME" type="VARCHAR(55)" value="Distribution"/>
+            <column name="COMMODITY_TYPE" type="VARCHAR(55)" value="ELECTRICITY"/>
+        </insert>
+
+        <insert
+                tableName="NETWORK_TYPE">
+            <column name="UUID" type="varchar(255)" value="ca2daacc-c325-11e7-b6c0-1da1ce285b50"/>
+            <column name="NAME" type="VARCHAR(55)" value="Prosumer"/>
+            <column name="COMMODITY_TYPE" type="VARCHAR(55)" value="ELECTRICITY"/>
+        </insert>
+
+        <sql>
+            UPDATE `ASSET_PROFILE` `AP1` SET `NETWORK_TYPE_ID` = (SELECT `ID` FROM `NETWORK_TYPE` `nt` WHERE `AP1`.`GRID_TYPE` = UPPER(`nt`.`NAME`) AND `COMMODITY_TYPE` = 'ELECTRICITY') ;
+        </sql>
+
+        <rollback>
+            <dropColumn tableName="ASSET_PROFILE" columnName="NETWORK_TYPE_ID" />
+            <delete tableName="NETWORK_TYPE" />
+            <dropTable tableName="NETWORK_TYPE"/>
+        </rollback>
+
+    </changeSet>
+
+    <changeSet id="networkTypeCreation3.xml" author="egamas">
+
+        <addForeignKeyConstraint baseTableName="ASSET_PROFILE"
+                                 baseColumnNames="NETWORK_TYPE_ID"
+                                 constraintName="FK_ASSET_PROFILE_NETWORK_TYPE_ID"
+                                 referencedTableName="NETWORK_TYPE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="networkTypeCreation4.xml" author="egamas">
+        <dropColumn tableName="ASSET_PROFILE" columnName="GRID_TYPE" />
+    </changeSet>
+
+    <changeSet id="networkTypeCreation5.xml" author="egamas">
+        <addColumn tableName="ASSET_GROUP">
+            <column name="COMMODITY_TYPE" type="VARCHAR(55)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="networkTypeCreation6.xml" author="egamas">
+        <sql>
+            UPDATE `ASSET_GROUP` SET `COMMODITY_TYPE` = 'ELECTRICITY';
+        </sql>
+        <rollback>
+            UPDATE `ASSET_GROUP` SET `COMMODITY_TYPE` = NULL;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="networkTypeCreation7.xml" author="egamas">
+        <insert
+                tableName="NETWORK_TYPE">
+            <column name="UUID" type="varchar(255)" value="f4c82258-c875-11e7-b6c0-1da1ce285b50"/>
+            <column name="NAME" type="VARCHAR(55)" value="Transportation"/>
+            <column name="COMMODITY_TYPE" type="VARCHAR(55)" value="GAS"/>
+        </insert>
+
+        <insert
+                tableName="NETWORK_TYPE">
+            <column name="UUID" type="varchar(255)" value="fbbb0aa8-c875-11e7-b6c0-1da1ce285b50"/>
+            <column name="NAME" type="VARCHAR(55)" value="Distribution"/>
+            <column name="COMMODITY_TYPE" type="VARCHAR(55)" value="GAS"/>
+        </insert>
+
+        <rollback>
+            <rollback>
+                DELETE FROM `NETWORK_TYPE` WHERE `COMMODITY_TYPE` = 'GAS' AND `UUID` IN ('f4c82258-c875-11e7-b6c0-1da1ce285b50','fbbb0aa8-c875-11e7-b6c0-1da1ce285b50');
+            </rollback>
+        </rollback>
+    </changeSet>
+    
+    <changeSet id="assetProfileTypeCreation1.xml" author="egamas">
+        <addColumn tableName="ASSET_PROFILE">
+            <column name="ASSET_PROFILE_TYPE" type="VARCHAR(55)" defaultValue="CATALOG_INVENTORY"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="newDeviceCreation1.xml" author="egamas">
+        <addColumn tableName="ASSET_DEVICE">
+            <column name="TRANSPORTATION_ASSET_ID" type="BIGINT(20) unsigned" />
+            <column name="CONNECTION_DISTRIBUTION_ASSET_ID" type="BIGINT(20) unsigned" />
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                 baseColumnNames="TRANSPORTATION_ASSET_ID"
+                                 constraintName="FK_ASSET_DEVICE_TRANSP_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+
+        <addForeignKeyConstraint baseTableName="ASSET_DEVICE"
+                                 baseColumnNames="CONNECTION_DISTRIBUTION_ASSET_ID"
+                                 constraintName="FK_ASSET_DEVICE_CON_DIST_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="newDeviceCreation2.xml" author="egamas">
+        <renameColumn tableName="ASSET_DEVICE" oldColumnName="CONNECTION_DISTRIBUTION_ASSET_ID" newColumnName="GAS_DISTRIBUTION_ASSET_ID" columnDataType="bigint(20) unsigned"/>
+    </changeSet>
+    <changeSet id="newDeviceCreation3.xml" author="egamas">
+        <addColumn tableName="DEVICE_LINK">
+            <column name="ASSET_PROFILE_ID" type="BIGINT(20) unsigned"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="DEVICE_LINK"
+                                 baseColumnNames="ASSET_PROFILE_ID"
+                                 constraintName="FK_DEVICE_LINK_PROFILE"
+                                 referencedTableName="ASSET_PROFILE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="newDeviceCreation4.xml" author="egamas">
+        <addColumn tableName="ASSET_ATTRIBUTE">
+            <column name="DEVICE_LINK_ID" type="BIGINT(20) unsigned"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="ASSET_ATTRIBUTE"
+                                 baseColumnNames="DEVICE_LINK_ID"
+                                 constraintName="FK_ASSET_DEVICE_LINK"
+                                 referencedTableName="DEVICE_LINK"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="deviceLine1" author="antonio.lopez">
+        <createTable tableName="DEVICE_LINE">
+            <column name="ID" type="bigint(20) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="NAME" type="varchar(255)"/>
+            <column name="START_LATITUDE" type="DECIMAL(9,6)"/>
+            <column name="START_LONGITUDE" type="DECIMAL(9,6)"/>
+            <column name="END_LATITUDE" type="DECIMAL(9,6)"/>
+            <column name="END_LONGITUDE" type="DECIMAL(9,6)"/>
+        </createTable>
+        <createTable tableName="DEVICE_LINE_DEVICE">
+            <column name="ASSET_DEVICE_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="DEVICE_LINE_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

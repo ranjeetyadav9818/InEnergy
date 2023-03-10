@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <div class="card card-w-title">
+        <h:panelGroup id="serviceAgreements">
+            <h3 class="with-icon">Service Agreements</h3>
+
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputTextarea rows="5" cols="50" value="#{energyContractController.rawServiceAgreements}" disabled="#{readonly}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:dataTable id="selectedServiceAgreements" var="serviceAgreement"
+                                 value="#{energyContractController.energyContract.contractServiceAgreements}">
+                        <p:column headerText="ID" width="80">
+                            <h:outputText value="#{serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="Name">
+                            <h:outputText value="#{serviceAgreement.account.person.toShortName()}"/>
+                        </p:column>
+                        <p:column headerText="Phone">
+                            <h:outputText value="#{serviceAgreement.phone}"/>
+                        </p:column>
+
+                        <p:column width="80">
+                            <p:commandButton update="selectedServiceAgreements" process="selectedServiceAgreements" value="Remove"
+                                             action="#{energyContractController.removeServiceAgreement(serviceAgreement)}"
+                                             rendered="#{!readonly}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+            </p:panelGrid>
+
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="serviceAgreements" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="serviceAgreements" process="serviceAgreements" value="Add"
+                                     action="#{energyContractController.addServiceAgreements()}"
+                                     rendered="#{!readonly}"/>
+                    <p:spacer width="10"/>
+                    <p:commandButton update="serviceAgreements" process="serviceAgreements" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

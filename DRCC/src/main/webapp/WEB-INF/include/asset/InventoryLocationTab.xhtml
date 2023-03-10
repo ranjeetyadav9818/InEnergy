@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:p="http://primefaces.org/ui">
+
+    <j:useBean id="controller" type="com.inenergis.controller.asset.DeviceDetailsController"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Location</h3>
+
+        <h:panelGroup id="location">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{controller.editModeTab}">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="address_1" value="#{controller.device.address1}" required="true"/>
+                        <p:outputLabel value="Address 1:" for="address_1"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="address_2" value="#{controller.device.address2}"/>
+                        <p:outputLabel value="Address 2:" for="address_2"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="address_3" value="#{controller.device.address3}"/>
+                        <p:outputLabel value="Address 3:" for="address_3"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="city" value="#{controller.device.city}" required="true"/>
+                        <p:outputLabel value="City:" for="city"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="postcode" value="#{controller.device.postcode}" required="true"/>
+                        <p:outputLabel value="Postcode:" for="postcode"/>
+                    </h:panelGroup>
+                    <p:spacer/>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber id="latitude" value="#{controller.device.latitude}" minValue="-90" maxValue="90" decimalPlaces="6"/>
+                        <p:outputLabel value="Latitude:" for="latitude"/>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputNumber id="longitude" value="#{controller.device.longitude}" minValue="-180" maxValue="180" decimalPlaces="6"/>
+                        <p:outputLabel value="Longitude:" for="longitude"/>
+                    </h:panelGroup>
+                    <p:commandButton action="#{controller.save()}" value="Save" update="form"/>
+                </p:panelGrid>
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!controller.editModeTab}">
+                    <p:outputLabel value="Address 1:"/>
+                    <p:outputLabel value="#{controller.device.address1}"/>
+
+                    <p:outputLabel value="Address 2:"/>
+                    <p:outputLabel value="#{controller.device.address2}"/>
+
+                    <p:outputLabel value="Address 3:"/>
+                    <p:outputLabel value="#{controller.device.address3}"/>
+
+                    <p:outputLabel value="City:"/>
+                    <p:outputLabel value="#{controller.device.city}"/>
+
+                    <p:outputLabel value="Postcode:"/>
+                    <p:outputLabel value="#{controller.device.postcode}"/>
+
+                    <p:outputLabel value="Latitude:"/>
+                    <p:outputLabel value="#{controller.device.latitude}"/>
+
+                    <p:outputLabel value="Longitude:"/>
+                    <p:outputLabel value="#{controller.device.longitude}"/>
+
+                    <p:commandButton action="#{controller.editTab()}" value="Edit" update="form"/>
+                </p:panelGrid>
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:gmap type="MAP" center="#{controller.device.latitude},#{controller.device.longitude}" zoom="7"
+                            style="width:100%;height:300px" model="#{mapController.model}" streetView="true"
+                            rendered="#{controller.device.latitude != null and controller.device.longitude !=null}">
+                        <p:ajax event="overlaySelect" listener="#{mapController.onMarkerSelect}"/>
+                    </p:gmap>
+                </p:panelGrid>
+
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:cc="http://java.sun.com/jsf/composite">
+<!-- INTERFACE -->
+<cc:interface componentType="dateRange">
+    <cc:attribute name="fromLabel"/>
+    <cc:attribute name="toLabel"/>
+    <cc:attribute name="value" type="com.inenergis.util.DateRange"/>
+    <cc:attribute name="onvaluechanged"/>
+    <cc:attribute name="pattern"/>
+    <cc:attribute name="timeZone"/>
+    <cc:attribute name="tableWidgetVar"/>
+</cc:interface>
+
+        <!-- IMPLEMENTATION -->
+<cc:implementation>
+    <h:panelGroup id="rangeFiter">
+    <table>
+        <tr>
+            <td style="width: 15%; border: none; font-size: small">
+                <h:outputText value="#{cc.attrs.fromLabel}"/>
+            </td>
+            <td style="width: 33%; border: none; font-size: small">
+                <p:calendar id="startDateCalendar" value="#{cc.attrs.value.from}" pattern="#{cc.attrs.pattern}" timeZone="#{cc.attrs.timeZone}">
+                    <p:ajax event="dateSelect" update="startDateCalendar" oncomplete="#{cc.attrs.onvaluechanged}" onsuccess="PF('#{cc.attrs.tableWidgetVar}').filter()"/>
+                </p:calendar>
+            </td>
+            <td style="width: 9%; border: none; font-size: small">
+                <h:outputText value="#{cc.attrs.toLabel}"/>
+            </td>
+            <td style="width: 32%; border: none; font-size: small">
+                <p:calendar id="endDateCalendar" value="#{cc.attrs.value.to}" mindate="#{cc.attrs.value.from}" pattern="#{cc.attrs.pattern}" timeZone="#{cc.attrs.timeZone}">
+                    <p:ajax event="dateSelect" update="endDateCalendar" oncomplete="#{cc.attrs.onvaluechanged}" onsuccess="PF('#{cc.attrs.tableWidgetVar}').filter()"/>
+                </p:calendar>
+            </td>
+            <td style="width: 12%; border: none; font-size: small">
+                <p:commandButton action="#{cc.attrs.value.reset}" update="rangeFiter" process="@this" icon="ui-icon-undo"
+                                 style="width: 17px; height: 17px; padding: 1px;" onsuccess="PF('#{cc.attrs.tableWidgetVar}').filter()"/>
+            </td>
+        </tr>
+    </table>
+    </h:panelGroup>
+</cc:implementation>
+</ui:composition>

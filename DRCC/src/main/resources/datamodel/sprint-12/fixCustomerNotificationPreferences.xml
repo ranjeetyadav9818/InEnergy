@@ -1,0 +1,18 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="fixCustomerNotificationPreferences.xml" author="egamas">
+        <createIndex tableName="CUSTOMER_NOTIFICATION_PREFERENCE" indexName="IDX_SA">
+            <column name="SA_ID"/>
+        </createIndex>
+        <createIndex tableName="CUSTOMER_NOTIFICATION_PREFERENCE" indexName="IDX_START_DATE">
+            <column name="START_DATE"/>
+        </createIndex>
+        <createIndex tableName="CUSTOMER_NOTIFICATION_PREFERENCE" indexName="IDX_SA_END_DATE">
+            <column name="END_DATE"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,155 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <j:useBean id="controller" type="com.inenergis.controller.program.RatePlanController"/>
+    <j:useBean id="ratePlan" type="com.inenergis.entity.program.RatePlan"/>
+    <j:useBean id="seasonCalendar" type="com.inenergis.entity.program.SeasonCalendar"/>
+    <j:useBean id="holidayCalendar" type="com.inenergis.entity.program.HolidayCalendar"/>
+
+
+    <o:importConstants type="com.inenergis.entity.genericEnum.TierType" />
+    <o:importConstants type="com.inenergis.entity.genericEnum.TierBoundType" />
+    <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <h:panelGroup styleClass="md-inputfield-select">
+            <p:outputLabel value="Tier type:" for="tierType"/>
+            <p:selectOneMenu id="tierType" value="#{controller.selectedProfile.tierType}" disabled="#{controller.viewModeOn or controller.selectedProfile.getActiveRateTiers().size() > 0}" required="true" converter="omnifaces.GenericEnumConverter" >
+                <f:selectItems value="#{constantsProvider.tierTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+            </p:selectOneMenu>
+
+<!--            <p:selectOneMenu id="gasTierType" value="#{controller.selectedProfile.tierType}" disabled="#{controller.viewModeOn or controller.selectedProfile.getActiveRateTiers().size() > 0}" required="true" converter="omnifaces.GenericEnumConverter"  rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">-->
+<!--                <f:selectItems value="#{constantsProvider.gasTierTypes}" var="gasTierType" itemLabel="#{gasTierType.name}" itemValue="#{gasTierType}"/>-->
+<!--            </p:selectOneMenu>-->
+        </h:panelGroup>
+        <h:panelGroup styleClass="md-inputfield">
+            <p:commandButton action="#{controller.addTier}" update="@form" icon="ui-icon-plus" process="@form" rendered="#{not controller.viewModeOn}">
+                <o:skipValidators/>
+            </p:commandButton>
+        </h:panelGroup>
+    </p:panelGrid>
+    <c:forEach items="#{controller.selectedProfile.getActiveRateTiers()}" var="tier" varStatus="idx">
+        <p:separator rendered="#{not idx.first}"/>
+        <p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank form-group" id="tiersDefinition">
+            <h:panelGroup styleClass="md-inputfield">
+                <p:inputText id="tierName" value="#{tier.name}" required="true" maxlength="255" disabled="#{controller.viewModeOn}"/>
+                <p:outputLabel value="Tier name:" for="tierName"/>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="Penalty:"/>
+                <p:inputNumber value="#{tier.penaltyAmount}" decimalPlaces="6" maxValue="10000" disabled="#{controller.viewModeOn}"/>
+                <p:selectOneMenu value="#{tier.penaltyPeriod}" disabled="#{controller.viewModeOn}" converter="omnifaces.GenericEnumConverter">
+                    <f:selectItems value="#{constantsProvider.penaltyPeriods}" var="period" itemLabel="#{period.name}" itemValue="#{period}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" rendered="#{controller.selectedProfile.tierType eq TierType.DEMAND}">
+                <p:outputLabel value="Interval calculation:" for="intervalDemand"/>
+                <p:selectOneMenu id="intervalDemand" value="#{tier.interval}" disabled="#{controller.viewModeOn}" required="true" converter="omnifaces.GenericEnumConverter">
+                    <f:selectItems value="#{constantsProvider.tierIntervals}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+            <p:column/>
+            <h:panelGroup styleClass="md-inputfield">
+                <p:commandButton action="#{controller.removeTier(tier)}" update="@form" icon="ui-icon-remove" process="@form" rendered="#{not controller.viewModeOn}">
+                    <o:skipValidators/>
+                </p:commandButton>
+            </h:panelGroup>
+
+        </p:panelGrid>
+        <p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank form-group" id="tiersFrom-#{idx.index}">
+
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="From (kWh):" for="fromBound" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}"/>
+                <p:outputLabel value="From (Therms):" for="fromBound" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}"/>
+
+                <p:selectOneMenu id="fromBound" value="#{tier.fromBound}" disabled="#{controller.viewModeOn}" required="true" converter="omnifaces.GenericEnumConverter">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.tierBounds}" var="bound" itemLabel="#{bound.name}" itemValue="#{bound}"
+                                   itemDisabled="#{(bound eq TierBoundType.UNLIMITED) or (bound eq TierBoundType.PREVIOUS_BAND and idx.index eq 0) or (bound ne TierBoundType.PREVIOUS_BAND and idx.index ne 0)}"/>
+                    <p:ajax update="tiersFrom-#{idx.index}" >
+                        <o:skipValidators/>
+                    </p:ajax>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{tier.fromBound eq TierBoundType.AMOUNT}">
+                <p:inputNumber label="from amount" value="#{tier.fromAmountValue}" required="true" minValue="0" decimalPlaces="3" disabled="#{controller.viewModeOn}" />
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" rendered="#{tier.fromBound eq TierBoundType.FORMULA}">
+                <p:outputLabel value="_" style="color: white !important;"/>
+                <p:selectOneMenu label="vaiable" value="#{tier.fromFormulaVariable}" disabled="#{controller.viewModeOn}" required="true" converter="omnifaces.GenericEnumConverter" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.tierFormulaVariables}" var="variable" itemLabel="#{variable.name}" itemValue="#{variable}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu label="vaiable" value="#{tier.gasfromFormulaVariable}" disabled="#{controller.viewModeOn}" required="true" converter="omnifaces.GenericEnumConverter" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.gasfromFormulaVariables}" var="gasfromFormulaVariable" itemLabel="#{gasfromFormulaVariable.name}" itemValue="#{gasfromFormulaVariable}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" rendered="#{tier.fromBound eq TierBoundType.FORMULA}">
+                <p:outputLabel value="_" style="color: white !important;"/>
+                <p:selectOneMenu label="operator" value="#{tier.fromFormulaOperator}" disabled="#{controller.viewModeOn}" converter="omnifaces.GenericEnumConverter">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.tierFormulaOperators}" var="operator" itemLabel="#{operator.name}" itemValue="#{operator}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{tier.fromBound eq TierBoundType.FORMULA}">
+                <p:inputNumber value="#{tier.fromAmountValue}" decimalPlaces="6" disabled="#{controller.viewModeOn}" />
+            </h:panelGroup>
+        </p:panelGrid>
+        <p:panelGrid columns="7" layout="grid" styleClass="ui-panelgrid-blank form-group" id="tiersTo-#{idx.index}">
+            <h:panelGroup styleClass="md-inputfield-select">
+                <p:outputLabel value="To (kWh):" for="toBound" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}"/>
+                <p:outputLabel value="To (Therms):" for="toBound" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}"/>
+
+                <p:selectOneMenu id="toBound" value="#{tier.toBound}" disabled="#{controller.viewModeOn}" required="true" converter="omnifaces.GenericEnumConverter">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.tierBounds}" var="bound" itemLabel="#{bound.name}" itemValue="#{bound}" itemDisabled="#{bound eq TierBoundType.PREVIOUS_BAND}"/>
+                    <p:ajax update="tiersTo-#{idx.index}">
+                        <o:skipValidators/>
+                    </p:ajax>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{tier.toBound eq TierBoundType.AMOUNT}">
+                <p:inputNumber label="to amount" value="#{tier.toAmountValue}" required="true" minValue="0" decimalPlaces="3" disabled="#{controller.viewModeOn}" />
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" rendered="#{tier.toBound eq TierBoundType.FORMULA}">
+                <p:outputLabel value="_" style="color: white !important;"/>
+                <p:selectOneMenu label="vaiable" value="#{tier.toFormulaVariable}" disabled="#{controller.viewModeOn}" required="true" converter="omnifaces.GenericEnumConverter" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Electricity'}">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.tierFormulaVariables}" var="variable" itemLabel="#{variable.name}" itemValue="#{variable}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu label="vaiable" value="#{tier.gasfromFormulaVariable}" disabled="#{controller.viewModeOn}" required="true" converter="omnifaces.GenericEnumConverter" rendered="#{controller.selectedProfile.ratePlan.commodityType == 'Gas'}">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.gasfromFormulaVariables}" var="gasfromFormulaVariable" itemLabel="#{gasfromFormulaVariable.name}" itemValue="#{gasfromFormulaVariable}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield-select" rendered="#{tier.toBound eq TierBoundType.FORMULA}">
+                <p:outputLabel value="_" style="color: white !important;"/>
+                <p:selectOneMenu label="operator" value="#{tier.toFormulaOperator}" disabled="#{controller.viewModeOn}" converter="omnifaces.GenericEnumConverter">
+                    <f:selectItem itemLabel="" noSelectionOption="true"/>
+                    <f:selectItems value="#{constantsProvider.tierFormulaOperators}" var="operator" itemLabel="#{operator.name}" itemValue="#{operator}"/>
+                </p:selectOneMenu>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="md-inputfield" rendered="#{tier.toBound eq TierBoundType.FORMULA}">
+                <p:inputNumber value="#{tier.toAmountValue}" decimalPlaces="6" disabled="#{controller.viewModeOn}" />
+            </h:panelGroup>
+        </p:panelGrid>
+    </c:forEach>
+
+
+</ui:composition>

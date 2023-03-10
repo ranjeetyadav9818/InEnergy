@@ -1,0 +1,23 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-245-1" author="antonio.lopez">
+        <addColumn tableName="RATE_CONSUMPTION_FEE">
+            <column name="RATE_PLAN_PROFILE_ID" type="BIGINT(20)"/>
+        </addColumn>
+        <addColumn tableName="RATE_ANCILLARY_FEE">
+            <column name="RATE_PLAN_PROFILE_ID" type="BIGINT(20)"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="RATE_CONSUMPTION_FEE" baseColumnNames="RATE_PLAN_PROFILE_ID"
+                                 constraintName="FK_RATE_CONSUMPTION_RATE_PROFILE"
+                                 referencedTableName="RATE_PLAN_PROFILE"
+                                 referencedColumnNames="ID"/>
+        <addForeignKeyConstraint baseTableName="RATE_ANCILLARY_FEE" baseColumnNames="RATE_PLAN_PROFILE_ID"
+                                 constraintName="FK_RATE_ANCILLARY_RATE_PROFILE"
+                                 referencedTableName="RATE_PLAN_PROFILE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+</databaseChangeLog>

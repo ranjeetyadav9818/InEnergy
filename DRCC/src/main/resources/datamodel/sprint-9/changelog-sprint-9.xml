@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet author="egamas" id="DES-18-1.sql">
+        <sql>ALTER TABLE `EVENT` ADD COLUMN `EVENT_NAME` varchar(99);</sql>
+    </changeSet>
+    <changeSet author="egamas" id="DES-18-2.sql">
+        <sqlFile path="DES-18-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-8.sql">
+        <sqlFile path="DES-8.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-18-2-1.sql">
+        <sql>ALTER TABLE `EVENT` DROP COLUMN `EVENT_PLAN_ID`; </sql>
+        <sql>DROP TABLE `EVENT_PLAN`; </sql>
+    </changeSet>
+    <changeSet author="egamas" id="DES-18-2-2.sql">
+        <sqlFile path="DES-18-2-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-8-2.sql">
+        <sqlFile path="DES-8-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-8-3.sql">
+        <sqlFile path="DES-8-3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="egamas" id="DES-18-2-3.sql">
+        <sql>ALTER TABLE `IMPACTED_CUSTOMER` MODIFY  `DRMS_ID` VARCHAR(50) DEFAULT NULL;</sql>
+    </changeSet>
+
+    <changeSet author="vm" id="DES-22">
+        <sqlFile path="DES-22.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DES-77.sql">
+        <sqlFile path="DES-77.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+</databaseChangeLog>

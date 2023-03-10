@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <j:useBean id="controller" type="com.inenergis.controller.asset.DeviceDetailsController"/>
+    <h:panelGroup rendered="#{controller.editMode}">
+        <c:set value="#{controller.device}" var="device"/>
+        <j:useBean id="device" type="com.inenergis.entity.device.AssetDevice"/>
+        <j:useBean id="inventoryType" type="java.lang.String"/>
+
+        <div class="card card-w-title">
+            <h3>Add new device.</h3>
+            <h:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="#{inventoryType} Asset" for="asset"/>
+                    <p:selectOneMenu id="asset" value="#{controller.device.asset}" required="true" converter="assetConverter">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.assets}" var="asset"
+                                       itemLabel="#{asset.name}" itemValue="#{asset}"/>
+                        <p:ajax listener="#{controller.loadDeviceAttributes(device)}" update="catalogAttributes"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <p:spacer/>
+                <p:spacer/>
+                <p:spacer/>
+
+                <h:panelGroup styleClass="md-inputfield" style="padding-bottom: 10px;">
+                    <p:inputText required="true" id="assetName" value="#{device.name}"/>
+                    <p:outputLabel value="Name:" for="assetName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield" style="padding-bottom: 10px;">
+                    <p:inputText required="true" id="assetDescription" value="#{device.description}"/>
+                    <p:outputLabel value="Description:" for="assetDescription"/>
+                </h:panelGroup>
+            </h:panelGrid>
+
+            <h:panelGrid id="catalogAttributes" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10">
+                <ui:repeat value="#{controller.device.deviceAttributes}" var="catalogAttruibute">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText value="#{catalogAttruibute.stringValue}"
+                                     required="#{catalogAttruibute.profileAttribute.mandatory}" size="30" maxlength="255" label="#{catalogAttruibute.profileAttribute.name}"
+                                     rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'TEXT'}"/>
+                        <p:inputNumber value="#{catalogAttruibute.numberValue}" required="#{catalogAttruibute.profileAttribute.mandatory}"
+                                       rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'NUMBER'}"
+                                       decimalPlaces="5" maxValue="999999.99999" label="#{catalogAttruibute.profileAttribute.name}"/>
+                        <p:calendar value="#{catalogAttruibute.dateValue}" pattern="MM/dd/yyyy" mask="true" placeholder="mm/dd/yyyy"
+                                    converter="localDateConverter"
+                                    required="#{catalogAttruibute.profileAttribute.mandatory}"
+                                    label="#{catalogAttruibute.profileAttribute.name}" rendered="#{catalogAttruibute.profileAttribute.attributeValidation eq 'DATE'}"/>
+                        <p:outputLabel value="#{catalogAttruibute.profileAttribute.name}:"/>
+                    </h:panelGroup>
+                </ui:repeat>
+            </h:panelGrid>
+
+            <p:commandButton id="save" value="Save" action="#{controller.save}" process="@form" update="@none"/>
+            <p:spacer width="10"/>
+            <p:commandButton id="cancel" value="Cancel" action="#{controller.clear()}" process="@this" update="@form"/>
+        </div>
+    </h:panelGroup>
+</ui:composition>

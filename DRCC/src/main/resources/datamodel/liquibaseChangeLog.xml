@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet context="ddl" id="pre-sprint-6-tag" author="antonio.lopez">
+        <tagDatabase tag="pre-sprint-6" />
+    </changeSet>
+
+    <include file="sprint-6/changelog-sprint-6.xml" relativeToChangelogFile="true"/>
+
+    <changeSet context="ddl" id="pre-sprint-7-tag" author="antonio.lopez">
+        <tagDatabase tag="pre-sprint-7" />
+    </changeSet>
+
+    <include file="sprint-7/changelog-sprint-7.xml" relativeToChangelogFile="true"/>
+
+    <changeSet context="ddl" id="pre-sprint-8-tag" author="antonio.lopez">
+        <tagDatabase tag="pre-sprint-8" />
+    </changeSet>
+
+    <include file="sprint-8/changelog-sprint-8.xml" relativeToChangelogFile="true"/>
+
+    <include file="sprint-9/changelog-sprint-9.xml" relativeToChangelogFile="true"/>
+
+    <include file="sprint-10/changelog-sprint-10.xml" relativeToChangelogFile="true"/>
+
+    <include file="sprint-11/changelog-sprint-11.xml" relativeToChangelogFile="true"/>
+
+    <changeSet context="ddl" id="pre-sprint-12-tag" author="antonio.lopez">
+        <tagDatabase tag="pre-sprint-12" />
+    </changeSet>
+
+    <include file="sprint-12/changelog-sprint-12.xml" relativeToChangelogFile="true"/>
+
+    <changeSet context="ddl" id="pre-sprint-13-tag" author="antonio.lopez">
+        <tagDatabase tag="pre-sprint-13" />
+    </changeSet>
+
+    <include file="sprint-13/changelog-sprint-13.xml" relativeToChangelogFile="true"/>
+
+
+</databaseChangeLog>

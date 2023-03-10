@@ -1,0 +1,223 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <c:set var="controller" value="#{scheduleEventController}"/>
+
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Schedule an Event" url="#"/>
+        </p:breadCrumb>
+
+        <h:form id="form">
+            <div class="card" style="padding-top: 40px;">
+                <h:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Program:" for="program"/>
+                        <p:selectOneMenu id="program" converter="programConverter" value="#{controller.newEvent.program}" required="true"
+                                         style="width: 157px;">
+                            <p:ajax listener="#{controller.loadOptions()}" update="option,eventStartDate,eventEndDate,dispatchLevel"/>
+                            <o:skipValidators/>
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{controller.programList}" var="program" itemLabel="#{program.name}" itemValue="#{program}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Option:" for="option"/>
+                        <p:selectOneMenu id="option" converter="programOptionConverter" value="#{controller.newEvent.programOption}"
+                                         disabled="#{controller.programOptionList.size() eq 0}"
+                                         style="width: 157px;">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{controller.programOptionList}" var="option" itemLabel="#{option.name}" itemValue="#{option}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:column/>
+
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:calendar id="eventStartDate" value="#{controller.newEvent.startDate}" pattern="MM/dd/yyyy hh:mm aa" required="true" size="28"
+                                    showButtonPanel="true" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"
+                                    disabled="#{controller.newEvent.program eq null}">
+                            <p:ajax update="totalHours,scheduleEvent" listener="#{controller.validateNewEventForm()}" delay="1000"/>
+                        </p:calendar>
+                        <p:outputLabel value="Event Start Date/Time" for="eventStartDate"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-calendar">
+                        <p:calendar id="eventEndDate" value="#{controller.newEvent.endDate}" pattern="MM/dd/yyyy hh:mm aa" required="true" size="28"
+                                    showButtonPanel="true" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"
+                                    disabled="#{controller.newEvent.program eq null}">
+                            <p:ajax update="totalHours,scheduleEvent" listener="#{controller.validateNewEventForm()}" delay="1000"/>
+                        </p:calendar>
+                        <p:outputLabel value="Event End Date/Time" for="eventEndDate"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup style="display: block;padding-bottom: 12px;">
+                        <p:outputLabel id="totalHours" value="(Total Hours: #{controller.totalHours} Minutes: #{controller.totalMinutes})"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Dispatch Reason:" for="dispatchReason"/>
+                        <p:selectOneMenu id="dispatchReason" converter="omnifaces.GenericEnumConverter" value="#{controller.newEvent.dispatchReason}"
+                                         required="true" style="width: 157px;">
+                            <p:ajax listener="#{controller.validateNewEventForm()}" update="scheduleEvent"/>
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.dispatchReasons}" var="dispatchReason" itemLabel="#{dispatchReason.name}"
+                                           itemValue="#{dispatchReason}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Dispatch Level:" for="dispatchLevel"/>
+                        <p:selectOneMenu id="dispatchLevel" converter="omnifaces.GenericEnumConverter" value="#{controller.newEvent.dispatchLevel}"
+                                         required="true" style="width: 157px;" disabled="#{controller.newEvent.program eq null}">
+                            <p:ajax listener="#{controller.selectDispatchLevel()}"
+                                    update="@form"/>
+                            <o:skipValidators/>
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{controller.programDispatchLevels}" var="dispatchLevel" itemLabel="#{msg[dispatchLevel.id]}"
+                                           itemValue="#{dispatchLevel}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText value="#{controller.newEvent.name}" id="idName"/>
+                        <p:outputLabel value="Name" for="idName"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+
+                <h:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:pickList value="#{controller.dispatchLevelPickList}" rendered="#{controller.showDispatchLevelPickList}"
+                                var="pickList" itemLabel="#{pickList.name}" itemValue="#{pickList}"
+                                showSourceFilter="true" showTargetFilter="true">
+                        <o:converter converterId="omnifaces.ListIndexConverter" list="#{controller.dispatchLevelList}"/>
+                        <f:facet name="sourceCaption">Non-Eligible</f:facet>
+                        <f:facet name="targetCaption">Eligible</f:facet>
+                    </p:pickList>
+
+                    <h:panelGroup styleClass="md-inputfield" rendered="#{controller.showDispatchLevelCommaSeparated}">
+                        <p:inputTextarea cols="80" value="#{controller.dispatchLevelCommaSeparated}" validator="commaSeparatedNumberValidator" required="true"
+                                         id="sa_ids"/>
+                        <p:outputLabel for="sa_ids" value="SA IDS:"/>
+                    </h:panelGroup>
+
+                </h:panelGrid>
+
+                <div>
+                    <p:commandButton id="scheduleEvent" value="Schedule an Event" action="#{controller.prepareEventSchedule()}" update="form"
+                                     disabled="#{controller.newEventFormValid != true}"/>
+                </div>
+            </div>
+            <div class="card card-w-title" jsf:rendered="#{controller.showReview}">
+                <h1>Review Event Instructions</h1>
+                <p:panelGrid columns="2">
+                    <p:outputLabel value="Program"/>
+                    <p:outputLabel value="#{controller.newEvent.program.name}"/>
+
+                    <p:outputLabel value="Event Start Date/Time"/>
+                    <p:outputLabel value="#{controller.newEvent.startDate}">
+                        <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"/>
+                    </p:outputLabel>
+
+                    <p:outputLabel value="Event End Date/Time"/>
+                    <p:outputLabel value="#{controller.newEvent.endDate}">
+                        <f:convertDateTime pattern="MM/dd/yyyy h:mm:ss a" timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}"/>
+                    </p:outputLabel>
+
+                    <p:outputLabel value="Event Duration"/>
+                    <p:outputLabel value="#{controller.totalHours} hours #{controller.totalMinutes} minutes"/>
+
+                    <p:outputLabel value="Dispatch Reason"/>
+                    <p:outputLabel value="#{controller.newEvent.dispatchReason.name}"/>
+
+                    <p:outputLabel value="Dispatch Level"/>
+                    <p:outputLabel value="#{msg[controller.newEvent.dispatchLevel.id]}"/>
+
+                    <p:outputLabel value="Size"/>
+                    <p:outputLabel value="#{controller.impactedCustomers.size()}"/>
+                </p:panelGrid>
+            </div>
+
+            <div class="card card-w-title" jsf:rendered="#{controller.showReview}">
+                <h1>Impacted Service Agreements</h1>
+                <p:dataTable value="#{controller.impactedCustomers}" var="psae" reflow="true" rows="25"
+                             rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false">
+                    <p:column headerText="DRMS Program ID" styleClass="topAligned">
+                        <h:outputText value="#{psae.drmsProgramId}"/>
+                    </p:column>
+                    <p:column headerText="DRMS ID" styleClass="topAligned">
+                        <h:outputText value="#{psae.drmsId}"/>
+                    </p:column>
+
+                    <p:column headerText="SAID" styleClass="topAligned">
+                        <h:outputText value="#{psae.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}"/>
+                    </p:column>
+
+                    <p:column headerText="Customer Name" styleClass="topAligned">
+                        <h:outputText
+                                value="#{psae.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}"/>
+                    </p:column>
+
+                    <p:column headerText="Service Address" styleClass="topAligned">
+                        <h:outputText
+                                value="#{psae.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps.get(0).servicePoint.premise.serviceAddress1}"/>
+                    </p:column>
+
+                    <p:column headerText="Service City" styleClass="topAligned">
+                        <h:outputText
+                                value="#{psae.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps.get(0).servicePoint.premise.serviceCityUpr}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['data.mapping.sublap']}" styleClass="topAligned">
+                        <h:outputText value="#{psae.locationSubmissionStatus.programServiceAgreementEnrollment.lastLocation.isoSublap}"/>
+                    </p:column>
+
+                    <p:column headerText="LSE" styleClass="topAligned">
+                        <h:outputText value="#{psae.locationSubmissionStatus.programServiceAgreementEnrollment.lastLocation.isoLse}"/>
+                    </p:column>
+
+                    <p:column headerText="Aggregator" styleClass="topAligned">
+                        <h:outputText value="#{psae.locationSubmissionStatus.programServiceAgreementEnrollment.aggregator.name}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+
+            <div class="card card-w-title" jsf:rendered="#{controller.showReview}">
+                <h1>Resource Outage</h1>
+                <p:dataTable value="#{controller.impactedResources}" var="res" reflow="true" rows="25"
+                             rowsPerPageTemplate="25,50,100"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false">
+                    <p:column headerText="Resource ID" styleClass="topAligned">
+                        <h:outputText value="#{res.isoResource.name}"/>
+                    </p:column>
+
+                    <p:column headerText="Market Product" styleClass="topAligned">
+                        <h:outputText value="#{res.isoResource.isoProduct.name}"/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <div class="card" jsf:rendered="#{controller.showReview}">
+                <h:panelGroup styleClass="md-inputfield MarginTop10">
+                    <p:password id="password" value="#{controller.password}" required="true"/>
+                    <p:outputLabel value="Password" for="password"/>
+                </h:panelGroup>
+                <p:commandButton value="Submit" action="#{controller.submitEvents}" process="@form" update="@form"/>
+                <p:spacer width="15"/>
+                <p:commandButton value="Go Back" action="#{controller.showNewEventForm}" process="@this" update="@form"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

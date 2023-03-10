@@ -1,0 +1,26 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+
+    <changeSet id="Alexa-POC-1" author="antonio">
+        <createTable tableName="METER_DATA_USAGE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="SERVICE_POINT_ID" type="VARCHAR(10)"/>
+            <column name="DATE" type="DATETIME"/>
+            <column name="CONSUMPTION_WATTS" type="BIGINT(10)"/>
+            <column name="PRICE" type="DECIMAL(8,2)"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="SERVICE_POINT_ID"
+                                 baseTableName="METER_DATA_USAGE"
+                                 constraintName="fk_meterDataUsage_SP"
+                                 referencedColumnNames="SERVICE_POINT_ID"
+                                 referencedTableName="SERVICE_POINT"/>
+    </changeSet>
+
+
+</databaseChangeLog>

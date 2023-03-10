@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <c:set var="bidHistoryModel" value="#{locationSubmissionDetailController.lazyBidHistoryModel}" scope="request"/>
+        <c:set var="controller" value="#{locationSubmissionDetailController}"/>
+
+
+        <h:form id="form">
+
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Market Integration" url="#"/>
+                <p:menuitem value="#{locationSubmissionDetailController.locationSubmissionStatus.iso.name}" url="#"/>
+                <p:menuitem value="Locations" outcome="Locations">
+                    <f:param name="o" value="#{parameterEncoderService.encode(locationSubmissionDetailController.locationSubmissionStatus.iso.id)}"/>
+                </p:menuitem>
+                <p:menuitem value="Location #{locationSubmissionDetailController.locationSubmissionStatus.isoResourceId}"
+                            rendered="#{locationSubmissionDetailController.locationSubmissionStatus.isoResourceId ne null}"/>
+            </p:breadCrumb>
+            <div class="card">
+                <p:carousel id="apmCarousel" numVisible="4" circular="true" responsive="true"
+                            value="#{locationSubmissionDetailController.locationDetails}"
+                            headerText="Service Agreement #{locationSubmissionDetailController.selectedServiceAgreement.serviceAgreementId}" var="sad">
+                    <i class="material-icons #{sad.icon} Fs20 hardblue TexAlCenter"/>
+                    <h:outputText class="Fs20 hardblue" value="#{sad.name}"/>
+                    <h:dataTable var="db" value="#{sad.dataBeans}" style="border:0;">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+            </div>
+
+
+                <p:tabView id="locationDetail" scrollable="false" activeIndex="#{locationSubmissionDetailController.tabIndex}">
+                    <p:tab id="idServicePoints" title="Service Points">
+                        <ui:include src="WEB-INF/include/location/LocationDetailSPTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="resourceHistory" title="Resource History">
+                        <ui:include src="WEB-INF/include/location/ResourceHistoryTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="idExceptions" title="Exceptions">
+                        <ui:include src="WEB-INF/include/location/LocationDetailExceptionsTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="bidHistory" title="Bid History">
+                        <ui:include src="WEB-INF/include/resource/BidHistoryTab.xhtml"/>
+                    </p:tab>
+                    <p:tab id="history" title="History">
+                        <ui:include src="WEB-INF/include/programProfile/HistoryTab.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

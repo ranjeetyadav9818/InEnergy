@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <include file="pricing-nodes.xml" relativeToChangelogFile="true"/>
+    <include file="sublap-lse-changes.xml" relativeToChangelogFile="true"/>
+    <include file="load-iso-dictionary.xml" relativeToChangelogFile="true"/>
+    <include file="networkTypeCreation.xml" relativeToChangelogFile="true"/>
+    <include file="deviceLinkMultipleSourcesAndTargets.xml" relativeToChangelogFile="true"/>
+    <include file="extending_ancillary_fees.xml" relativeToChangelogFile="true"/>
+    <include file="ancillary_percentage_fees.xml" relativeToChangelogFile="true"/>
+    <include file="ancillary_fees_grouping.xml" relativeToChangelogFile="true"/>
+    <include file="billing-exception.xml" relativeToChangelogFile="true"/>
+    <include file="oneAssetForAllTypes.xml" relativeToChangelogFile="true"/>
+    <include file="showCurrency.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

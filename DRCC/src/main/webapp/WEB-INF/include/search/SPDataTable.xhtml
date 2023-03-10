@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <div class="ui-g-12 ui-md-6 ui-lg-6">
+        <o:importFunctions type="com.inenergis.controller.general.Functions" var="ine"/>
+
+        <p:dataTable value="#{controller.elasticAgreementPointMaps}" widgetVar="spSearch" lazy="true" id="spSearchTable"
+                     var="apm" reflow="true" rows="10" rowsPerPageTemplate="10,25,50,100" selectionMode="single" rowKey="#{apm.apmId}"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="true" style="text-align: center;margin-top: 10px;font-size: 14px">
+            <p:ajax event="rowSelect" listener="#{controller.onSelectSP}"/>
+            <f:facet name="header">Service Points</f:facet>
+            <p:column headerText="SP ID" width="13%"> <h:outputText value="#{ine:highlighter(controller.querySearch,apm.servicePointId)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Premise ID" width="13%"> <h:outputText value="#{ine:highlighter(controller.querySearch,apm.premiseId)}" escape="false"/>
+            </p:column>
+            <h:outputText value="#{ine:highlighter(controller.querySearch, apm.street)}, #{ine:highlighter(controller.querySearch, apm.city)}
+                                (#{ine:highlighter(controller.querySearch,apm.state)}), #{ine:highlighter(controller.querySearch,apm.postalCode)}"
+                          escape="false"/>
+            <p:column headerText="Meter ID" width="13%"> <h:outputText value="#{ine:highlighter(controller.querySearch,apm.meterId)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Badge" width="13%"> <h:outputText value="#{ine:highlighter(controller.querySearch,apm.meterBadgeNumber)}" escape="false"/>
+            </p:column>
+
+        </p:dataTable>
+    </div>
+</ui:composition>

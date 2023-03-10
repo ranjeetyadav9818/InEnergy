@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+    <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+    <p:dataTable id="attributeListId_#{tabIndex}" value="#{attributeslist}" lazy="false" var="attribute" widgetVar="wgbAttribute"
+                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100" rowIndexVar="ind"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{attribute.uuid}" editable="true" style="text-align: center">
+        <p:ajax event="rowEdit" listener="#{controller.editAttribute}"/>
+        <p:ajax event="rowEditCancel"/>
+        <p:column headerText="Attribute" styleClass="topAligned" filterBy="#{attribute.name}" filterMatchMode="contains">
+            <h:outputText value="#{attribute.name}"/>
+        </p:column>
+
+        <p:column headerText="Validation" styleClass="topAligned" filterBy="#{attribute.attributeValidation.label}" filterMatchMode="contains">
+            <h:outputText value="#{attribute.attributeValidation.label}"/>
+        </p:column>
+        <p:column headerText="Mandatory" styleClass="topAligned" filterBy="#{attribute.mandatory}" filterMatchMode="equals">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('wgbAttribute').filter()">
+                    <f:converter converterId="javax.faces.Boolean"/>
+                    <f:selectItem itemLabel="All" itemValue=""/>
+                    <f:selectItem itemLabel="Yes" itemValue="true"/>
+                    <f:selectItem itemLabel="Not" itemValue="false"/>
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="Y" rendered="#{attribute.mandatory}"/>
+            <h:outputText value="N" rendered="#{not attribute.mandatory}"/>
+        </p:column>
+        <p:column headerText="Order" styleClass="topAligned" filterBy="#{attribute.order}" filterMatchMode="contains" width="15%">
+            <h:outputText value="#{attribute.order}"/>
+        </p:column>
+        <p:column headerText="Value" filterable="false">
+            <p:cellEditor>
+                <f:facet name="output">
+                    <h:outputText value="#{attribute.stringValue}" rendered="#{attribute.attributeValidation eq 'TEXT'}"/>
+                    <h:outputText value="#{attribute.numberValue}" rendered="#{attribute.attributeValidation eq 'NUMBER'}">
+                        <f:convertNumber pattern="######.##"/>
+                    </h:outputText>
+                    <h:outputText value="#{attribute.dateValue}" rendered="#{attribute.attributeValidation eq 'DATE'}" converter="localDateConverter"/>
+                </f:facet>
+                <f:facet name="input">
+                    <p:inputText value="#{attribute.stringValue}" required="#{attribute.mandatory}" size="30" maxlength="255" label="#{attribute.name}"
+                                 rendered="#{attribute.attributeValidation eq 'TEXT'}"/>
+                    <p:inputNumber value="#{attribute.numberValue}" required="#{attribute.mandatory}" rendered="#{attribute.attributeValidation eq 'NUMBER'}"
+                                   decimalPlaces="5"  maxValue="999999.99999" label="#{attribute.name}"/>
+                    <p:calendar value="#{attribute.dateValue}" pattern="MM/dd/yyyy" mask="true" placeholder="mm/dd/yyyy" label="#{attribute.name}"
+                                rendered="#{attribute.attributeValidation eq 'DATE'}" converter="localDateTimeConverter" required="#{attribute.mandatory}"/>
+                </f:facet>
+            </p:cellEditor>
+        </p:column>
+        <p:column width="5%" rendered="#{editable eq true}">
+            <p:rowEditor/>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

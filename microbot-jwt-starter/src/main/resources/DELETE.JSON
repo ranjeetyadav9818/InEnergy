@@ -1,0 +1,158 @@
+[
+  {
+    "messages": [],
+    "servicePointsEligibility": [
+      {
+        "firmServiceLevel": null,
+        "thirdPartyName": null,
+        "eligible": false,
+        "ineligibleReason": "Enroller sources, SA status, Rate schedules, Premise type; Enroller sources, SA status, Rate schedules, Premise type; Enroller sources, SA status, Rate schedules, Premise type",
+        "accountId": "6814256129",
+        "uuid": "4590620671",
+        "customerName": null,
+        "businessName": "PARAGON INDUSTRIES INC (BEDROSIAN BUILDING SUPPLY)",
+        "serviceAddress1": "4055 GRASS VALLEY HWY STE 110",
+        "serviceAddress2": null,
+        "city": "AUBURN",
+        "state": "CA",
+        "zip": "956029156",
+        "meterBadgeNumber": "1005416612",
+        "aggregators": null,
+        "preselectedAggregator": null,
+        "agreementPointMapPK": {
+          "servicePointId": "5939404210",
+          "serviceAgreementId": "6814256072"
+        },
+        "fslRange": null,
+        "enrollmentAttributeAdapters": null
+      }
+    ],
+    "hasError": false,
+    "eligible": false
+  },
+  {
+    "messages": [],
+    "servicePointsEligibility": [
+      {
+        "firmServiceLevel": null,
+        "thirdPartyName": null,
+        "eligible": false,
+        "ineligibleReason": "SA status, Rate schedules, Premise type; SA status, Rate schedules, Premise type; SA status, Rate schedules, Premise type",
+        "accountId": "6814256129",
+        "uuid": "4590620671",
+        "customerName": null,
+        "businessName": "PARAGON INDUSTRIES INC (BEDROSIAN BUILDING SUPPLY)",
+        "serviceAddress1": "4055 GRASS VALLEY HWY STE 110",
+        "serviceAddress2": null,
+        "city": "AUBURN",
+        "state": "CA",
+        "zip": "956029156",
+        "meterBadgeNumber": "1005416612",
+        "aggregators": [
+          {
+            "name": "SA_test",
+            "id": 128
+          },
+          {
+            "name": "AggTest",
+            "id": 4803
+          }
+        ],
+        "preselectedAggregator": null,
+        "agreementPointMapPK": {
+          "servicePointId": "5939404210",
+          "serviceAgreementId": "6814256072"
+        },
+        "fslRange": {
+          "min": 0,
+          "max": 9223372036854775807,
+          "avgSummerOnPeakWattList": [
+            142857
+          ],
+          "avgWinterPartialPeakWattList": [
+            1000
+          ],
+          "noDataWarning": true,
+          "dataAvailabilityAllMonths": 0,
+          "dataAvailabilitySummerMonths": 0,
+          "dataAvailabilityWinterMonths": 0,
+          "minKw": 0,
+          "maxKw": 9223372036854776
+        },
+        "enrollmentAttributeAdapters": [
+          {
+            "key": "SAID",
+            "value": "SAID"
+          },
+          {
+            "key": "UUID",
+            "value": "UUID"
+          },
+          {
+            "key": "CUSTOMER_NAME",
+            "value": "Customer Name"
+          },
+          {
+            "key": "BUSINESS_NAME",
+            "value": "DBA Name"
+          },
+          {
+            "key": "SERVICE_ADDRESS_1",
+            "value": "Service Address 1"
+          },
+          {
+            "key": "SERVICE_ADDRESS_2",
+            "value": "Service Address 2"
+          },
+          {
+            "key": "CITY",
+            "value": "City"
+          },
+          {
+            "key": "STATE",
+            "value": "State"
+          },
+          {
+            "key": "ZIP",
+            "value": "Zip"
+          },
+          {
+            "key": "METER_BADGE_NUMBER",
+            "value": "Meter Badge Number"
+          },
+          {
+            "key": "AGGREGATOR_NAME",
+            "value": "Aggregator Name"
+          },
+          {
+            "key": "FSL",
+            "value": "FSL"
+          },
+          {
+            "key": "THIRD_PARTY_NAME",
+            "value": "Third Party Name"
+          }
+        ]
+      }
+    ],
+    "hasError": false,
+    "eligible": false
+  },
+  {
+    "programId": 5571,
+    "selectedAggregator": 4803,
+    "fsl": 7,
+    "thirdPartyName": "ye third part",
+    "servicePointId": "5939404210"
+  }
+,
+  {
+    "id": 5571,
+    "name": "FUTURE DER",
+    "active": true,
+    "programType": "Demand Response",
+    "enrollmentStatus": null,
+    "messages": [],
+    "hasError": false
+  }
+]

@@ -1,0 +1,27 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="catalog-inventories-import.xml" author="vm">
+        <addColumn tableName="ASSET">
+            <column name="EXTERNAL_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="catalog-inventories-import-2.xml" author="vm">
+        <addColumn tableName="DEVICE">
+            <column name="EXTERNAL_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="catalog-inventories-import-3.xml" author="vm">
+        <dropColumn tableName="DEVICE" columnName="EXTERNAL_ID"/>
+        <addColumn tableName="ASSET_DEVICE">
+            <column name="EXTERNAL_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="catalog-inventories-import-4.xml" author="vm">
+        <addColumn tableName="DEVICE_LINK">
+            <column name="EXTERNAL_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

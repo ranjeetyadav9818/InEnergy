@@ -1,0 +1,147 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form id="formTASK">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Configure Tasks" outcome="Tasks"/>
+            </p:breadCrumb>
+
+            <div class="card" jsf:rendered="#{not taskController.newTask}">
+                <p:commandButton id="addVSMButton" process="@this" update="@form" value="Add" action="#{taskController.add}"/>
+            </div>
+            <div class="card card-w-title" jsf:rendered="#{taskController.newTask}">
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{taskController.task.name}" maxlength="45" id="taskName" required="true"/>
+                    <label>Task Title:</label>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel>Business Owner:</p:outputLabel>
+                    <p:selectOneMenu id="busOwn" value="#{taskController.task.businessOwner}" required="true"
+                                     converter="businessOwnerConverter">
+                        <f:selectItem itemLabel="Select" noSelectionOption="false"/>
+                        <f:selectItems value="#{taskController.businessOwners}" var="bo"
+                                       itemValue="#{bo}" itemLabel="#{bo.name}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText value="#{taskController.task.durationValue}" id="duration" required="true"/>
+                    <label>Task Duration:</label>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel>Measure:</p:outputLabel>
+                    <p:selectOneMenu label="Task Duration" id="measure" value="#{taskController.task.durationMeasure}"
+                                     required="true">
+                        <f:selectItem itemLabel="Select" noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.intervalTypes}" var="intervalType" itemValue="#{intervalType}"
+                                       itemLabel="#{intervalType.name}" converter="omnifaces.GenericEnumConverter"/>
+                    </p:selectOneMenu>
+
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputTextarea rows="5" value="#{taskController.task.description}" id="taskDet" maxlength="255"
+                                     required="true"/>
+                    <label>Task Description:</label>
+                </h:panelGroup>
+                <p:commandButton id="save" value="#{msg['save']}" action="#{taskController.save()}" process="@form" update="@form"/>
+                <p:spacer width="15"/>
+                <p:commandButton id="cancel" value="#{msg['cancel']}" action="#{taskController.cancel}" process="@this" update="@form"/>
+            </div>
+
+            <div class="card card-w-title">
+
+                <!-- Filters & Results -->
+                <p:dataTable id="dmTable" value="#{taskController.list}" widgetVar="taskWidget" editable="true" var="tk"
+                             reflow="true" rows="25"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorAlwaysVisible="false" rowKey="#{tk.id}">
+
+                    <p:ajax event="rowEdit" listener="#{taskController.onRowEdit}"/>
+                    <p:ajax event="rowEditCancel" listener="#{taskController.onRowCancel}"/>
+
+                    <p:column headerText="Task ID" filterBy="#{tk.id}" style="width: 65px">
+                        <h:outputText value="#{tk.id}"/>
+                    </p:column>
+
+                    <p:column headerText="Business Owner" filterBy="#{tk.businessOwner.name}" style="width: 175px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{tk.businessOwner.name}"/></f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{tk.businessOwner}" required="true" autoWidth="false" style="width: 135px;"
+                                                 converter="businessOwnerConverter">
+                                    <f:selectItem itemLabel="Select" noSelectionOption="false"/>
+                                    <f:selectItems value="#{taskController.businessOwners}" var="bo"
+                                                   itemValue="#{bo}" itemLabel="#{bo.name}"/>
+                                </p:selectOneMenu></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Task Name" filterBy="#{tk.name}">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{tk.name}"/></f:facet>
+                            <f:facet name="input">
+                                <p:inputTextarea rows="5" cols="45" value="#{tk.name}" label="Task Name" maxlength="255"
+                                                 rendered="#{tk.taskType eq 'USER'}"/>
+                                <h:outputText value="#{tk.name}" rendered="#{tk.taskType eq 'SYS'}"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Task Description" filterBy="#{tk.description}">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{tk.description}"/></f:facet>
+                            <f:facet name="input">
+                                <p:inputTextarea rows="5" cols="45" value="#{tk.description}" label="Task Description" maxlength="512"
+                                                 rendered="#{tk.taskType eq 'USER'}"/>
+                                <h:outputText value="#{tk.description}" rendered="#{tk.taskType eq 'SYS'}"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Task Duration" style="width: 130px">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{tk.durationValue}"/>
+                                <p:spacer width="5"/>
+                                <h:outputText value="#{tk.durationMeasure.getName()}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:panelGrid columns="2" columnClasses="Container25, Container75">
+                                    <p:inputText value="#{tk.durationValue}" required="true" style="width: 30px;"/>
+                                    <p:selectOneMenu value="#{tk.durationMeasure}" required="true" autoWidth="false" style="width: 75px;">
+                                        <f:selectItem itemLabel="Select" noSelectionOption="false"/>
+                                        <f:selectItems value="#{constantsProvider.intervalTypes}" var="intervalType" itemValue="#{intervalType}"
+                                                       itemLabel="#{intervalType.name}" converter="omnifaces.GenericEnumConverter"/>
+                                    </p:selectOneMenu>
+                                </h:panelGrid>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="In Use" style="width: 30px">
+                        <h:outputText icon="ui-icon ui-icon-sun" styleClass="blueIcon" style="display: inline-block;margin-right:8px;"
+                                      rendered="#{tk.workPlanTaskLists.size() gt 0}"/>
+                    </p:column>
+
+                    <p:column style="width:32px" class="showOnDesktop">
+                        <p:rowEditor/>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,95 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet context="ddl" id="pre-DES-207.xml" author="egamas">
+        <tagDatabase tag="pre-DES-207" />
+    </changeSet>
+
+    <changeSet context="ddl" id="DES-207-1.xml" author="egamas">
+        <addColumn tableName="ASSET_ATTRIBUTE">
+            <column name="ASSET_ID" type="bigint(20) unsigned"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="ASSET_ATTRIBUTE"
+                                 baseColumnNames="ASSET_ID"
+                                 constraintName="FK_ASSET_ATTRIBUTE_ASSET"
+                                 referencedTableName="ASSET"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet context="ddl" id="DES-207-2.xml" author="egamas">
+        <renameColumn tableName="ASSET_ATTRIBUTE" oldColumnName="VALUE" newColumnName="STRING_VALUE" columnDataType="varchar(255) DEFAULT NULL"/>
+        <addColumn tableName="ASSET_ATTRIBUTE">
+            <column name="NUMBER_VALUE" type="bigint(20)"/>
+            <column name="DATE_VALUE" type="datetime"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-207-3.xml" author="egamas">
+        <modifyDataType tableName="ASSET_ATTRIBUTE" columnName="NUMBER_VALUE" newDataType="decimal(20,6) DEFAULT NULL"/>
+    </changeSet>
+    <changeSet context="ddl" id="pre-DES-207-4.xml" author="egamas">
+        <tagDatabase tag="pre-DES-207-4" />
+    </changeSet>
+    <changeSet id="DES-207-4.xml" author="egamas">
+        <addColumn tableName="ASSET">
+            <column name="SUPPLIER_ID" type="bigint(20) unsigned"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="ASSET"
+                                 baseColumnNames="SUPPLIER_ID"
+                                 constraintName="FK_ASSET_SUPPLIER"
+                                 referencedTableName="CONTRACT_ENTITY"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="DES-207-5.xml" author="egamas">
+        <addColumn tableName="ASSET_ATTRIBUTE">
+            <column name="DEVICE_ID" type="bigint(20) unsigned"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="ASSET_ATTRIBUTE"
+                                 baseColumnNames="DEVICE_ID"
+                                 constraintName="FK_ASSET_ATTRIBUTE_DEVICE"
+                                 referencedTableName="ASSET_DEVICE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+    <changeSet id="DES-207-6.xml" author="egamas">
+        <addColumn tableName="ASSET_ATTRIBUTE">
+            <column name="TYPE" type="VARCHAR(55)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="DES-207-7.xml" author="egamas">
+        <dropForeignKeyConstraint baseTableName="ASSET_ATTRIBUTE" constraintName="FK_ASSET_ATTRIBUTE_PROFILE" />
+        <rollback>
+            <addForeignKeyConstraint baseTableName="ASSET_ATTRIBUTE"
+                                     baseColumnNames="PROFILE_ATTRIBUTE_ID"
+                                     constraintName="FK_ASSET_ATTRIBUTE_PROFILE"
+                                     referencedTableName="ASSET_PROFILE_ATTRIBUTE"
+                                     referencedColumnNames="ID"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="DES-207-8.xml" author="egamas">
+        <addForeignKeyConstraint baseTableName="ASSET_ATTRIBUTE"
+                                 baseColumnNames="PROFILE_ATTRIBUTE_ID"
+                                 constraintName="FK_ASSET_ATTRIBUTE_PROFILE"
+                                 referencedTableName="ASSET_PROFILE_ATTRIBUTE"
+                                 referencedColumnNames="ID" onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="DES-207-9.xml" author="egamas">
+        <addColumn tableName="ASSET_ATTRIBUTE">
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="VALIDATION" type="VARCHAR(255)"/>
+            <column name="MANDATORY" type="TINYINT(1) NOT NULL DEFAULT 0" defaultValue="0" />
+            <column name="ORDER" type="BIGINT(20)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="DES-207-10.xml" author="egamas">
+        <renameColumn tableName="ASSET_ATTRIBUTE" oldColumnName="ORDER" newColumnName="ATTR_ORDER"  columnDataType="bigint(20) DEFAULT NULL"/>
+
+    </changeSet>
+
+</databaseChangeLog>

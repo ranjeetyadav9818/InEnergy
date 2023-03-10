@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+>
+
+    <j:useBean id="controller" type="com.inenergis.controller.asset.AssetDetailsController"/>
+    <h:panelGroup rendered="#{controller.editMode}" id="editForm">
+        <c:set value="#{controller.asset}" var="asset"/>
+        <j:useBean id="asset" type="com.inenergis.entity.asset.Asset"/>
+
+        <div class="card card-w-title">
+            <h:panelGrid id="asset" columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group MarginTop20 MarginBottom10">
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="assetName" value="#{asset.name}"/>
+                    <p:outputLabel value="Name:" for="assetName"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="assetDescription" value="#{asset.description}"/>
+                    <p:outputLabel value="Description:" for="assetDescription"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="make" value="#{asset.make}" maxlength="255"/>
+                    <p:outputLabel value="Make:" for="make"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="model" value="#{asset.model}" maxlength="255"/>
+                    <p:outputLabel value="Model:" for="model"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:autoComplete id="supplierFilterAdd"
+                                    value="#{asset.supplier}" converter="contractEntityConverter"
+                                    completeMethod="#{controller.completeEntity}"
+                                    var="link" itemLabel="#{link.businessName}" itemValue="#{link}"/>
+                    <p:outputLabel value="Supplier:" for="supplierFilterAdd"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:inputText required="true" id="supplier" value="#{asset.supplierPartNumber}" maxlength="255"/>
+                    <p:outputLabel value="Supplier Part No.:" for="supplier"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Asset Type Profile:" for="assetProfile"/>
+                    <p:selectOneMenu id="assetProfile" converter="assetProfileConverter" value="#{asset.assetProfile}" required="true">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{controller.assetProfiles}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                        <p:ajax listener="#{controller.loadCatalogAttributes(asset.assetProfile)}" update="catalogAttributes"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Asset Group:" for="assetGroup2"/>
+                    <p:selectOneMenu id="assetGroup2" converter="assetGroupConverter" value="#{asset.assetGroup}"
+                                     required="true">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{controller.assetGroups}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select" style="padding-bottom: 10px;">
+                    <p:outputLabel value="Manufacturer:" for="manufacturer"/>
+                    <p:selectOneMenu id="manufacturer" value="#{asset.manufacturer}" onchange="PF('custTableA').filter()" required="true">
+                        <f:converter converterId="manufacturerConverter"/>
+                        <f:selectItem itemLabel="Select" noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.manufacturers}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Ownership:" for="ownership"/>
+                    <p:selectOneMenu id="ownership" converter="omnifaces.GenericEnumConverter" value="#{asset.ownership}"
+                                     required="true">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.assetOwnerships}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Usage:" for="usage"/>
+                    <p:selectOneMenu id="usage" converter="omnifaces.GenericEnumConverter" value="#{asset.usage}" required="true">
+                        <f:selectItem noSelectionOption="false"/>
+                        <f:selectItems value="#{constantsProvider.assetUsages}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Active:" for="active"/>
+                    <p:inputSwitch id="active" value="#{asset.active}"/>
+                </h:panelGroup>
+            </h:panelGrid>
+            <c:set var="attributeList" value="#{controller.asset.catalogAttributes}"/>
+            <ui:include src="CatalogAttributesForm.xhtml"/>
+
+            <p:commandButton id="save" value="Save" action="#{controller.save}" process="@form" update="@none"/>
+            <p:spacer width="10"/>
+            <p:commandButton id="cancel" value="Cancel" action="#{controller.clear()}" process="@this" update="@form"/>
+        </div>
+    </h:panelGroup>
+</ui:composition>

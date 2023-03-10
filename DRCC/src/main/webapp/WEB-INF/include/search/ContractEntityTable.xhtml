@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <div class="ui-g-12 ui-md-6 ui-lg-6">
+        <o:importFunctions type="com.inenergis.controller.general.Functions" var="ine"/>
+
+        <p:dataTable value="#{controller.elasticContractEntities}" lazy="true"
+                     var="contractEntity" reflow="true" rows="10" rowsPerPageTemplate="10,25,50,100" selectionMode="single" rowKey="#{contractEntity.id}"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="true" style="text-align: center;margin-top: 10px;font-size: 14px">
+            <p:ajax event="rowSelect" listener="#{controller.onSelectContractEntity}"/>
+            <f:facet name="header">Contract Entities</f:facet>
+            <p:column headerText="ID" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,contractEntity.id)}" escape="false"/>
+            </p:column>
+            <p:column headerText="DBA" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,contractEntity.dba)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Sector" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,contractEntity.sector)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Tax ID" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,contractEntity.taxId)}" escape="false"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+</ui:composition>

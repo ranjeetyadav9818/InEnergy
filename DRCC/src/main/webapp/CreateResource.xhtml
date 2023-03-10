@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <p:breadCrumb>
+            <p:menuitem value="Dashboard" outcome="dashboard"/>
+            <p:menuitem value="Market Integration" url="#"/>
+            <p:menuitem value="#{createResource.iso.name}" url="#"/>
+            <p:menuitem value="Resources" outcome="Resources">
+                <f:param name="o" value="#{parameterEncoderService.encode(createResource.iso.id)}"/>
+            </p:menuitem>
+            <p:menuitem value="Add new resource" url="#"/>
+        </p:breadCrumb>
+        <h:form id="form">
+            <div class="card">
+                <p:panelGrid layout="grid" columns="3" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText required="true" id="resourceName" value="#{createResource.resource.name}">
+                            <f:validator validatorId="uniqueEntityValidator"/>
+                            <f:attribute name="currentEntity" value="#{createResource.resource}"/>
+                            <f:attribute name="uniqueColumns" value="name"/>
+                            <f:attribute name="fields" value="{newValue}"/>
+                        </p:inputText>
+                        <p:outputLabel value="Resource Name:" for="resourceName"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="resourceIsoId" value="#{createResource.resource.isoResourceId}"/>
+                        <p:outputLabel value="Market ID:" for="resourceIsoId"/>
+                    </h:panelGroup>
+                    <p:column></p:column>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="#{msg['data.mapping.sublap']}:" for="sublap"/>
+                        <p:selectOneMenu id="sublap" value="#{createResource.resource.isoSublap}" styleClass="selectfield">
+                            <f:selectItems value="#{createResource.sublaps}" var="sublap" itemLabel="#{sublap.name}" itemValue="#{sublap.code}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="LSE:" for="lse"/>
+                        <p:selectOneMenu id="lse" value="#{createResource.resource.isoLse}" styleClass="selectfield">
+                            <f:selectItems value="#{createResource.lses}" var="lse" itemLabel="#{lse.name}" itemValue="#{lse.code}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <p:column></p:column>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Type:" for="type"/>
+                        <p:selectOneMenu id="type" value="#{createResource.resource.type}" styleClass="selectfield" converter="omnifaces.GenericEnumConverter">
+                            <f:selectItems value="#{constantsProvider.productTypes}" var="type" itemLabel="#{type.name}" itemValue="#{type}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Market Product:" for="product"/>
+                        <p:selectOneMenu id="product" value="#{createResource.resource.isoProduct}" styleClass="selectfield" converter="isoProductConverter">
+                            <f:selectItems value="#{createResource.isoProducts}" var="product" itemLabel="#{product.name} (#{product.type.name} - #{product.marketType.name})" itemValue="#{product}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <p:column></p:column>
+                    <p:commandButton id="save" value="Save" action="#{createResource.save()}" process="@form" update="@form,"/>
+                    <p:column></p:column>
+                    <p:column></p:column>
+                </p:panelGrid>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

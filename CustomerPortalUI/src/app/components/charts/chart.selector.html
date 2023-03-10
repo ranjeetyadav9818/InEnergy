@@ -1,0 +1,11 @@
+<p-panel class="no-header horizontal-scroll" >
+    <p-inputSwitch #inputSwitch [(ngModel)]="selected" (onClick)="onClick(inputSwitch)" onLabel="kWh" offLabel="$">
+    </p-inputSwitch>
+    <div [hidden]="!selected">
+      <app-monthly-consumption></app-monthly-consumption>
+    </div>
+    <div [hidden]="selected">
+      <app-monthly-billing></app-monthly-billing>
+    </div>
+</p-panel>
+

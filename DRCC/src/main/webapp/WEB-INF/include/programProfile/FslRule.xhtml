@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:column>
+        <h:outputText value="#{rule.comparisonAttribute}" rendered="#{ruleIterStatus.first}"/>
+        <h:outputText value="and" rendered="#{!ruleIterStatus.first}"/>
+    </p:column>
+    <p:column>
+        <p:selectOneMenu value="#{rule.comparisonOperator}">
+            <f:selectItem itemLabel="≥" itemValue="GE"/>
+            <f:selectItem itemLabel="≤" itemValue="LE"/>
+            <f:selectItem itemLabel="=" itemValue="EQ"/>
+        </p:selectOneMenu>
+    </p:column>
+    <p:column>
+        <p:inputNumber value="#{rule.comparisonValue}" maxValue="100" decimalPlaces="2" rendered="#{rule.type eq 'season'}"/>
+        <h:outputText value=" %" rendered="#{rule.type eq 'season'}"/>
+        <p:inputNumber value="#{rule.comparisonValue}" maxValue="99999" decimalPlaces="2" rendered="#{rule.type eq 'load_reduction'}"/>
+    </p:column>
+    <p:column>
+        <p:selectOneMenu value="#{rule.comparisonReference}" rendered="#{rule.type eq 'season'}">
+            <f:selectItems value="#{constantsProvider.fslComparisonReferences}" var="ref" itemLabel="#{ref.name}" itemValue="#{ref}"/>
+        </p:selectOneMenu>
+        <p:selectOneMenu value="#{rule.energyUnit}" rendered="#{rule.type eq 'load_reduction' and programProfileController.program.commodity eq 'Electricity' }">
+            <f:selectItem noSelectionOption="false"/>
+            <f:selectItem itemLabel="kW" itemValue="KW"/>
+            <f:selectItem itemLabel="MW" itemValue="MW"/>
+        </p:selectOneMenu>
+        <p:selectOneMenu value="#{rule.energyUnit}" rendered="#{rule.type eq 'load_reduction' and programProfileController.program.commodity eq 'Gas' }">
+            <f:selectItem noSelectionOption="false"/>
+            <f:selectItem itemLabel="Therms" itemValue="THERMS"/>
+        </p:selectOneMenu>
+    </p:column>
+    <p:column>
+        <p:commandButton action="#{programProfileController.removeFslRule(rule)}" update="@form" icon="ui-icon-remove"/>
+    </p:column>
+</ui:composition>

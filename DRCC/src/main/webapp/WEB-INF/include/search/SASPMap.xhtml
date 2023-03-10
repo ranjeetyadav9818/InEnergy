@@ -1,0 +1,22 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <div class="ui-g-12 ui-md-6 ui-lg-6" jsf:id="idMap">
+        <p:panel id="most_recent_events" header="Customer map (First Ten Results)" toggleable="false" closable="false"
+                 style="text-align: center;margin-top: 10px;font-size: 14px">
+            <p:gmap type="MAP" center="#{controller.mapCenter.lat},#{controller.mapCenter.lng}"
+                    zoom="#{controller.zoom}" style="width:100%;height:600px" model="#{controller.mapModel}" streetView="true"
+                    rendered="#{controller.mapModel ne null}" id="idSearchMap">
+                <p:ajax event="overlaySelect" listener="#{controller.onMarkerSelect}"/>
+                <p:gmapInfoWindow id="infoWindow">
+                    <h4>SA: #{controller.marker.title}</h4>
+                    <h:outputLabel value="#{controller.marker.data.customerName}"/>
+                    <br/>
+                </p:gmapInfoWindow>
+            </p:gmap>
+        </p:panel>
+    </div>
+</ui:composition>

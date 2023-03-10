@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <j:useBean id="controller" type="com.inenergis.controller.customerData.NewContractController"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Locations</h3>
+        <h:panelGroup id="devices">
+            <p:commandButton action="#{controller.addDevice()}" update="@form" process="@this"
+                             icon="ui-icon-add" >
+                <o:skipValidators/>
+            </p:commandButton>
+            <p:spacer width="10"/>
+            <p:outputLabel rendered="#{empty controller.entity.devices}">No locations defined yet</p:outputLabel>
+
+            <ui:repeat value="#{controller.entity.devices}" var="device" varStatus="devStatus">
+
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="locID" maxlength="55" size="55" value="#{device.uuid}" readonly="true" label="Location Id"/>
+                        <p:outputLabel value="Location ID" for="locID"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Power Source"/>
+                        <p:selectOneMenu id="powerSource" value="#{device.powerSource}" >
+                            <f:selectItem noSelectionOption="false"/>
+                            <f:selectItems value="#{controller.powerSources}" var="powerSource"
+                                           itemLabel="#{powerSource.value}" itemValue="#{powerSource.value}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <p:commandButton action="#{controller.removeDevice(device)}" update="@form" process="@this"
+                                     icon="ui-icon-remove" >
+                        <o:skipValidators/>
+                    </p:commandButton>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="deviceName" maxlength="55" size="55" value="#{device.name}" required="true" label="Location Name" />
+                        <label>Location Name</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="equipmentId" maxlength="55" size="55" value="#{device.equipmentId}" required="true" label="Equipment ID" />
+                        <label>Equipment ID</label>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+            </ui:repeat>
+
+        </h:panelGroup>
+    </div>
+
+</ui:composition>

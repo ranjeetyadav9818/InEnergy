@@ -1,0 +1,28 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="DES-210-1" author="antonio">
+        <createTable tableName="DEVICE_LINK">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="TYPE" type="VARCHAR(255)"/>
+            <column name="DEVICE_SOURCE_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="DEVICE_TARGET_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="DEVICE_LINK"
+                                 baseColumnNames="DEVICE_SOURCE_ID"
+                                 constraintName="FK_DEVICE_LINK_SOURCE"
+                                 referencedTableName="ASSET_DEVICE"
+                                 referencedColumnNames="ID"/>
+        <addForeignKeyConstraint baseTableName="DEVICE_LINK"
+                                 baseColumnNames="DEVICE_TARGET_ID"
+                                 constraintName="FK_DEVICE_LINK_TARGET"
+                                 referencedTableName="ASSET_DEVICE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+</databaseChangeLog>

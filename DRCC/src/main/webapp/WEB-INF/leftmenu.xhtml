@@ -1,0 +1,189 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:c="http://java.sun.com/jsp/jstl/core"
+        xmlns:pa="http://primefaces.org/barcelona"
+        xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <div class="layout-sidebar">
+        <p:importEnum type="com.inenergis.entity.genericEnum.CommodityType" var="CommodityType" allSuffix="COMMODITY_TYPE_ALL"/>
+        <pa:tabMenu id="layout-menubar">
+            <pa:tab icon="home" title="Home">
+                <h:form id="menu-form-home">
+                    <pa:menu>
+                        <p:menuitem id="um_dashboard" value="Dashboard" icon="web" outcome="dashboard"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+            <pa:tab icon="group_work" title="Customer Management" rendered="#{authorizationChecker.superUser}">
+                <h:form id="menu-form-crm">
+                    <pa:menu>
+                        <p:submenu id="um_customers" label="Customers" icon="person_outline" rendered="#{customerSearchNavigator.customers.size() > 0}">
+                            <p:menuitem id="um_customers_search" value="Search" icon="search" outcome="CustomerList"/>
+                            <c:forEach items="#{customerSearchNavigator.customers}" var="customer">
+                                <p:submenu label="#{customer.toShortName()}" icon="person_outline">
+                                    <c:forEach items="#{customer.accounts}" var="account">
+                                        <p:submenu label="Account #{account.accountId}">
+                                            <c:forEach items="#{account.serviceAgreements}" var="sa">
+                                                <p:menuitem value="SA #{sa.serviceAgreementId}" outcome="CustomerList.xhtml" rendered="#{sa.serviceAgreementId ne null}">
+                                                    <f:param name="o" value="#{parameterEncoderService.encode(sa.serviceAgreementId)}"/>
+                                                </p:menuitem>
+                                            </c:forEach>
+                                        </p:submenu>
+                                    </c:forEach>
+                                </p:submenu>
+                            </c:forEach>
+                            <p:menuitem id="um_customers_search_show_previous" value="Load previous results" action="#{customerSearchNavigator.loadPrevious()}"
+                                        update=":menu-form-crm" rendered="#{customerSearchNavigator.startIndex > 0}"/>
+                            <p:menuitem id="um_customers_search_show_next" value="Load next results" action="#{customerSearchNavigator.loadNext()}"
+                                        update=":menu-form-crm" rendered="#{customerSearchNavigator.customers.size() > 0}"/>
+                        </p:submenu>
+                        <p:menuitem id="um_customers_search_direct" value="Customers" icon="person_outline" outcome="CustomerList"
+                                    rendered="#{customerSearchNavigator.customers.size() == 0}"/>
+                        <p:menuitem id="um_service_points" value="Service Points" icon="power" outcome="ServicePointList"/>
+                        <p:submenu id="um_aggregators" label="Aggregators" icon="settings_input_component">
+                            <p:menuitem id="um_search_aggregator" value="Search" icon="search" outcome="AggregatorList"/>
+                            <p:menuitem id="um_add_aggregator" value="New" icon="add_box" outcome="CreateAggregator"/>
+                        </p:submenu>
+                        <p:menuitem id="um_map" value="Map" icon="map" outcome="Map"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+            <pa:tab icon="lightbulb_outline" title="Program Operations" rendered="#{authorizationChecker.superUser}">
+                <h:form id="menu-form-programs">
+                    <pa:menu>
+                        <p:menuitem id="um_energy_resource_programs" value="Energy Resource Programs" outcome="EnergyResourcePrograms"/>
+                        <p:submenu id="subm_dispatch" label="Dispatch">
+                            <p:menuitem id="um_schedule_event" value="Schedule" outcome="ScheduleEvent"/>
+                            <p:menuitem id="um_monitor_event" value="Monitor" outcome="DispatchManagement"/>
+                            <p:menuitem id="um_event_notifications" value="Event Notification" outcome="EventList"/>
+                            <p:menuitem id="um_forecast_a_dispatch" value="Forecasting" outcome="ForecastDispatch"/>
+                        </p:submenu>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+            <pa:tab icon="attach_money" title="Billing Management">
+                <h:form id="menu-form-billing">
+                    <pa:menu>
+                        <p:submenu id="subm_rate_programs" label="Rate Programs">
+                            <p:menuitem id="um_rate_code_library" value="Rate Code Library" outcome="RateCodeLibrary.xhtml"/>
+                            <p:menuitem id="um_search_rate_plans" value="Search Rate Plans" outcome="RatePlans.xhtml"/>
+                            <p:menuitem id="um_eligibility_verification" value="Eligibility Verification" outcome="RateEligibilityVerification.xhtml"/>
+                            <p:menuitem id="um_bulk_rate" value="Bulk Customer Upload" outcome="BulkRateUpload.xhtml"/>
+                        </p:submenu>
+                        <p:menuitem value="Billing Solution Center" outcome="BillingSolutionCenter.xhtml" icon="new_releases"/>
+                        <p:menuitem id="um_aged_Invoices" value="Aged Invoices" outcome="AgedInvoices" icon="hourglass_empty"/>
+                        <p:menuitem value="Baseline Allowance" outcome="BaselineAllowance.xhtml" icon="show_chart"/>
+                        <p:menuitem value="Billing Cycle Schedule" outcome="BillingCycleSchedule.xhtml" icon="schedule"/>
+                        <p:menuitem value="Billing Cycle Statistics" outcome="BillingStatistics" icon="pie_chart"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+            <pa:tab icon="toys" title="Market Operations" rendered="#{authorizationChecker.superUser}">
+                <h:form id="menu-form-isos">
+                    <pa:menu>
+                        <p:menuitem id="um_iso_management" value="#{msg['data.mapping.isoManagement']}" outcome="IsoManagement" icon="account_balance"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+            <pa:tab icon="verified_user" title="Contract management">
+                <h:form id="menu-form-contract">
+                    <pa:menu>
+                        <p:submenu id="um_contract_entities" label="Contract Entities" icon="perm_contact_calendar">
+                            <p:menuitem id="um_search_entity" value="Search" icon="search" outcome="SearchContractEntity"/>
+                            <p:menuitem id="um_new_entity" value="New" icon="add_box" outcome="NewContractEntity"/>
+                        </p:submenu>
+                        <p:submenu id="um_energy_contracts" label="Energy Contracts" icon="spellcheck">
+                            <p:menuitem id="um_search_contract" value="Search" outcome="SearchContracts" icon="search"/>
+                            <p:menuitem id="um_create_new_contract" value="New" outcome="CreateNewContract" icon="add_box"/>
+                        </p:submenu>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+
+            <pa:tab icon="extension" title="Asset management">
+                <h:form id="menu-form-assets">
+                    <pa:menu>
+                        <c:forEach items="#{leftMenu.assetSubMenus}" var="menu">
+                            <p:submenu label="#{menu.name}">
+                                <c:forEach items="#{menu.childsOrdered}" var="childMenu">
+                                    <p:menuitem value="#{childMenu.name}" rendered="#{not empty childMenu.outcome}" outcome="#{childMenu.outcome}">
+                                        <f:param name="n" value="#{parameterEncoderService.encode(childMenu.commodityType)}"/>
+                                    </p:menuitem>
+                                    <p:submenu label="#{childMenu.name}" rendered="#{empty childMenu.outcome}">
+                                        <c:forEach items="#{childMenu.childsOrdered}" var="grandChildMenu">
+                                            <p:menuitem value="#{grandChildMenu.name}" outcome="#{grandChildMenu.outcome}">
+                                                <f:param name="nt" value="#{parameterEncoderService.encode(grandChildMenu.networkType.id)}" />
+                                                <f:param name="n" value="#{parameterEncoderService.encode(grandChildMenu.commodityType)}" />
+                                            </p:menuitem>
+                                        </c:forEach>
+                                    </p:submenu>
+                                </c:forEach>
+                            </p:submenu>
+                        </c:forEach>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+            <pa:tab icon="polymer" title="Tasks &amp; Workflow" rendered="#{authorizationChecker.superUser}">
+
+                <h:form id="menu-form-tasks_wf">
+                    <pa:menu>
+                        <p:menuitem id="um_monitor_alerts" value="Monitor Tasks &amp; Alerts" icon="vibration" outcome="MonitorAlerts"/>
+                        <p:menuitem id="um_bus_owners" value="Business Owner Config" icon="people_outline" outcome="BusinessOwner"/>
+                        <p:menuitem id="um_tasks" value="Task Configuration" icon="format_list_bulleted" outcome="Tasks"/>
+                        <p:menuitem id="um_work_plans" value="Work Plan Configuration" icon="linear_scale" outcome="WorkPlans"/>
+                        <p:menuitem id="um_alerts" value="Alert Configuration" icon="report_problem" outcome="NotificationDefinition"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+
+            <pa:tab icon="pie_chart" title="Reports &amp; Dashboards" rendered="#{authorizationChecker.superUser}">
+
+                <h:form id="menu-form-rep_das">
+                    <pa:menu>
+                        <p:menuitem id="um_reports" value="Reports" icon="multiline_chart" outcome="EventList"/>
+                        <p:menuitem id="um_dashboards" icon="web" value="Dashboards"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+
+            <pa:tab icon="settings" title="Administration" rendered="#{authorizationChecker.superUser}">
+
+                <h:form id="menu-form-wfm">
+                    <pa:menu>
+                        <p:submenu id="subm_maintenance_data" label="Maintenance Data">
+                            <c:forEach items="#{constantsProvider.dataMappingTypes}" var="type">
+                                <p:menuitem value="#{msg[type.id]} #{msg['data.mapping']}" outcome="DataMapping.xhtml">
+                                    <f:param name="o" value="#{parameterEncoderService.encode(type)}"/>
+                                </p:menuitem>
+                            </c:forEach>
+                            <p:menuitem id="um_vendor_mapping" value="Vendor Status Mapping" outcome="VendorStatusMappingList"/>
+
+                            <c:forEach items="#{constantsProvider.maintenanceClasses}" var="maintenanceClass">
+                                <p:menuitem value="#{maintenanceClass.name} Maintenance data" outcome="MaintenanceData.xhtml">
+                                    <f:param name="o" value="#{parameterEncoderService.encode(maintenanceClass.name())}"/>
+                                </p:menuitem>
+                            </c:forEach>
+
+                            <p:menuitem value="Manufacturers" outcome="Manufacturers.xhtml"/>
+                            <p:menuitem value="BaseLineTherms" outcome="BaselineThermsFactor.xhtml"/>
+
+                            <p:menuitem value="PNodes" outcome="PricingNodes.xhtml"/>
+                            <p:menuitem value="#{msg['data.mapping.sublap']}" outcome="Sublaps.xhtml"/>
+                            <p:menuitem value="LSEs" outcome="Lses.xhtml"/>
+                            <p:menuitem value="Fees by area (Taxes)" outcome="PercentageFeeHierarchy.xhtml"/>
+                        </p:submenu>
+
+                        <p:menuitem id="um_season_calendar" value="Season Calendar" outcome="SeasonCalendars.xhtml" icon="event"/>
+                        <p:menuitem id="um_user_administration" value="#{msg['user.manage']}" outcome="UserList" icon="group"/>
+                        <p:menuitem id="um_file_logs" value="File Processor Logs" outcome="FileProcessorLogs" icon="view_headline"/>
+                        <p:menuitem id="um_currency_settings" value="Currency Settings" outcome="CurrencySettings" icon="attach_money"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+
+        </pa:tabMenu>
+    </div>
+</ui:composition>

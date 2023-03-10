@@ -1,0 +1,58 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<h:form id="userModalForm">
+
+		<p:dialog dynamic="true" header="#{messages['title']}"
+			closeOnEscape="true" id="userModal" modal="true"
+			widgetVar="userModalWidget">
+			<p:outputPanel id="userModalDiv">
+				 <p:panel>
+	                <div class="Container">
+	                    <div class="Container100"><div class="ContainerIndent"><h:outputText value="#{msg['user.details']}" styleClass="FontBold Fs18 hardblue"></h:outputText></div></div>
+	                    <div class="Container100">
+	                        <div class="ContainerIndent">
+	                         <p:panelGrid columns="2" layout="grid" style="border:0px none;background:none">
+	                            
+	                                <p:outputLabel value="#{msg['user.loginName']}:" for="userName" />
+	                                <p:inputText id="userName" value="#{userManagement.user.loginName}"/>
+	                                
+	                                <p:outputLabel value="#{msg['user.email']}:" for="email" />
+	                                <p:inputText id="email" value="#{userManagement.user.email}"/>
+	
+									<p:outputLabel value="#{msg['user.loginName']}:" for="firstName" />
+	                                <p:inputText id="firstName" value="#{userManagement.user.firstName}"/>
+	                                
+	                                <p:outputLabel value="#{msg['user.loginName']}:" for="lastName" />
+	                                <p:inputText id="firstName" value="#{userManagement.user.lastName}"/>
+	
+	                                <p:outputLabel value="DropDown:" for="dd" />
+	                                <p:autoComplete id="dd" dropdown="true" value="#{autoCompleteView.txt6}" completeMethod="#{autoCompleteView.completeText}" />
+	
+	                                <p:outputLabel value="Group:" for="group" />
+	                                <p:autoComplete id="group" value="#{autoCompleteView.theme4}" completeMethod="#{autoCompleteView.completeThemeContains}"
+	                                                var="theme" itemLabel="#{theme.displayName}" itemValue="#{theme}" converter="themeConverter"
+	                                                groupBy="#{autoCompleteView.getThemeGroup(theme)}" scrollHeight="250"/>
+	                            </p:panelGrid>
+	                        </div>
+	                    </div>
+	                </div>
+	            </p:panel>
+				<span class="buttonSpan modalButtonSpan"> 
+				<p:commandButton
+					oncomplete="if(typeof args == 'undefined' || args.validationFailed == null || args.validationFailed == false){PF('userModalWidget').hide()}"
+					id="save" 
+					value="#{messages['save']}" 
+					action="#{action}" 
+					update=""/>
+				</span>
+			</p:outputPanel>
+
+		</p:dialog>
+	</h:form>
+
+</ui:composition>

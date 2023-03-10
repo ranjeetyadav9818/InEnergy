@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <ui:param name="readonly" value="#{energyContractController.readonly}"/>
+    <j:useBean id="readonly" type="java.lang.Boolean"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Fees</h3>
+
+        <h:panelGroup id="fees">
+            <p:commandButton action="#{energyContractController.addFee()}" update="fees" process="fees" icon="ui-icon-add"
+                             rendered="#{readonly == false}">
+                <o:skipValidators/>
+            </p:commandButton>
+            <p:spacer width="10"/>
+            <p:outputLabel rendered="#{empty energyContractController.energyContract.fees}">No fees defined yet</p:outputLabel>
+
+            <ui:repeat value="#{energyContractController.energyContract.fees}" var="fee">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Fee Category" for="feeCategory"/>
+                        <p:selectOneMenu id="feeCategory" label="Fee Category" value="#{fee.feeCategory}" required="true" disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.energyContractFeeTypes}" var="feeType"
+                                           itemLabel="#{feeType.name}" itemValue="#{feeType}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-select">
+                        <p:outputLabel value="Fee Type" for="feeType"/>
+                        <p:selectOneMenu id="feeType" label="Fee Type" value="#{fee.amountType}" required="true" disabled="#{readonly}">
+                            <f:selectItem noSelectionOption="true"/>
+                            <f:selectItems value="#{constantsProvider.amountTypes}" var="type" itemValue="#{type}" itemLabel="#{type.name}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield-icon">
+                        <p:commandButton action="#{energyContractController.removeFee(fee)}"
+                                         rendered="#{readonly == false}"
+                                         update=":form:#{tabViewId}:fees" process=":form:#{tabViewId}:fees" icon="ui-icon-remove">
+                            <o:skipValidators/>
+                        </p:commandButton>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <h5>Add details
+                    <p:commandButton action="#{energyContractController.addDetail(fee)}"
+                                     rendered="#{energyContractController.readonly == false}"
+                                     update=":form:#{tabViewId}:fees" process=":form:#{tabViewId}:fees" icon="ui-icon-add">
+                        <o:skipValidators/>
+                    </p:commandButton>
+                </h5>
+                <ui:repeat value="#{fee.feeDetailList}" var="detail">
+                    <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Fee:" for="amount"/>
+                            <p:inputNumber label="amount" decimalPlaces="5" maxValue="10000" id="amount" value="#{detail.amount}" required="true" readonly="#{readonly}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Units from:" for="from"/>
+                            <p:inputNumber label="From Capacity" decimalPlaces="5" maxValue="10000" id="from" value="#{detail.from}" readonly="#{readonly}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="to:" for="to"/>
+                            <p:inputNumber label="To Capacity" decimalPlaces="5" maxValue="10000" id="to" value="#{detail.to}" readonly="#{readonly}"/>
+                        </h:panelGroup>
+
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Unit" for="capUnit"/>
+                            <p:selectOneMenu id="capUnit" value="#{detail.feeUnit}" disabled="#{readonly}">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.feeDetailUnits}" var="feeUnit"
+                                               itemLabel="#{feeUnit.label}" itemValue="#{feeUnit}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-icon">
+                            <p:commandButton action="#{energyContractController.removeDetail(fee,detail)}"
+                                             rendered="#{energyContractController.readonly == false}"
+                                             update="form:#{tabViewId}:fees" process="form:#{tabViewId}:fees" icon="ui-icon-remove">
+                                <o:skipValidators/>
+                            </p:commandButton>
+                        </h:panelGroup>
+
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Index" for="index"/>
+                            <p:selectOneMenu id="index" value="#{detail.index}" disabled="#{energyContractController.readonly}">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.feeIndices}" var="index"
+                                               itemLabel="#{index.name}" itemValue="#{index}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Unit of Measure" for="unitOfMeasure"/>
+                            <p:selectOneMenu id="unitOfMeasure" value="#{detail.unitOfMeasure}" disabled="#{energyContractController.readonly}">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{constantsProvider.feeUnitOfMeasures}" var="unit"
+                                               itemLabel="#{unit.name}" itemValue="#{unit}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-calendar">
+                            <p:outputLabel value="Date Range" for="drFrom" style="top: -30px;"/>
+                            <p:calendar value="#{detail.dateFrom}" pattern="MM/dd/yyyy" disabled="#{energyContractController.readonly}"
+                                        timeZone="UTC" mask="true" placeholder="mm/dd/yyyy" label="Date From" required="true" id="drFrom">
+                                <f:validator validatorId="endDateRangeValidator"/>
+                            </p:calendar>
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="md-inputfield-calendar">
+                            <p:outputLabel value="To" for="drTo" style="top: -30px;"/>
+                            <p:calendar value="#{detail.dateTo}" pattern="MM/dd/yyyy" disabled="#{energyContractController.readonly}"
+                                        timeZone="UTC" mask="true" placeholder="mm/dd/yyyy" label="Date To" required="true" id="drTo">
+                                <f:validator validatorId="endDateRangeValidator"/>
+                            </p:calendar>
+                        </h:panelGroup>
+                        <p:column/>
+                    </p:panelGrid>
+                </ui:repeat>
+            </ui:repeat>
+            <p:panelGrid columns="1" styleClass="form-group">
+                <h:column>
+                    <p:commandButton update="fees" process="@this" value="Edit" rendered="#{readonly}">
+                        <f:setPropertyActionListener value="false" target="#{readonly}"/>
+                    </p:commandButton>
+                    <p:commandButton update="fees" process="fees" value="Save" action="#{energyContractController.save()}"
+                                     rendered="#{!readonly and energyContractController.editMode}">
+                        <f:actionListener binding="#{energyContractController.makeReadonly()}"/>
+                    </p:commandButton>
+                </h:column>
+            </p:panelGrid>
+        </h:panelGroup>
+    </div>
+</ui:composition>

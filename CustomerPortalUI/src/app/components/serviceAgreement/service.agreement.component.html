@@ -1,0 +1,55 @@
+<p-dataList *ngIf="serviceAgreement" [value]="[serviceAgreement]" [paginator]="false" [rows]="1">
+    <p-header>
+      Service Agreement ID: {{serviceAgreement.serviceAgreementId}}
+    </p-header>
+    <ng-template let-sa pTemplate="item">
+      <div class="ui-g ui-fluid">
+        <div class="ui-g-12">
+          <div class="ui-g">
+            <div class="ui-g-4"><b>Address:</b></div>
+            <div class="ui-g-8">
+              <app-sa-address
+                [address1]="sa.mailingAddress1"
+                [address2]="sa.mailingAddress2"
+                [city]="sa.mailingCityUpr"
+                [postal]="sa.mailingPostal"
+                [state]="sa.mailingState">
+              </app-sa-address>
+            </div>
+            <div class="ui-g-4"><b>Service Status:</b></div>
+            <div class="ui-g-8">{{sa.startDate | date:"MM/dd/yy"}}</div>
+            <div class="ui-g-4"><b>Account Holder:</b></div>
+            <div class="ui-g-8">{{sa.businessName + (sa.customerName | nullSafePipe)}}</div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-dataList>
+<p></p>
+<p-dataList *ngIf="servicePoints" [value]="servicePoints" [paginator]="true" [rows]="1">
+  <p-header>
+    Service Points
+  </p-header>
+  <ng-template let-sp pTemplate="item">
+    <div class="ui-g ui-fluid">
+      <div class="ui-g-12">
+        <div class="ui-g">
+          <div class="ui-g-4"><b>Address:</b></div>
+          <div class="ui-g-8">
+            <app-sa-address
+              [address1]="sp.serviceAddress1"
+              [address2]="sp.serviceAddress2"
+              [city]="sp.serviceCityUpr"
+              [postal]="sp.servicePostal"
+              [state]="sp.serviceState">
+            </app-sa-address>
+          </div>
+          <div class="ui-g-4"><b>Premise Type:</b></div>
+          <div class="ui-g-8">{{sp.premiseType}}</div>
+          <div class="ui-g-4"><b>Meter Number:</b></div>
+          <div class="ui-g-8">{{sp.meterId}}</div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-dataList>

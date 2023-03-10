@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <div class="ui-g-12 ui-md-6 ui-lg-6">
+        <o:importFunctions type="com.inenergis.controller.general.Functions" var="ine"/>
+
+        <p:dataTable value="#{controller.elasticIsos}" lazy="true"
+                     var="iso" reflow="true" rows="10" rowsPerPageTemplate="10,25,50,100" selectionMode="single" rowKey="#{iso.id}"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="true" style="text-align: center;margin-top: 10px;font-size: 14px">
+            <p:ajax event="rowSelect" listener="#{controller.onSelectIso}"/>
+            <f:facet name="header">Markets</f:facet>
+            <p:column headerText="ID" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,iso.id)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Name" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,iso.name)}" escape="false"/>
+            </p:column>
+            <p:column headerText="UDC ID" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,iso.udcId)}" escape="false"/>
+            </p:column>
+            <p:column headerText="DRP ID" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,iso.drpId)}" escape="false"/>
+            </p:column>
+            <p:column headerText="SC ID" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,iso.scId)}" escape="false"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+</ui:composition>

@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:o="http://omnifaces.org/ui"
+>
+    <o:importFunctions type="com.inenergis.controller.general.Functions" var="ine" />
+
+    <p:dataTable value="#{locationSubmissionController.lazyLocationSubmissionExceptionDataModel}" id="TbExceptions" widgetVar="custTable" lazy="true" var="excep" reflow="true"
+                 rows="25" rowsPerPageTemplate="25,50,100" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{excep.uuid}" selectionMode="single">
+        <p:ajax event="rowSelect" listener="#{locationSubmissionController.onSelectException}" update="form"/>
+        <p:column headerText="SA ID" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}"
+                  field="locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId" filterMatchMode="contains">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.serviceAgreementId}"/>
+        </p:column>
+        <p:column headerText="UU ID" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.saUuid}"
+                  field="locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.saUuid" filterMatchMode="contains">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.saUuid}"/>
+        </p:column>
+        <p:column headerText="Customer Name" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName}"
+                  field="locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName" filterMatchMode="contains">
+            <h:outputText value="#{fn:replace(excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.customerName,',',', ')}"/>
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.account.person.businessName}"/>
+        </p:column>
+        <p:column headerText="Service Address" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}"
+                  field="locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceAddress1} "/>
+        </p:column>
+        <p:column headerText="City" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps}"
+                  field="locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps" filterable="false">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.serviceAgreement.agreementPointMaps[0].servicePoint.premise.serviceCityUpr} "/>
+        </p:column>
+        <p:column headerText="Program" filterBy="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.program.name}"
+                  field="locationSubmissionStatus.programServiceAgreementEnrollment.program.name" filterMatchMode="contains">
+            <h:outputText value="#{excep.locationSubmissionStatus.programServiceAgreementEnrollment.program.name}"/>
+        </p:column>
+        <p:column headerText="Exception" filterBy="#{excep.type}" field="type" filterMatchMode="contains">
+            <h:outputText value="#{ine:translateException(excep.type,msg)}"/>
+        </p:column>
+        <p:column headerText="Effective Date" filterBy="#{excep.dateAdded}" field="dateAdded" filterable="false">
+            <h:outputText value="#{excep.dateAdded}">
+                <f:convertDateTime pattern="MM/dd/yyyy"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Disposit." filterBy="#{excep.markedRetry}" field="markedRetry">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('custTable').filter()">
+                    <f:converter converterId="javax.faces.Boolean"/>
+                    <f:selectItem itemLabel="All" itemValue=""/>
+                    <f:selectItem itemLabel="REV." itemValue="true"/>
+                    <f:selectItem itemLabel="NOT R." itemValue="false"/>
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{excep.formatDisposition()}"/>
+        </p:column>
+        <p:column headerText="Commodity"  filterBy="#{pend.programServiceAgreementEnrollment.serviceAgreement.commodity}" field="programServiceAgreementEnrollment.serviceAgreement.commodity" filterMatchMode="contains">
+            <h:outputText value="#{pend.programServiceAgreementEnrollment.serviceAgreement.commodity}" />
+        </p:column>
+        <p:column headerText="Actions" width="115">
+            <p:menuButton value="Actions" rendered="#{ ( !excep.markedRetry and !excep.disputed() ) or (excep.locationSubmissionStatus.isoSublap eq null)}">
+                <p:menuitem action="#{locationSubmissionController.reprocessException(excep)}" process="@this" update="@form" value="Mark As Reviewed"
+                            rendered="#{ !excep.markedRetry and !excep.disputed()}"/>
+                <p:menuitem action="#{locationSubmissionController.changeSublapManually(excep)}" process="@this" update="@form" value="Change #{msg['data.mapping.sublap']} Manually"
+                            rendered="#{ excep.locationSubmissionStatus.isoSublap eq null}"/>
+            </p:menuButton>
+        </p:column>
+    </p:dataTable>
+    <p:dialog header="Changue #{msg['data.mapping.sublap']}" widgetVar="changueSublap" modal="true" resizable="false" closeOnEscape="true"
+              visible="#{locationSubmissionController.showChangeSubLapDialog eq true}">
+        <p:panelGrid columns="4" style="width: 100%;background-color: white">
+            <p:outputLabel value="#{msg['data.mapping.sublap']}" for="sublapSearch"/>
+            <p:selectOneMenu id="sublapSearch" value="#{locationSubmissionController.newSublap}" converter="subLapConverter" style="width: 200px;" autoWidth="false">
+                <f:selectItem itemLabel="All" noSelectionOption="true"/>
+                <f:selectItems value="#{locationSubmissionController.subLapList}" var="subLap" itemValue="#{subLap}" itemLabel="#{subLap.name} (#{subLap.code})"/>
+            </p:selectOneMenu>
+            <p:commandButton value="Submit" action="#{locationSubmissionController.acceptNewSublap()}" update="@form"/>
+            <p:commandButton value="Cancel" action="#{locationSubmissionController.cancelNewSublap()}" update="@form"/>
+        </p:panelGrid>
+    </p:dialog>
+</ui:composition>

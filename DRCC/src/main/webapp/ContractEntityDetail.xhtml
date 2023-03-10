@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="form">
+
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Entities" outcome="SearchContractEntity"/>
+                <p:menuitem value="Entity #{contractEntityDetailController.entity.businessName}"/>
+            </p:breadCrumb>
+
+            <div class="card">
+                <p:carousel numVisible="4" circular="true" responsive="true" value="#{contractEntityDetailController.entityDetails}"
+                            headerText="#{contractEntityDetailController.entity.businessName}" var="details" style="border: 0;">
+                    <i class="material-icons #{details.icon} Fs20 hardblue"/>
+                    <h:outputText value="#{details.name}" styleClass="Fs20 hardblue"/>
+                    <h:dataTable var="db" value="#{details.dataBeans}" style="border:0;" styleClass="ui-panelgrid-blank">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+                <p:commandButton action="#{contractEntityDetailController.editEntity()}" value="Edit Entity"/>
+            </div>
+            <c:set value="#{contractEntityDetailController}" var="controller"/>
+            <p:tabView>
+                <p:tab title="POC">
+                    <ui:include src="WEB-INF/include/contract/POCTab.xhtml"/>
+                </p:tab>
+                <p:tab title="Contracts">
+                    <p:dataTable value="#{contractEntityDetailController.entity.parties}" var="party">
+                        <p:column headerText="Contract Name">
+                            <h:outputText value="#{party.energyContract.name}"/>
+                        </p:column>
+                        <p:column headerText="Contract Type">
+                            <h:outputText value="#{party.energyContract.type.name}"/>
+                        </p:column>
+                        <p:column headerText="Start Date">
+                            <h:outputText value="#{party.energyContract.agreementStartDate}">
+                                <f:convertDateTime timeZone="#{constantsProvider.CUSTOMER_TIMEZONE}" pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Status">
+                            <h:outputText value="#{party.energyContract.status}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Notes">
+                    <ui:include src="WEB-INF/include/general/NotesTab.xhtml"/>
+                </p:tab>
+                <p:tab title="Locations">
+                    <ui:include src="WEB-INF/include/general/EntityDevices.xhtml"/>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+    </ui:define>
+</ui:composition>

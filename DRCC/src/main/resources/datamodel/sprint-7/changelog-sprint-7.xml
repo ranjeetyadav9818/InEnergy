@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet author="egamas" id="DRCC-149-PREV">
+        <sql>DROP TABLE if exists `LR_EXCEPTION`;</sql>
+        <sql>DROP TABLE if exists `LOCATION_REGISTRATION_STATUS`;</sql>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="DRCC-NOTDEF-LSR">
+        <sqlFile path="DRCC-NOTDEF-LSR.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="antonio.lopez" id="IDX_PHONE">
+        <sql>CREATE index `IDX_SA_PHONE` ON `SERVICE_AGREEMENT`(PHONE);</sql>
+    </changeSet>
+
+    <changeSet author="antonio.lopez" id="on-delete-cascade-for-profile-creation">
+        <sql>
+            alter table PROGRAM_PROFILE DROP FOREIGN KEY FK_PROFILE_PROGRAM;
+            alter table PROGRAM_PROFILE ADD CONSTRAINT `FK_PROFILE_PROGRAM` FOREIGN KEY (`PROGRAM_ID`) REFERENCES `PROGRAM` (`ID`) ON DELETE CASCADE ON UPDATE
+            NO ACTION;
+
+            alter table PROGRAM_OPTION DROP FOREIGN KEY FK_OPTION_PROFILE;
+            alter table PROGRAM_OPTION ADD CONSTRAINT `FK_OPTION_PROFILE` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES `PROGRAM_PROFILE` (`ID`) ON DELETE
+            CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_SEASON DROP FOREIGN KEY fk_PROGRAM_SEASON_PROGRAM_PROFILE1;
+            alter table PROGRAM_SEASON ADD CONSTRAINT `fk_PROGRAM_SEASON_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES `PROGRAM_PROFILE`
+            (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_PRODUCT DROP FOREIGN KEY fk_PROGRAM_PRODUCTS_PROGRAM_OPTION1;
+            alter table PROGRAM_PRODUCT ADD CONSTRAINT `fk_PROGRAM_PRODUCTS_PROGRAM_OPTION1` FOREIGN KEY (`PROGRAM_OPTION_ID`) REFERENCES `PROGRAM_OPTION`
+            (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_PRODUCT DROP FOREIGN KEY fk_PROGRAM_PRODUCTS_PROGRAM_OPTION1;
+            alter table PROGRAM_PRODUCT ADD CONSTRAINT `fk_PROGRAM_PRODUCTS_PROGRAM_OPTION1` FOREIGN KEY (`PROGRAM_OPTION_ID`) REFERENCES `PROGRAM_OPTION`
+            (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_CUST_DATA_NOTIFICATIONS DROP FOREIGN KEY fk_PROGRAM_CUST_DATA_NOTIFICATIONS_PROGRAM_PROFILE1;
+            alter table PROGRAM_CUST_DATA_NOTIFICATIONS ADD CONSTRAINT `fk_PROGRAM_CUST_DATA_NOTIFICATIONS_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`)
+            REFERENCES `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_DEMAND DROP FOREIGN KEY fk_PROGRAM_DEMAND_CALCULATION_PROGRAM_PROFILE1;
+            alter table PROGRAM_DEMAND ADD CONSTRAINT `fk_PROGRAM_DEMAND_CALCULATION_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES
+            `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_ELIG_SA_STATUS DROP FOREIGN KEY fk_PROGRAM_ELIG_SA_STATUS_PROGRAM_PROFILE1;
+            alter table PROGRAM_ELIG_SA_STATUS ADD CONSTRAINT `fk_PROGRAM_ELIG_SA_STATUS_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES
+            `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_ENROLLERS DROP FOREIGN KEY fk_PROGRAM_ENROLLERS_PROGRAM_PROFILE1;
+            alter table PROGRAM_ENROLLERS ADD CONSTRAINT `fk_PROGRAM_ENROLLERS_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES `PROGRAM_PROFILE`
+            (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_ENROLMENT_NOTIFICATIONS DROP FOREIGN KEY fk_PROGRAM_ENROLLER_NOTIFICATIONS_PROGRAM_PROFILE1;
+            alter table PROGRAM_ENROLMENT_NOTIFICATIONS ADD CONSTRAINT `fk_PROGRAM_ENROLLER_NOTIFICATIONS_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`)
+            REFERENCES `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_EQUIPMENT DROP FOREIGN KEY fk_PROGRAM_EQUIPMENT_PROGRAM_PROFILE1;
+            alter table PROGRAM_EQUIPMENT ADD CONSTRAINT `fk_PROGRAM_EQUIPMENT_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES `PROGRAM_PROFILE`
+            (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_ENROLMENT_NOTIFICATIONS DROP FOREIGN KEY fk_PROGRAM_ENROLLER_NOTIFICATIONS_PROGRAM_ENROLLERS1;
+            alter table PROGRAM_ENROLMENT_NOTIFICATIONS ADD CONSTRAINT `fk_PROGRAM_ENROLLER_NOTIFICATIONS_PROGRAM_ENROLLERS1` FOREIGN KEY
+            (`PROGRAM_ENROLLERS_ID`) REFERENCES `PROGRAM_ENROLLERS` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_ELIG_RATE_SCHEDULE DROP FOREIGN KEY fk_PROGRAM_RATE_SCHEDULE_PROGRAM_PROFILE1;
+            alter table PROGRAM_ELIG_RATE_SCHEDULE ADD CONSTRAINT `fk_PROGRAM_RATE_SCHEDULE_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES
+            `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_HOLIDAYS DROP FOREIGN KEY fk_PROGRAM_HOLIDAYS_PROGRAM_PROFILE1;
+            alter table PROGRAM_HOLIDAYS ADD CONSTRAINT `fk_PROGRAM_HOLIDAYS_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`) REFERENCES `PROGRAM_PROFILE`
+            (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+            alter table PROGRAM_FSL_RULE DROP FOREIGN KEY FK_FSL_PROFILE;
+            alter table PROGRAM_FSL_RULE ADD CONSTRAINT `FK_FSL_PROFILE` FOREIGN KEY (`PROFILE_ID`) REFERENCES `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON
+            UPDATE NO ACTION;
+
+            alter table PROGRAM_ENROLMENT_ATTRIBUTES DROP FOREIGN KEY fk_PROGRAM_ENROLMENT_ATTRIBUTES_PROGRAM_PROFILE1;
+            alter table PROGRAM_ENROLMENT_ATTRIBUTES ADD CONSTRAINT `fk_PROGRAM_ENROLMENT_ATTRIBUTES_PROGRAM_PROFILE1` FOREIGN KEY (`PROGRAM_PROFILE_ID`)
+            REFERENCES `PROGRAM_PROFILE` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+        </sql>
+    </changeSet>
+    <changeSet id="DRCC-172" author="vm">
+        <sqlFile path="DRCC-172.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-148-Products" author="vm">
+        <sqlFile path="DRCC-148-Products.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCM-24" author="antonio.lopez">
+        <sqlFile path="DRCM-24.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet author="egamas" id="DRCC-149">
+        <sql>ALTER TABLE LR_EXCEPTION ADD MARKED_RETRY tinyint(1) DEFAULT '0';</sql>
+        <sql>ALTER TABLE LR_EXCEPTION ADD COLUMN SUBLAP varchar(20) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION ADD COLUMN CAISO_UUID varchar(55) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION add lse varchar(10) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION ADD COLUMN LOCATION varchar(10) DEFAULT NULL;</sql>
+    </changeSet>
+
+    <changeSet author="egamas" id="DRCC-149_2">
+        <sql>ALTER TABLE LR_EXCEPTION DROP COLUMN `CONTINUE`;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION ADD COLUMN `CAN_CONTINUE` tinyint(1) DEFAULT '0';</sql>
+    </changeSet>
+
+    <changeSet author="egamas" id="DRCC-149_3">
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN ISO_SUBMISSION_DATE DATETIME DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION DROP COLUMN SUBLAP;</sql>
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN SUBLAP varchar(20) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION DROP COLUMN CAISO_UUID;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION DROP COLUMN lse;</sql>
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN LSE varchar(10) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LR_EXCEPTION DROP COLUMN LOCATION;</sql>
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN LOCATION varchar(10) DEFAULT NULL;</sql>
+    </changeSet>
+
+    <changeSet author="egamas" id="DRCC-149-4">
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN ISO_RESOURCE_ID VARCHAR(20) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN ISO_NON_REG_REASON VARCHAR(50) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS ADD COLUMN ISO_NON_REG_DATE DATE DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet author="egamas" id="DRCC-149-5">
+        <sql>ALTER TABLE LOCATION_REGISTRATION_STATUS MODIFY COLUMN LSE VARCHAR(50) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-174" author="vm">
+        <sqlFile path="DRCC-174.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-184" author="antonio.lopez">
+        <sqlFile path="DRCC-184.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-185" author="vm">
+        <sqlFile path="DRCC-185.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-186" author="vm">
+        <sqlFile path="DRCC-186.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-176" author="antonio.lopez">
+        <sqlFile path="DRCC-176.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-176_1" author="antonio.lopez">
+        <sqlFile path="DRCC-176_1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="DRCC-187.sql" author="egamas">
+        <sqlFile path="DRCC-187.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="fix_pk_Status_tab" author="egamas">
+        <sql>alter table LOCATION_REGISTRATION_STATUS drop primary key, ADD PRIMARY KEY(ID);</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-187_fix_said" author="egamas">
+        <sql>alter table TROVE_METER_FORECAST modify column SERVICE_AGREEMENT_ID BIGINT(10);</sql>
+    </changeSet>
+
+    <changeSet id="DRCC-179" author="vm">
+        <sqlFile path="DRCC-179.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-179-2" author="vm">
+        <sqlFile path="DRCC-179-2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-180.sql" author="egamas">
+        <sqlFile path="DRCC-180.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-182" author="vm">
+        <sqlFile path="DRCC-182.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-195-1" author="egamas">
+        <sql>ALTER TABLE ISO_RESOURCE ADD CAISO_ID VARCHAR(10) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE REGISTRATION_STATUS ADD CAISO_ID VARCHAR(10) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-195-2" author="egamas">
+        <sql>alter table ISO_RESOURCE CHANGE COLUMN `CAISO_ID` `ISO_RESOURCE_ID` VARCHAR(10) DEFAULT NULL;</sql>
+        <sql>ALTER TABLE REGISTRATION_STATUS CHANGE COLUMN `CAISO_ID` `ISO_REGISTRATION_ID` VARCHAR(10) DEFAULT NULL;</sql>
+    </changeSet>
+    <changeSet id="DRCC-182-3" author="vm">
+        <sqlFile path="DRCC-182-3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="DRCC-195-3" author="antonio.lopez">
+        <sql>alter table LOCATION_REGISTRATION_STATUS ADD ISO_BATCH_ID VARCHAR(20) DEFAULT NULL;</sql>
+    </changeSet>
+</databaseChangeLog>

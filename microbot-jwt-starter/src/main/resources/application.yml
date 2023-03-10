@@ -1,0 +1,70 @@
+app:
+  name: Microbot - Token Security
+
+dev:
+  mode: false
+
+jwt:
+  header: Authorization
+  expires_in: 600 # 10 minutes
+  secret: queenvictoria
+
+server:
+  port: 5000
+spring:
+  profiles:
+    active: enrique
+
+#logging.level.org.hibernate.SQL=debug
+
+mysql:
+  jdbc:
+    url: jdbc:mysql://ea-iat-01-cluster.cluster-ck7eybgpaefb.us-east-1.rds.amazonaws.com:3306/drcc?relaxAutoCommit=true
+    user: DRCMUser
+    pass: LeMPLymAYOUNgEldiVAL
+    driverClassName: com.mysql.jdbc.Driver
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+      show_sql: false
+redshift:
+  jdbc:
+    url: jdbc:postgresql://public.c4t8oqlq7wzz.us-east-1.redshift.amazonaws.com:5439/test
+    user: dbuser
+    pass: pXfLT4rwDZkviFQ4*K7s
+    driverClassName: org.postgresql.Driver
+  hibernate:
+    dialect: org.hibernate.dialect.PostgreSQL82Dialect
+    show_sql: true
+    temp:
+      use_jdbc_metadata_defaults: false
+
+elastic:
+  url: https://search-energy-array-iat-56-fqt5x7vuyil3b4icxve7pxy7iy.us-east-1.es.amazonaws.com
+  port: 443
+
+pge:
+  api:
+    password: Layer7ControlCenter
+    username: DemandResponseDRCC
+    url: https://apiqa.pge.com/tst/demandresponse/v1/meterdata/availability
+    numberOfDaysToCheck: 50
+    availableDaysToBeReady: 45
+    peakdemand:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/meterdata/peakdemand
+    resourceregistration:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/resource/registration
+    bid:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/bid
+    bidstatus:
+      url: https://apiqa.pge.com/tst/demandresponse/v1/bid/status
+  certificate:
+    location: /opt/certificates/pgeCertificate.p12
+    password: yw4ZZUx5DL9p5edN
+
+jms:
+  host: tcp://localhost:61616
+  username: admin
+  password: jUZrxWrXMwbm69bB
+aws:
+  region: us-east-1
+

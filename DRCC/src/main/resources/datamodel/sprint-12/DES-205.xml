@@ -1,0 +1,80 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet context="ddl" id="pre-DES-205.xml" author="egamas">
+        <tagDatabase tag="pre-DES-205" />
+    </changeSet>
+
+    <changeSet id="DES-205.xml" author="egamas">
+        <createTable tableName="ASSET_PROFILE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="GRID_TYPE" type="VARCHAR(55)"/>
+        </createTable>
+
+        <addColumn tableName="ASSET">
+            <column name="ASSET_PROFILE_ID" type="BIGINT(20) UNSIGNED"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="ASSET"
+                                 baseColumnNames="ASSET_PROFILE_ID"
+                                 constraintName="FK_ASSET_ASSET_PROFILE"
+                                 referencedTableName="ASSET_PROFILE"
+                                 referencedColumnNames="ID"/>
+    </changeSet>
+
+    <changeSet id="DES-205-2.xml" author="egamas">
+
+        <createTable tableName="ASSET_PROFILE_ATTRIBUTE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="VALIDATION" type="VARCHAR(255)"/>
+            <column name="MANDATORY" type="TINYINT(1) NOT NULL DEFAULT 0" defaultValue="0" />
+            <column name="ORDER" type="BIGINT(20)"/>
+            <column name="ASSET_PROFILE_ID" type="BIGINT(20) UNSIGNED"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="ASSET_PROFILE_ATTRIBUTE"
+                                 baseColumnNames="ASSET_PROFILE_ID"
+                                 constraintName="FK_ASSET_ATTRIBUTE_ASSET_PROFILE"
+                                 referencedTableName="ASSET_PROFILE"
+                                 referencedColumnNames="ID"/>
+
+
+        <createTable tableName="ASSET_ATTRIBUTE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+
+            <column name="PROFILE_ATTRIBUTE_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="VALUE" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="ASSET_ATTRIBUTE"
+                                 baseColumnNames="PROFILE_ATTRIBUTE_ID"
+                                 constraintName="FK_ASSET_ATTRIBUTE_PROFILE"
+                                 referencedTableName="ASSET_PROFILE_ATTRIBUTE"
+                                 referencedColumnNames="ID"/>
+
+    </changeSet>
+    <changeSet id="DES-205-3.xml" author="egamas">
+        <renameColumn tableName="ASSET_PROFILE_ATTRIBUTE" oldColumnName="ORDER" newColumnName="ATTR_ORDER" columnDataType="BIGINT(20)"/>
+    </changeSet>
+
+    <changeSet id="DES-205-4.xml" author="egamas">
+        <addColumn tableName="ASSET_PROFILE_ATTRIBUTE">
+            <column name="TYPE" type="VARCHAR(10) NOT NULL"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

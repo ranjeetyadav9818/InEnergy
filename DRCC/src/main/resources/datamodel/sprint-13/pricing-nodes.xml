@@ -1,0 +1,24 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+
+    <changeSet id="pricing-nodes-1" author="antonio">
+        <createTable tableName="PRICING_NODE">
+            <column name="ID" type="BIGINT(20) UNSIGNED" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="VARCHAR(55)"/>
+            <column name="SUBLAP_ID" type="BIGINT(20) UNSIGNED"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="SUBLAP_ID"
+                                 baseTableName="PRICING_NODE"
+                                 constraintName="fk_PricingNode_Sublap"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SUBLAP"/>
+    </changeSet>
+
+
+</databaseChangeLog>

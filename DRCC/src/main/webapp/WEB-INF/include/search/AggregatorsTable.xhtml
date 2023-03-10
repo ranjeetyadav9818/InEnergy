@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <div class="ui-g-12 ui-md-6 ui-lg-6">
+        <o:importFunctions type="com.inenergis.controller.general.Functions" var="ine"/>
+
+        <p:dataTable value="#{controller.elasticAggregators}" lazy="true"
+                     var="aggregator" reflow="true" rows="10" rowsPerPageTemplate="10,25,50,100" selectionMode="single" rowKey="#{aggregator.id}"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="true" style="text-align: center;margin-top: 10px;font-size: 14px">
+            <p:ajax event="rowSelect" listener="#{controller.onSelectAggregator}"/>
+            <f:facet name="header">Aggregators</f:facet>
+            <p:column headerText="ID" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,aggregator.id)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Name" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,aggregator.name)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Address" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,aggregator.address)}" escape="false"/>
+            </p:column>
+            <p:column headerText="City" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,aggregator.city)}" escape="false"/>
+            </p:column>
+            <p:column headerText="State" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,aggregator.state)}" escape="false"/>
+            </p:column>
+            <p:column headerText="Phone" width="13%">
+                <h:outputText value="#{ine:highlighter(controller.querySearch,aggregator.phone)}" escape="false"/>
+            </p:column>
+        </p:dataTable>
+    </div>
+</ui:composition>

@@ -1,0 +1,163 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+
+        <h:form id="FVSM">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Data Mapping"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+
+                <p:outputPanel id="vsmDiv">
+                    <h:panelGroup rendered="#{not dataMappingController.newDataMapping and dataMappingController.dataMapping eq null}">
+                        <p:commandButton id="addVSMButton" process="@this" update="FVSM:vsmDiv" value="Add Mapping" action="#{dataMappingController.add}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{dataMappingController.newDataMapping}">
+                        <h3>Add Mapping</h3>
+
+                        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{dataMappingController.currentDataMappingType eq null}">
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Type:" for="dataMappingType"/>
+                                <p:selectOneMenu id="dataMappingType" required="true" value="#{dataMappingController.dataMapping.type}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="false"/>
+                                    <f:selectItems value="#{dataMappingController.dataMappingTypes}" var="type" itemValue="#{type}" itemLabel="#{msg[type.id]}"/>
+                                    <f:ajax render="@form"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{dataMappingController.dataMapping.type eq 'SUBLAP'}">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText id="feeder" value="#{dataMappingController.dataMapping.source}" required="true"/>
+                                <p:outputLabel value="Feeder:" for="feeder"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="#{msg['data.mapping.sublap']}:" for="idSublap"/>
+                                <p:selectOneMenu id="idSublap" required="true" label="#{msg['data.mapping.sublap']}" converter="subLapConverter"
+                                                 value="#{dataMappingController.entity}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{dataMappingController.subLapList}" var="n" itemValue="#{n}" itemLabel="#{n.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{dataMappingController.dataMapping.type eq 'LSE'}">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText value="#{dataMappingController.dataMapping.source}" id="name" required="true"/>
+                                <p:outputLabel value="Name:" for="name"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="LSE:" for="idLSE"/>
+                                <p:selectOneMenu id="idLSE" required="true" label="LSE"
+                                                 converter="lseConverter"
+                                                 value="#{dataMappingController.entity}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{dataMappingController.lseList}" var="n" itemValue="#{n}" itemLabel="#{n.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{dataMappingController.dataMapping.type eq 'METER_TYPE'}">
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputText value="#{dataMappingController.dataMapping.source}" id="meterConfigurationType" size="26" required="true"/>
+                                <p:outputLabel value="Meter Configuration Type:" for="meterConfigurationType"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="md-inputfield-select">
+                                <p:outputLabel value="Meter Type:" for="meterType"/>
+                                <p:selectOneMenu id="meterType" required="true" label="Meter Type" value="#{dataMappingController.entity}">
+                                    <f:selectItem itemLabel="Select One" noSelectionOption="true"/>
+                                    <f:selectItems value="#{dataMappingController.meterTypes}" var="n" itemValue="#{n}" itemLabel="#{n.name}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <p:commandButton id="save" value="#{msg['save']}" action="#{dataMappingController.save()}"
+                                         process="@form" update="@form"/>
+                        <p:spacer width="5"/>
+                        <p:commandButton id="cancel" value="#{msg['cancel']}"
+                                         action="#{dataMappingController.cancelDataMapping()}" process="@this" update="FVSM:vsmDiv"/>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </div>
+            <div class="card card-w-title">
+                <div class="EmptyBox10"></div>
+                <p:outputPanel id="vsmDivT">
+
+                    <!-- Filters & Results -->
+                    <p:dataTable id="dmTable" value="#{dataMappingController.dataMappingList}" widgetVar="mappingWidget" editable="true" var="dm"
+                                 reflow="true" rows="25"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" rowKey="#{dm.id}"
+                                 selection="#{dataMappingController.selectedDataMapping}" selectionMode="single">
+
+                        <p:ajax event="rowEdit" listener="#{dataMappingController.onRowEdit}"/>
+                        <p:ajax event="rowEditCancel" listener="#{dataMappingController.onRowCancel}"/>
+
+                        <p:column headerText="Type" filterBy="#{dm.type}"
+                                  filterable="#{dataMappingController.currentDataMappingType eq null}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{msg[dm.type.id]}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu id="dataMappingTypeTab" required="true" value="#{dm.type}" label="Type" converter="omnifaces.GenericEnumConverter" style="padding-left: 7px;">
+                                        <f:selectItem itemLabel="Select One" noSelectionOption="false"/>
+                                        <f:selectItems value="#{dataMappingController.dataMappingTypes}" var="type" itemValue="#{type}" itemLabel="#{msg[type.id]}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column headerText="Source" filterBy="#{dm.source}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{dm.source}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{dm.source}" label="Feeder" maxlength="100"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column headerText="Destination" filterBy="#{dm.destination}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{dm.destination}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{dm.destination}" label="Destination" maxlength="100"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column headerText="Destination Code" filterBy="#{dm.destinationCode}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{dm.destinationCode}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{dm.destinationCode}" label="Destination Code" maxlength="100"/></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column style="width:32px" class="showOnDesktop">
+                            <p:rowEditor/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:contextMenu for="dmTable" widgetVar="vsmMenu">
+                        <p:menuitem value="Delete" update="FVSM:vsmDivT" icon="ui-icon-trash-1"
+                                    actionListener="#{dataMappingController.deleteDataMapping()}"/>
+                        <p:menuitem value="Hide" icon="ui-icon-close" onclick="PF('vsmMenu').hide()"/>
+                    </p:contextMenu>
+                </p:outputPanel>
+                <div class="EmptyBox20"></div>
+            </div>
+        </h:form>
+
+        <div class="EmptyBox20"></div>
+    </ui:define>
+</ui:composition>

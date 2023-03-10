@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form>
+        <p:dataTable value="#{resourceDetailController.resource.outages}" var="outage"
+                     reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                     paginator="true" paginatorAlwaysVisible="false" >
+
+            <p:column headerText="Outage Date" styleClass="topAligned">
+                <h:outputText value="#{outage.impactedResource.event.startDate}">
+                    <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Registration ID" styleClass="topAligned" filterBy="#{outage.registration.isoRegistrationId}">
+                <h:outputText value="#{outage.registration.isoRegistrationId}"/>
+            </p:column>
+
+            <p:column headerText="Total Locations Impacted" styleClass="topAligned" filterBy="#{outage.impactedResource.totalImpactedLocations}">
+                <h:outputText value="#{outage.impactedResource.totalImpactedLocations}"/>
+            </p:column>
+
+            <p:column headerText="Dispatch Event ID" styleClass="topAligned" filterBy="#{outage.impactedResource.event.externalEventId}">
+                <h:outputText value="#{outage.impactedResource.event.externalEventId}"/>
+            </p:column>
+        </p:dataTable>
+    </h:form>
+
+</ui:composition>

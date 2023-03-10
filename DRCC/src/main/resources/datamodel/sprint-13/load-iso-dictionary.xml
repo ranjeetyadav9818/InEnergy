@@ -1,0 +1,13 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+    <changeSet id="load-iso-dictionary1.xml" author="egamas">
+        <addColumn tableName="MI_ISO">
+            <column name="BASE_LOCALE" type="VARCHAR(55)" defaultValue="en_US">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXTENDED_LOCALE" type="VARCHAR(55)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

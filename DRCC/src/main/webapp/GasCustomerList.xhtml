@@ -1,0 +1,736 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:outputScript name="jquery/jquery.js" library="primefaces" target="head"/>
+        <h:form id="formCL">
+            <p:breadCrumb>
+                <p:menuitem value="Dashboard" outcome="dashboard"/>
+                <p:menuitem value="Customers" outcome="CustomerList"/>
+                <p:menuitem value="Search" action="#{gasAgreementPointMapList.onServiceAgreementClear()}" update="formCL"
+                            rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}"/>
+                <p:menuitem value="ACC ID #{gasAgreementPointMapList.serviceAgreement.account.accountId}" actionListener="#{gasAgreementPointMapList.updateCard(gasAgreementPointMapList.serviceAgreement.account.accountId)}" update="formCL" ajax="true"
+                            rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}"/>
+                <p:menuitem value="SA ID #{gasAgreementPointMapList.selectedServiceAgreement.serviceAgreementId}"
+                            rendered="#{(gasAgreementPointMapList.accountId == null and gasAgreementPointMapList.selectedServiceAgreement != null)}"/>
+            </p:breadCrumb>
+
+            <div class="card card-w-title">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{gasAgreementPointMapList.showSearch}">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="saId" maxlength="10" value="#{gasAgreementPointMapList.serviceAgreementId}"/>
+                        <label>SA ID</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="address" value="#{gasAgreementPointMapList.address}"/>
+                        <label>Service Address</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="name" value="#{gasAgreementPointMapList.name}"/>
+                        <label>Name</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="accId" maxlength="10" value="#{gasAgreementPointMapList.accountId}"/>
+                        <label>Acc ID</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="city" value="#{gasAgreementPointMapList.city}"/>
+                        <label>City</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="phone" value="#{gasAgreementPointMapList.phone}"/>
+                        <label>POC Phone</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="personId" maxlength="10" value="#{gasAgreementPointMapList.personId}"/>
+                        <label>Person ID</label>
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="postCode" value="#{gasAgreementPointMapList.postCode}"/>
+                        <label>Post Code</label>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <p:commandButton value="Search" id="search" update="@form,:menu-form-crm" action="#{gasAgreementPointMapList.doSearch()}"
+                                 rendered="#{gasAgreementPointMapList.showSearch}"/>
+
+                <p:carousel id="personCarousel" rendered="#{(gasAgreementPointMapList.showCarousel and gasAgreementPointMapList.accountId != null)}" numVisible="4" circular="true" responsive="true"
+                            value="#{gasAgreementPointMapList.customerDetails}"
+                            headerText="Account Id #{gasAgreementPointMapList.serviceAgreement.account.accountId}"
+                            var="sad" style="border: 0;">
+                    <i class="material-icons #{sad.icon} Fs20 hardblue"/>
+                    <h:outputText value="#{sad.name}" styleClass="Fs20 hardblue"/>
+                    <h:dataTable var="db" value="#{sad.dataBeans}" style="border:0;" styleClass="ui-panelgrid-blank">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+
+                <p:carousel id="apmCarousel" rendered="#{(gasAgreementPointMapList.showCarousel and gasAgreementPointMapList.accountId == null)}" numVisible="4" circular="true" responsive="true"
+                            value="#{gasAgreementPointMapList.serviceAgreementDetails}"
+                            headerText="Service Agreement #{gasAgreementPointMapList.selectedAgreementPointMap.serviceAgreement.serviceAgreementId}"
+                            var="sad" style="border: 0;">
+                    <i class="material-icons #{sad.icon} Fs20 hardblue"/>
+                    <h:outputText value="#{sad.name}" styleClass="Fs20 hardblue"/>
+                    <h:dataTable var="db" value="#{sad.dataBeans}" style="border:0;" styleClass="ui-panelgrid-blank">
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.name}" style="border:0;"/>
+                        </h:column>
+                        <h:column style="border:0;">
+                            <h:outputText value="#{db.value}" style="border:0;"/>
+                        </h:column>
+                    </h:dataTable>
+                </p:carousel>
+            </div>
+
+            <p:tabView id="TEvDet" dynamic="true" scrollable="true" activeIndex="#{gasAgreementPointMapList.tabActiveIndex}">
+                <p:ajax event="tabChange" listener="#{gasAgreementPointMapList.setActiveTab(gasAgreementPointMapList.tabActiveIndex)}"/>
+                <p:tab title="Customer">
+                    <h:panelGroup rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}">
+                        <c:set value="#{gasAgreementPointMapList.selectedServiceAgreement.account.person}" var="person"/>
+                        <div class="card card-w-title">
+                            <h3>Primary contact</h3>
+
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <p:outputLabel value="Person ID"/>
+                                <h:panelGroup>#{person.personId}</h:panelGroup>
+                                <p:column/>
+                                <p:column/>
+
+                                <p:outputLabel value="Customer Name"/>
+                                <h:outputText value="#{person.toName()}"/>
+                                <p:column/>
+                                <p:column/>
+
+                                <p:outputLabel value="Phone"/>
+                                <h:outputText value="#{gasAgreementPointMapList.serviceAgreement.phone}" converter="phoneConverter"/>
+                                <p:column/>
+                                <p:column/>
+                            </p:panelGrid>
+                        </div>
+
+                        <div class="card card-w-title">
+                            <h3>Secondary contacts</h3>
+
+                            <p:panelGrid columns="1" styleClass="form-group" rendered="#{gasAgreementPointMapList.newSecondaryContact eq null}">
+                                <h:column>
+                                    <p:commandButton action="#{gasAgreementPointMapList.createNewSecondaryContact}" update="@(.ui-tabs-panel:visible)"
+                                                     process="@this" value="Add"/>
+                                </h:column>
+                            </p:panelGrid>
+
+                            <h:panelGroup rendered="#{gasAgreementPointMapList.newSecondaryContact != null}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputText id="secondaryContactTitle" value="#{gasAgreementPointMapList.newSecondaryContact.title}"/>
+                                        <p:outputLabel value="Title:" for="secondaryContactTitle"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputText id="secondaryContactName" value="#{gasAgreementPointMapList.newSecondaryContact.name}" required="true"/>
+                                        <p:outputLabel value="Name:" for="secondaryContactName"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputText id="secondaryContactSurname" value="#{gasAgreementPointMapList.newSecondaryContact.surname}" required="true"/>
+                                        <p:outputLabel value="Surname:" for="secondaryContactSurname"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputText id="secondaryContactPhone" value="#{gasAgreementPointMapList.newSecondaryContact.phone}"/>
+                                        <p:outputLabel value="Phone:" for="secondaryContactPhone"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputText id="secondaryContactMobile" value="#{gasAgreementPointMapList.newSecondaryContact.mobile}"/>
+                                        <p:outputLabel value="Mobile:" for="secondaryContactMobile"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputText id="secondaryContactEmail" value="#{gasAgreementPointMapList.newSecondaryContact.email}"/>
+                                        <p:outputLabel value="E-mail:" for="secondaryContactEmail"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+
+                                <p:panelGrid columns="1" styleClass="form-group">
+                                    <h:column>
+                                        <p:commandButton action="#{gasAgreementPointMapList.saveSecondaryContacts}" update="@form" value="Save"/>
+                                        <p:spacer width="10"/>
+                                        <p:commandButton action="#{gasAgreementPointMapList.cancelNewSecondaryContract}"
+                                                         update="@form" process="@this" value="Cancel"/>
+                                    </h:column>
+                                </p:panelGrid>
+                                <p:separator/>
+                            </h:panelGroup>
+
+                            <p:dataTable widgetVar="custTable" value="#{gasAgreementPointMapList.selectedServiceAgreement.secondaryContacts}"
+                                         lazy="false" var="secondaryContact" editable="true"
+                                         reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                         paginator="true" paginatorAlwaysVisible="false" selectionMode="single" rowKey="#{secondaryContact.uuid}"
+                                         rendered="#{gasAgreementPointMapList.selectedServiceAgreement.secondaryContacts.size() != 0}">
+
+                                <p:ajax event="rowEdit" listener="#{gasAgreementPointMapList.onSecondaryContactEdit}"/>
+                                <p:ajax event="rowEditCancel"/>
+
+                                <p:column headerText="Title">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{secondaryContact.title}"/></f:facet>
+                                        <f:facet name="input"><h:inputText value="#{secondaryContact.title}"/></f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Name">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{secondaryContact.name}"/></f:facet>
+                                        <f:facet name="input"><h:inputText value="#{secondaryContact.name}"/></f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Surname">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{secondaryContact.surname}"/></f:facet>
+                                        <f:facet name="input"><h:inputText value="#{secondaryContact.surname}"/></f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Phone">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{secondaryContact.phone}"/></f:facet>
+                                        <f:facet name="input"><h:inputText value="#{secondaryContact.phone}"/></f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Mobile">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{secondaryContact.mobile}"/></f:facet>
+                                        <f:facet name="input"><h:inputText value="#{secondaryContact.mobile}"/></f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Email ID">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{secondaryContact.email}"/></f:facet>
+                                        <f:facet name="input"><h:inputText value="#{secondaryContact.email}"/></f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column style="width: 32px" class="showOnDesktop">
+                                    <p:rowEditor/>
+                                </p:column>
+                                <p:column style="width: 66px" class="showOnDesktop">
+                                    <p:commandButton action="#{gasAgreementPointMapList.removeSecondaryContact(secondaryContact)}" update="@form" process="@this"
+                                                     value="Delete"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:panelGroup>
+
+                    <p:dataTable id="TBCust" widgetVar="custTable" value="#{(gasAgreementPointMapList.custlist != null) ? gasAgreementPointMapList.custlist : gasAgreementPointMapList.agreementPointMapLazyModel}" lazy="true" var="apm"
+                                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single" rowKey="#{apm.rowKey}"
+                                 rendered="#{gasAgreementPointMapList.selectedServiceAgreement eq null}">
+                        <p:ajax event="rowSelect" listener="#{gasAgreementPointMapList.onCustomerSelect}" update="formCL"/>
+                        <p:column headerText="Person ID" filterBy="#{apm.serviceAgreement.account.person.personId}" field="personId">
+                            <h:outputText value="#{apm.serviceAgreement.account.person.personId}"/>
+                        </p:column>
+                        <p:column headerText="Acc ID" filterBy="#{apm.serviceAgreement.account.accountId}" field="acctId">
+                            <h:outputText value="#{apm.serviceAgreement.account.accountId}"/>
+                        </p:column>
+                        <p:column headerText="Customer Name" filterBy="#{apm.serviceAgreement.account.person.businessName}" field="busName">
+                            <h:outputText value="#{apm.serviceAgreement.account.person.businessName}"
+                                          rendered="#{apm.serviceAgreement.account.person.customerName eq null}"/>
+                            <h:outputText value="#{apm.serviceAgreement.account.person.customerName}"
+                                          rendered="#{apm.serviceAgreement.account.person.businessName eq null}"/>
+                            <h:outputText
+                                    value="#{apm.serviceAgreement.account.person.customerName} (#{apm.serviceAgreement.account.person.businessName})"
+                                    rendered="#{apm.serviceAgreement.account.person.businessName ne null and apm.serviceAgreement.account.person.customerName ne null}"/>
+                        </p:column>
+                        <p:column headerText="Phone" filterBy="#{apm.serviceAgreement.phone}" field="phone">
+                            <h:outputText value="#{apm.serviceAgreement.phone}" converter="phoneConverter"/>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <ui:include src="WEB-INF/include/portalUser/PortalUserManagement.xhtml"/>
+
+                </p:tab>
+
+                <p:tab title="Equipment &amp; Devices" rendered="#{(gasAgreementPointMapList.selectedServiceAgreement ne null and  gasAgreementPointMapList.accountId == null)}">
+
+
+                    <div class="card card-w-title">
+                        <h3>Eligible Assets</h3>
+
+                        <h:panelGroup styleClass="md-inputfield-select">
+                            <p:outputLabel value="Select new asset" for="idTypeCr"/>
+                            <p:selectOneMenu id="idTypeCr" value="#{gasAgreementPointMapList.asset}" required="#{gasAgreementPointMapList.tabActiveIndex eq 1}" converter="assetConverter">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{gasAgreementPointMapList.availableAssets}" var="asset" itemLabel="#{asset.name} (#{asset.assetProfile.name})"
+                                               itemValue="#{asset}"/>
+                            </p:selectOneMenu>
+                            <p:spacer width="15"/>
+                            <p:commandButton rendered="#{gasAgreementPointMapList.tabActiveIndex eq 1}" update="@form" process="@form" value="Add" action="#{gasAgreementPointMapList.addAsset}"/>
+                        </h:panelGroup>
+
+                    </div>
+
+                    <p:dataTable id="TBEquipmentDeviced2" widgetVar="custTable" value="#{gasAgreementPointMapList.assets}" var="asset">
+                        <j:useBean id="asset" type="com.inenergis.entity.program.AssetWrapper"/>
+                        <p:column headerText="Service Point">
+                            <p:link href="ServicePointList.xhtml?o=#{parameterEncoderService.encode(asset.servicePoint)}"
+                                    value="#{asset.servicePoint}"/>
+                        </p:column>
+                        <p:column headerText="Program">
+                            <h:outputText value="#{asset.program}"/>
+                        </p:column>
+                        <p:column headerText="Device Name">
+                            <h:outputText value="#{asset.deviceName}"/>
+                        </p:column>
+                        <p:column headerText="Device Type">
+                            <h:outputText value="#{asset.deviceType}"/>
+                        </p:column>
+                        <p:column headerText="Usage">
+                            <h:outputText value="#{asset.usage}"/>
+                        </p:column>
+                        <p:column headerText="Manufacturer">
+                            <h:outputText value="#{asset.manufacturer}"/>
+                        </p:column>
+                        <p:column headerText="Model">
+                            <h:outputText value="#{asset.model}"/>
+                        </p:column>
+                        <p:column headerText="Serial No">
+                            <h:outputText value="#{asset.serial}"/>
+                        </p:column>
+                        <p:column headerText="Installed">
+                            <h:outputText value="#{asset.installed}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Owner">
+                            <h:outputText value="#{asset.owner}"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandLink action="#{gasAgreementPointMapList.removeAsset(asset.serviceAgreementAsset)}"
+                                           value="Remove" process="@this" update="@form" rendered="#{asset.serviceAgreementAsset != null}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+
+                <p:tab title="Equipment &amp; Devices" rendered="#{(gasAgreementPointMapList.selectedServiceAgreement ne null and  gasAgreementPointMapList.accountId !=null)}">
+
+
+
+                    <p:dataTable id="TBEquipmentDeviced" widgetVar="custTable" value="#{gasAgreementPointMapList.assets}" var="asset">
+                        <j:useBean id="asset" type="com.inenergis.entity.program.AssetWrapper"/>
+                        <p:column headerText="Service Point">
+                            <p:link href="ServicePointList.xhtml?o=#{parameterEncoderService.encode(asset.servicePoint)}"
+                                    value="#{asset.servicePoint}"/>
+                        </p:column>
+                        <p:column headerText="Program">
+                            <h:outputText value="#{asset.program}"/>
+                        </p:column>
+                        <p:column headerText="Device Name">
+                            <h:outputText value="#{asset.deviceName}"/>
+                        </p:column>
+                        <p:column headerText="Device Type">
+                            <h:outputText value="#{asset.deviceType}"/>
+                        </p:column>
+                        <p:column headerText="Usage">
+                            <h:outputText value="#{asset.usage}"/>
+                        </p:column>
+                        <p:column headerText="Manufacturer">
+                            <h:outputText value="#{asset.manufacturer}"/>
+                        </p:column>
+                        <p:column headerText="Model">
+                            <h:outputText value="#{asset.model}"/>
+                        </p:column>
+                        <p:column headerText="Serial No">
+                            <h:outputText value="#{asset.serial}"/>
+                        </p:column>
+                        <p:column headerText="Installed">
+                            <h:outputText value="#{asset.installed}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Owner">
+                            <h:outputText value="#{asset.owner}"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandLink action="#{gasAgreementPointMapList.removeAsset(asset.serviceAgreementAsset)}"
+                                           value="Remove" process="@this" update="@form" rendered="#{asset.serviceAgreementAsset != null}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+
+                <p:tab title="Service Agreement"   rendered="#{(gasAgreementPointMapList.accountId != null or gasAgreementPointMapList.selectedServiceAgreement == null)}">
+                    <p:dataTable id="TBServAgr" widgetVar="servAgrTable" value="#{gasAgreementPointMapList.agreementPointMapLazyModel}" lazy="true"
+                                 var="apm" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single"
+                                 selection="#{gasAgreementPointMapList.selectedAgreementPointMap}" rowKey="#{apm.rowKey}">
+                        <p:ajax event="rowSelect" listener="#{gasAgreementPointMapList.onServiceAgreementSelect}" update="formCL"/>
+                        <p:column headerText="Acc ID" filterBy="#{apm.serviceAgreement.account.accountId}" field="acctId">
+                            <h:outputText value="#{apm.serviceAgreement.account.accountId}"/>
+                        </p:column>
+                        <p:column headerText="SA ID" filterBy="#{apm.serviceAgreement.serviceAgreementId}" field="saId">
+                            <h:outputText value="#{apm.serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="SP ID" filterBy="#{apm.servicePoint.servicePointId}" field="spId">
+                            <h:outputText value="#{apm.servicePoint.servicePointId}"/>
+                        </p:column>
+                        <p:column headerText="Prem ID" filterBy="#{apm.servicePoint.premise.premiseId}" field="premId">
+                            <h:outputText value="#{apm.servicePoint.premise.premiseId}"/>
+                        </p:column>
+                        <p:column headerText="Address" filterBy="#{apm.servicePoint.premise.serviceAddress1}" field="address">
+                            <h:outputText value="#{apm.servicePoint.premise.serviceAddress1}"/>
+                        </p:column>
+                        <p:column headerText="City" filterBy="#{apm.servicePoint.premise.serviceCityUpr}" field="serviceCityUpr">
+                            <h:outputText value="#{apm.servicePoint.premise.serviceCityUpr}"/>
+                        </p:column>
+                        <p:column headerText="SA Status" filterBy="#{apm.serviceAgreement.saStatus}" field="stat">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('servAgrTable').filter()" converter="omnifaces.GenericEnumConverter">
+                                    <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{gasAgreementPointMapList.saStatusList}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{apm.serviceAgreement.translateSAStatusLabel()}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="ENP">
+                    <p:dataTable id="TBcnp" widgetVar="cnpTable" value="#{gasAgreementPointMapList.customerNotificationPreferenceLazyModel}" lazy="true"
+                                 var="cnp" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single">
+                        <p:ajax event="rowSelect" listener="#{gasAgreementPointMapList.onENPSelect}" update="formCL"/>
+                        <p:column headerText="Acc ID" filterBy="#{cnp.serviceAgreement.account.accountId}" field="acctId">
+                            <h:outputText value="#{cnp.serviceAgreement.account.accountId}"/>
+                        </p:column>
+                        <p:column headerText="SA ID" filterBy="#{cnp.serviceAgreement.serviceAgreementId}" field="saId">
+                            <h:outputText value="#{cnp.serviceAgreement.serviceAgreementId}"/>
+                        </p:column>
+                        <p:column headerText="Customer Name" filterBy="#{cnp.serviceAgreement.account.person.businessName}" field="businessName">
+                            <h:outputText value="#{cnp.serviceAgreement.account.person.businessName}"/>
+                        </p:column>
+                        <p:column headerText="Program" filterBy="#{cnp.notificationProgram}" field="program">
+                            <h:outputText value="#{cnp.notificationProgram}"/>
+                        </p:column>
+                        <p:column headerText="Channel" filterBy="#{cnp.notificationTypeId}" field="channel">
+                            <h:outputText value="#{cnp.notificationTypeId}"/>
+                        </p:column>
+                        <p:column headerText="Language" filterBy="#{cnp.notificationLanguage}" field="language">
+                            <h:outputText value="#{cnp.notificationLanguage}"/>
+                        </p:column>
+                        <p:column headerText="ENP" filterBy="#{cnp.notificationValue}" field="notificationValue" style="word-wrap: break-word">
+                            <h:outputText value="#{cnp.notificationValue}" converter="phoneConverter"/>
+                        </p:column>
+
+                    </p:dataTable>
+                </p:tab>
+                <p:tab id="ratePlansId" title="Rate Plans" rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}">
+                    <p:dataTable value="#{gasAgreementPointMapList.selectedServiceAgreement.ratePlanEnrollments}"
+                                 var="enrollment" reflow="true" rows="25" rowsPerPageTemplate="25,50,100" paginator="true" paginatorAlwaysVisible="false"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+                        <p:column headerText="Rate plan">
+                            <h:outputText value="#{enrollment.ratePlan.name}"/>
+                        </p:column>
+                        <p:column headerText="Code ID">
+                            <h:outputText value="#{enrollment.ratePlan.activeProfile.buildRateCodeId()}"/>
+                        </p:column>
+                        <p:column headerText="Rate profile Title">
+                            <h:outputText value="#{enrollment.ratePlan.activeProfile.rateScheduleTitle}"/>
+                        </p:column>
+                        <p:column headerText="Related Rate Plans">
+                            <h:outputText value="#{enrollment.ratePlan.activeProfile.printRelatedRatePlansCodeIds()}"/>
+                        </p:column>
+                        <p:column headerText="Start date">
+                            <h:outputText value="#{enrollment.startDate}">
+                                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="End date">
+                            <h:outputText value="#{enrollment.endDate}">
+                                <f:convertDateTime timeZone="America/Los_Angeles" pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Actions">
+                            <p:commandLink rendered="#{enrollment.active}" action="#{gasAgreementPointMapList.unenrollRatePlan(enrollment)}" value="Unenroll"
+                                           update="@form"/>
+                            <p:commandLink
+                                    rendered="#{not enrollment.active and gasAgreementPointMapList.serviceAgreementDoeNotHaveThisActiveEnrollment(enrollment)}"
+                                    action="#{gasAgreementPointMapList.enrollRatePlan(enrollment)}" value="Re-enroll" update="@form"/>
+                            <p:outputLabel
+                                    rendered="#{not enrollment.active and not gasAgreementPointMapList.serviceAgreementDoeNotHaveThisActiveEnrollment(enrollment)}"
+                                    value="Already Enrolled"/>
+                        </p:column>
+
+                    </p:dataTable>
+                    <p/>
+                    <p:commandButton update="@form" value="Check Eligibility" action="#{gasAgreementPointMapList.checkRatePlansEligibility()}"/>
+                    <p/>
+                    <c:set var="controller" value="#{gasAgreementPointMapList}"/>
+                    <div jsf:rendered="#{gasAgreementPointMapList.showRatesTable}">
+                        <ui:include src="WEB-INF/include/ratePlanProfile/EligibleRates.xhtml"/>
+                    </div>
+                    <ui:include src="WEB-INF/include/ratePlanProfile/EligibleRatesDialog.xhtml"/>
+                </p:tab>
+                <p:tab title="Notifications">
+
+                    <p:dataTable value="#{gasAgreementPointMapList.pdpSrEvents}" var="event" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single" selection="#{eventList.pdpSrEvent}"
+                                 rowKey="#{event.eventId}">
+                        <p:ajax event="rowSelect" listener="#{eventList.onRowSelectEvent}" update="formCL"/>
+                        <p:column headerText="Event Name" sortBy="#{event.eventName}">
+                            <h:outputText value="#{event.eventName}"/>
+                        </p:column>
+                        <p:column headerText="Program" sortBy="#{event.eventProgram}">
+                            <h:outputText value="#{event.eventProgram}"/>
+                        </p:column>
+                        <p:column headerText="Event Start" sortBy="#{event.eventStart}">
+                            <h:outputText value="#{event.eventStart}">
+                                <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Event End" sortBy="#{event.eventEnd}">
+                            <h:outputText value="#{event.eventEnd}">
+                                <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Event State" sortBy="#{event.eventState}">
+                            <h:outputText value="#{event.eventState}"/>
+                        </p:column>
+                        <p:column headerText="Event Options">
+                            <h:outputText value="#{event.eventOptionsLabel}"/>
+                        </p:column>
+                        <p:column headerText="Event Type" sortBy="#{event.eventType}">
+                            <h:outputText value="#{event.eventType}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Events" rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}">
+                    <p:dataTable value="#{gasAgreementPointMapList.selectedServiceAgreementEvents}" var="customer" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single" rowKey="#{customer.uuid}">
+                        <p:ajax event="rowSelect" listener="#{gasAgreementPointMapList.onEventSelect}" update="formCL"/>
+                        <p:column headerText="Dispatch date" sortBy="#{customer.event.startDate}">
+                            <h:outputText value="#{customer.event.startDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" timeZone="America/Los_Angeles"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Program" sortBy="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.program.name}"
+                                  filterBy="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.program.name}">
+                            <h:outputText value="#{customer.locationSubmissionStatus.programServiceAgreementEnrollment.program.name}"/>
+                        </p:column>
+                        <p:column headerText="Event ID" sortBy="#{customer.event.externalEventId}" filterBy="#{customer.event.externalEventId}">
+                            <h:outputText value="#{customer.event.externalEventId}"/>
+                        </p:column>
+                        <p:column headerText="Start Time" sortBy="#{customer.event.startDate}">
+                            <h:outputText value="#{customer.event.startDate}">
+                                <f:convertDateTime pattern="h:mm a" timeZone="America/Los_Angeles"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="End Time" sortBy="#{customer.event.endDate}">
+                            <h:outputText value="#{customer.event.endDate}">
+                                <f:convertDateTime pattern="h:mm a" timeZone="America/Los_Angeles"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Dispatch Total Hours">
+                            <h:outputText value="#{customer.event.duration.toHours()}"/>
+                        </p:column>
+                        <p:column headerText="Dispatch Reason">
+                            <h:outputText value="#{customer.event.dispatchReason.name}"/>
+                        </p:column>
+                        <p:column headerText="Dispatch Status">
+                            <h:outputText value="#{customer.event.status.name}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Service Point">
+                    <p:dataTable id="TBPointService" widgetVar="servPointTable" value="#{gasAgreementPointMapList.agreementPointMapLazyModel}" lazy="true"
+                                 var="apm" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false" selectionMode="single">
+                        <p:ajax event="rowSelect" listener="#{gasAgreementPointMapList.onServicePointSelect}"/>
+                        <p:column headerText="SP ID" filterBy="#{apm.servicePoint.servicePointId}" field="spId">
+                            <h:outputText value="#{apm.servicePoint.servicePointId}"/>
+                        </p:column>
+                        <p:column headerText="Meter ID" filterBy="#{apm.servicePoint.meter.meterId}" field="meterId">
+                            <h:outputText value="#{apm.servicePoint.meter.meterId}"/>
+                        </p:column>
+
+                        <p:column headerText="Meter Badge Number" filterBy="#{apm.servicePoint.meter.badgeNumber}" field="meterBadgeNumber">
+                            <h:outputText value="#{apm.servicePoint.meter.badgeNumber}"/>
+                        </p:column>
+                        <p:column headerText="Start Date" filterable="false">
+                            <h:outputText value="#{apm.startDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="End Date" filterable="false">
+                            <h:outputText value="#{apm.endDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                    <p>
+                        <p:gmap type="MAP" center="#{gasAgreementPointMapList.mapCenter}" zoom="13" style="width:100%;height:600px"
+                                model="#{gasAgreementPointMapList.mapModel}" streetView="true"
+                                rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}">
+                            <p:ajax event="overlaySelect" listener="#{gasAgreementPointMapList.onMarkerSelect}"/>
+                            <p:gmapInfoWindow id="infoWindow" rendered="#{gasAgreementPointMapList.marker ne null}">
+                                <h4>#{gasAgreementPointMapList.marker.title}</h4>
+                            </p:gmapInfoWindow>
+                        </p:gmap>
+                    </p>
+                </p:tab>
+                <p:tab title="Programs" rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}">
+                    <p:dataTable value="#{gasAgreementPointMapList.selectedServiceAgreement.enrollments}" var="enrollment" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+                        <p:column headerText="Program" filterBy="#{enrollment.program.name}" filterMatchMode="contains"
+                                  sortBy="#{enrollment.program.name}">
+                            <h:outputText value="#{enrollment.program.name}"/>
+                        </p:column>
+                        <p:column headerText="Application ID" filterBy="#{enrollment.id}" filterMatchMode="contains" sortBy="#{enrollment.id}">
+                            <p:link href="ApplicationEnrollment.xhtml?o=#{parameterEncoderService.encode(enrollment.id)}" value="#{enrollment.id}"/>
+                        </p:column>
+                        <p:column headerText="Enrollment Status" filterBy="#{enrollment.enrollmentStatus}" filterMatchMode="contains"
+                                  sortBy="#{enrollment.enrollmentStatus}">
+                            <h:outputText value="#{enrollment.enrollmentStatus}"/>
+                        </p:column>
+                        <p:column headerText="Effective Enroll Date" sortBy="#{enrollment.effectiveStartDate}">
+                            <h:outputText value="#{enrollment.effectiveStartDate}">
+                                <f:convertDateTime pattern="yyyy/MM/dd h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Unenroll Date" sortBy="#{enrollment.effectiveEndDate}">
+                            <h:outputText value="#{enrollment.effectiveEndDate}">
+                                <f:convertDateTime pattern="yyyy/MM/dd h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="History" rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}">
+                    <p:dataTable value="#{gasAgreementPointMapList.history}" var="history" reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+                        <p:column headerText="Entity" filterBy="#{history.entity}" filterMatchMode="contains" sortBy="#{history.entity}">
+                            <h:outputText value="#{history.entity}"/>
+                        </p:column>
+                        <p:column headerText="Id" filterBy="#{history.entityId}" filterMatchMode="contains" sortBy="#{history.entityId}">
+                            <h:outputText value="#{history.entityId}"/>
+                        </p:column>
+                        <p:column headerText="Field" filterBy="#{history.field}" filterMatchMode="contains" sortBy="#{history.field}">
+                            <h:outputText value="#{history.field}"/>
+                        </p:column>
+                        <p:column headerText="Old Value" filterBy="#{history.oldValue}" filterMatchMode="contains" sortBy="#{history.oldValue}">
+                            <h:outputText value="#{history.oldValue}"/>
+                        </p:column>
+                        <p:column headerText="New Value" filterBy="#{history.newValue}" filterMatchMode="contains" sortBy="#{history.newValue}">
+                            <h:outputText value="#{history.newValue}"/>
+                        </p:column>
+                        <p:column headerText="Last Modification Date" sortBy="#{history.creationDate}">
+                            <h:outputText value="#{history.creationDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy h:mm a"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Author" filterBy="#{history.author}" filterMatchMode="contains" sortBy="#{history.author}">
+                            <h:outputText value="#{history.author}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+
+                <p:tab title="Devices" rendered="false">
+                    <p:dataTable id="TBDevice" widgetVar="deviceTable" value="#{gasAgreementPointMapList.agreementPointMapLazyModel}" lazy="true" var="dev"
+                                 reflow="true" rows="25" rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+
+                        <p:column headerText="Account">
+                        </p:column>
+                        <p:column headerText="SA ID">
+                        </p:column>
+                        <p:column headerText="Premise Address">
+                        </p:column>
+                        <p:column headerText="MFG">
+                        </p:column>
+                        <p:column headerText="Model">
+                        </p:column>
+                        <p:column headerText="Seriel">
+                        </p:column>
+                        <p:column headerText="Install Date">
+                        </p:column>
+                        <p:column headerText="Uninstall Date">
+                        </p:column>
+
+                    </p:dataTable>
+                </p:tab>
+
+                <p:tab title="Gas Contracts" rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null}">
+                    <p:dataTable value="#{gasAgreementPointMapList.selectedServiceAgreement.energyContracts}" var="energyContract" reflow="true" rows="25"
+                                 rowsPerPageTemplate="25,50,100"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorAlwaysVisible="false">
+                        <p:column headerText="ID" filterBy="#{energyContract.id}" filterMatchMode="contains" sortBy="#{energyContract.id}">
+                            <p:link href="EnergyContractDetail.xhtml?o=#{parameterEncoderService.encode(energyContract.id)}" value="#{energyContract.id}"/>
+                        </p:column>
+                        <p:column headerText="Name" filterBy="#{energyContract.name}" filterMatchMode="contains" sortBy="#{energyContract.name}">
+                            <h:outputText value="#{energyContract.name}"/>
+                        </p:column>
+                        <p:column headerText="Type" filterBy="#{energyContract.type.name}" filterMatchMode="contains" sortBy="#{energyContract.type.name}">
+                            <h:outputText value="#{energyContract.type.name}"/>
+                        </p:column>
+                        <p:column headerText="Start Date">
+                            <h:outputText value="#{energyContract.agreementStartDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="End Date">
+                            <h:outputText value="#{energyContract.agreementEndDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Buyer">
+                            <h:outputText value="???"/>
+                        </p:column>
+                        <p:column headerText="Seller">
+                            <h:outputText value="???"/>
+                        </p:column>
+                        <p:column headerText="Contract Term" filterBy="#{energyContract.contractTerm}" filterMatchMode="contains"
+                                  sortBy="#{energyContract.contractTerm}">
+                            <h:outputText value="#{energyContract.contractTerm}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Invoices" id="invoicesId" rendered="#{gasAgreementPointMapList.selectedServiceAgreement ne null }">
+                    <c:set var="controller" value="#{gasAgreementPointMapList}"/>
+                    <c:set var="tabViewId" value="#{'inv'}"/>
+                    <ui:include src="WEB-INF/include/billing/InvoiceList.xhtml"/>
+                    <ui:include src="WEB-INF/include/billing/InvoiceDetail.xhtml"/>
+                </p:tab>
+            </p:tabView>
+
+            <p:remoteCommand name="onload" autoRun="true" update=":menu-form-crm" rendered="#{gasAgreementPointMapList.selectedServiceAgreement eq null}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

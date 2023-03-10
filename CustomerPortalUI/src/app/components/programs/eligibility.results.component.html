@@ -1,0 +1,31 @@
+<div style="text-align: left">
+  <button pButton (click)="cancelButton($event)" label="Go Back"></button>
+</div>
+<hr/>
+<h3>Eligibility results</h3>
+<p-panel *ngFor="let eli of userSelectedProgramsEligibility" [toggleable]="!eli.eligibility.eligible"
+         [collapsed]="true">
+  <p-header>
+    <div style="float: left">
+               <span class="ui-panel-title" style="font-size:16px;display:inline-block;margin-top:2px">{{eli.program.name}} Result:
+                 <span class="{{eli.eligibility.eligible === false ? 'error-text' : 'green-text'}}">
+                   {{eli.eligibility.eligible?'Eligible':'Ineligible: Toggle to see the reasons'}}
+                 </span>
+               </span>
+    </div>
+    <div style="float: right;">
+      <button *ngIf="eli.eligibility.eligible" pButton
+              (click)="nextButton(eli.program?.id, eli.eligibility?.servicePointsEligibility[0]?.agreementPointMapPK?.servicePointId)"
+              label="Apply"
+              style="text-align: center"></button>
+    </div>
+  </p-header>
+  <div *ngIf="!eli.eligibility.eligible" style="text-align: justify">
+    <ul>
+      <li *ngFor="let error of eli.eligibility.servicePointsEligibility">{{error.ineligibleReason}}</li>
+    </ul>
+    <ul>
+      <li *ngFor="let error of eli.eligibility.messages">{{error}}</li>
+    </ul>
+  </div>
+</p-panel>

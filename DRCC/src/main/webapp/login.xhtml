@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Energy Array</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <link rel="shortcut icon" href="/DRCC/javax.faces.resource/images/favicon.ico.jsf"/>
+    <h:outputScript name="jquery/jquery.js" library="primefaces"/>
+    <h:outputStylesheet name="css/nanoscroller.css" library="barcelona-layout"/>
+    <h:outputStylesheet name="css/animate.css" library="barcelona-layout"/>
+    <h:outputStylesheet name="css/ripple.css" library="barcelona-layout"/>
+    <h:outputStylesheet name="css/layout-blue.css" library="barcelona-layout"/>
+    <h:outputStylesheet name="css/drcc.css"/>
+    <h:outputStylesheet library="css" name="drcc.css"/>
+    <h:outputStylesheet name="css/drcc.css"/>
+    <h:outputScript name="js/ripple.js" library="barcelona-layout"/>
+    <h:outputScript name="js/layout.js" library="barcelona-layout"/>
+</h:head>
+
+<h:body styleClass="login-body">
+    <h:form id="form">
+        <p:growl id="growl" showDetail="false" sticky="false"/>
+        <!--<div class="login-panel ui-fluid">-->
+        <div class="ui-g login-panel ui-fluid">
+            <div class="ui-g-12 login-header">
+                    <span style="color: whitesmoke; font-size: 20px">
+                        <h:graphicImage name="images/Inenergis_Logo.png" styleClass="" style="width: 55px;top: 15px;"/>
+                        <span>Energy Array</span>
+                        <span>
+                    </span>
+                    </span>
+            </div>
+            <p:outputPanel rendered="#{not loginController.reset and not loginController.firstAccess}" styleClass="ui-g-12">
+                <h:panelGroup styleClass="md-inputfield-static">
+                    <p:inputText id="Username" value="#{loginCredentials.userId}" required="true"/>
+                    <label>Username</label>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield-static">
+                    <p:password id="Password" value="#{loginCredentials.password}" required="true"/>
+                    <label>Password</label>
+                </h:panelGroup>
+                <div class="ui-g-12 button-container">
+                    <p:commandButton value="Log In" action="#{loginController.login}" update="@form"/>
+                </div>
+                <div style="text-align: center">
+                    <p:commandLink action="#{loginController.openReset()}" process="@this" update="@form" value="I have forgotten my password"/>
+                </div>
+
+            </p:outputPanel>
+
+            <p:outputPanel rendered="#{loginController.reset}">
+                <div class="ui-g-12">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputText id="email" value="#{loginController.email}"/>
+                        <label>E-mail</label>
+                    </h:panelGroup>
+                </div>
+                <div class="ui-g-12 button-container">
+                    <p:commandButton value="Reset Password" action="#{loginController.resetMyPassword}" update="@form"/>
+                </div>
+                <div class="ui-g-12 button-container">
+                    <p:commandLink action="#{loginController.closeReset()}" process="@this" update="@form" value="Cancel"/>
+                </div>
+            </p:outputPanel>
+
+            <p:outputPanel rendered="#{loginController.firstAccess}">
+                <div class="ui-g-12">
+                    This is your first login, please change your initial password
+                </div>
+                <div class="ui-g-12">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:password id="newPassword1" value="#{loginController.newPassword1}" required="true"/>
+                        <label>New password</label>
+                    </h:panelGroup>
+                </div>
+                <div class="ui-g-12">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:password id="newPassword2" value="#{loginController.newPassword2}" required="true"/>
+                        <label>Repeat new password</label>
+                    </h:panelGroup>
+                </div>
+                <div class="ui-g-12 button-container">
+                    <p:commandButton value="Change Password" styleClass="Fs16 PrimBlueButton" action="#{loginController.changePassword}" update="@form"/>
+                </div>
+
+            </p:outputPanel>
+            <div class="md-inputfield" style="width: 100%;padding-right: 5%">
+                <h:graphicImage name="images/DRCCPoweredByLogo.jpg" styleClass="" style="width: 70px;height: 70px; float: right;"/>
+            </div>
+        </div>
+        <!--</div>-->
+
+    </h:form>
+    <!-- LOGIN BOX COVER END -->
+
+    <h:outputStylesheet name="css/layout-#{guestPreferences.layout}.css" library="barcelona-layout"/>
+    <h:outputStylesheet name="css/ripple.css" library="barcelona-layout"/>
+</h:body>
+
+</html>

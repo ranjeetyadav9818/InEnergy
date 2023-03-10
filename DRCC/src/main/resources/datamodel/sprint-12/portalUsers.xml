@@ -1,0 +1,31 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="liquibaseChangeLog.xml">
+
+    <changeSet id="portalUsers.xml" author="antonio">
+        <createTable tableName="PORTAL_USER">
+            <column name="ID" type="bigint(20) unsigned" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="UUID" type="varchar(55)"/>
+            <column name="EMAIL" type="varchar(255)"/>
+            <column name="PASSWORD" type="varchar(255)"/>
+            <column name="SERVICE_AGREEMENT_ID" type="varchar(10)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="PORTAL_USER"
+                                 baseColumnNames="SERVICE_AGREEMENT_ID"
+                                 constraintName="FK_PORTAL_USER_SA_ID"
+                                 referencedTableName="SERVICE_AGREEMENT"
+                                 referencedColumnNames="SERVICE_AGREEMENT_ID"/>
+    </changeSet>
+
+    <changeSet id="portalUsers2.xml" author="antonio">
+        <addColumn tableName="PORTAL_USER">
+            <column name="NAME" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="PORTAL_USER">
+            <column name="PHONE" type="varchar(35)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

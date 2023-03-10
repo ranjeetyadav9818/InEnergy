@@ -1,0 +1,26 @@
+<p-dataList [value]="[data]" [paginator]="false" [rows]="1">
+  <p-header>
+    Electricity
+  </p-header>
+  <ng-template let-data pTemplate="item">
+    <div class="ui-g ui-fluid">
+      <div class="ui-g-12">
+        <div class="ui-g">
+          <div class="ui-g-4"><b>Currrent Balance:</b></div>
+          <div class="ui-g-8">{{data.currentBalance.balance / 100 | currency:'USD':true}}</div>
+
+          <div class="ui-g-4"><b>Last Bill:</b></div>
+          <div class="ui-g-8">
+            {{data.lastBill.total / 100 | currency:'USD':true}}
+             ({{data.lastBill.date | date:"MM/dd/yy"}})
+          </div>
+
+          <div class="ui-g-4"><b>Last Payment:</b></div>
+          <div class="ui-g-8">{{data.lastPayment.value / 100 | currency:'USD':true}}
+            ({{data.lastBill.date | date:"MM/dd/yy"}})
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-dataList>

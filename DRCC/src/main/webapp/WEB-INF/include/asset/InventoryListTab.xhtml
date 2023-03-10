@@ -1,0 +1,23 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:j="http://java.sun.com/JSP/Page">
+
+    <j:useBean id="controller" type="com.inenergis.controller.asset.AssetDetailsController"/>
+
+    <p:dataTable value="#{controller.asset.assetDevices}" var="device">
+        <p:column headerText="Id">
+            <h:outputText value="#{device.id}"/>
+        </p:column>
+        <p:column headerText="Name">
+            <h:outputText value="#{device.name}"/>
+        </p:column>
+        <p:column headerText="Description">
+            <h:outputText value="#{device.description}"/>
+        </p:column>
+        <p:column>
+            <p:commandButton value="Details" actionListener="#{controller.goToDeviceDetails(device)}"/>
+        </p:column>
+    </p:dataTable>
+</ui:composition>

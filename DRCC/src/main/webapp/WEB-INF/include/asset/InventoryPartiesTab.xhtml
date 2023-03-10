@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:j="http://java.sun.com/JSP/Page"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <j:useBean id="controller" type="com.inenergis.controller.asset.DeviceDetailsController"/>
+
+    <div class="card card-w-title">
+        <h3 class="with-icon">Parties</h3>
+
+        <p:panelGrid id="parties" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{controller.partiesEditModeTab}">
+                <h:panelGroup styleClass="md-inputfield-select">
+                    <p:outputLabel value="Role" for="partyType"/>
+                    <p:selectOneMenu id="partyType" value="#{controller.newDeviceParty.type}" required="true" label="Party Type">
+                        <f:selectItem noSelectionOption="true"/>
+                        <f:selectItems value="#{controller.partyTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup styleClass="md-inputfield">
+                    <p:autoComplete id="supplierFilter"
+                                    converter="contractEntityConverter"
+                                    completeMethod="#{controller.completeEntity}"
+                                    value="#{controller.newDeviceParty.contractEntity}"
+                                    var="link" itemLabel="#{link.businessName}" itemValue="#{link}"/>
+                    <p:outputLabel value="Supplier:" for="supplierFilter"/>
+                </h:panelGroup>
+                <p:spacer/>
+                <p:spacer/>
+
+                <h:panelGroup>
+                    <p:commandButton action="#{controller.saveParty()}" value="Save" process="parties" update="form"/>
+                    <p:spacer width="10"/>
+                    <p:commandButton action="#{controller.clear()}" value="Cancel" process="@this" update="form"/>
+                </h:panelGroup>
+            </p:panelGrid>
+
+            <h:panelGroup rendered="#{!controller.partiesEditModeTab}">
+                <p:commandButton action="#{controller.addParty()}" value="Add" process="parties" update="form"/>
+            </h:panelGroup>
+
+            <p:dataTable value="#{controller.device.deviceParties}" var="entity" editable="true" id="deviceParties">
+
+                <p:ajax event="rowEdit" listener="#{controller.onPartiesRowEdit}"/>
+                <p:column headerText="Party ID">
+                    <h:outputText value="#{entity.id}"/>
+                </p:column>
+                <p:column headerText="Party Type">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{entity.type}"/></f:facet>
+                        <f:facet name="input">
+                            <p:selectOneMenu value="#{entity.type}" required="true" label="Party Type">
+                                <f:selectItem noSelectionOption="true"/>
+                                <f:selectItems value="#{controller.partyTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.value}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Name">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{entity.contractEntity.businessName}"/></f:facet>
+                        <f:facet name="input">
+                            <p:autoComplete converter="contractEntityConverter"
+                                            completeMethod="#{controller.completeEntity}"
+                                            value="#{entity.contractEntity}"
+                                            var="link" itemLabel="#{link.businessName}" itemValue="#{link}"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="City">
+                    <h:outputText value="#{entity.contractEntity.allCities}"/>
+                </p:column>
+                <p:column headerText="Region/State">
+                    <h:outputText value="#{entity.contractEntity.allStates}"/>
+                </p:column>
+                <p:column headerText="Zip">
+                    <h:outputText value="#{entity.contractEntity.allZips}"/>
+                </p:column>
+
+                <p:column style="width: 32px;" class="showOnDesktop">
+                    <p:rowEditor/>
+                </p:column>
+                <p:column style="width: 32px;" class="showOnDesktop">
+                    <p:commandButton action="#{controller.removeParty(entity)}" update="deviceParties" icon="ui-icon-remove" process="@this"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:panelGrid>
+    </div>
+</ui:composition>

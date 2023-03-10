@@ -1,0 +1,79 @@
+<div class="dashboard">
+  <div class="ui-g">
+    <div class="ui-g-2">
+      <div class="fixed">
+        <app-lateral-menu></app-lateral-menu>
+      </div>
+    </div>
+    <div class="ui-g-7">
+      <p-panel header="Eligibility and enrollment">
+        <div class="ui-g">
+          <div class="ui-g-12">
+            <p-steps [model]="items" [activeIndex]="activeIndex" [style.pointer-events]="'none'"></p-steps>
+          </div>
+          <div class="ui-g-12">
+
+            <app-eligibility-pick-list (nextButtonEmitter)="checkEligibility()" (cancelButtonEmitter)="cancel()"
+                                       [availablePrograms]="availablePrograms" [activeIndex]="activeIndex"
+                                       [userSelectedPrograms]="userSelectedPrograms">
+
+            </app-eligibility-pick-list>
+
+          </div>
+
+          <div class="ui-g-12" style="text-align: -webkit-center" [style.display]="activeIndex===1?'grid':'none'">
+            <app-eligibility-results [userSelectedProgramsEligibility]="userSelectedProgramsEligibility"
+                                     (nextButtonEmitter)="viewEnroll($event)" (cancelButtonEmitter)="cancel()">
+            </app-eligibility-results>
+          </div>
+
+          <div class="ui-g-12" style="text-align: -webkit-center" [style.display]="activeIndex===2?'grid':'none'">
+            <app-enroll-confirmation (cancelButtonEmitter)="cancel()"
+                                     [activeIndex]="activeIndex"
+                                     [selectedProgram]="selectedProgram"
+                                     [aggregators]="aggregators"
+                                     [userAppliedPrograms]="userAppliedPrograms"
+                                     [(finalEnrollResult)]="enrollResult"
+                                     [availablePrograms]="availablePrograms"
+                                     (finalEnrollResultChange)="onCompleteEnroll($event)"
+                                     [servicePointId]="enrollResult?.servicePointsEligibility[0]?.agreementPointMapPK?.servicePointId"
+                                     *ngIf="enrollResult?.servicePointsEligibility">
+            </app-enroll-confirmation>
+          </div>
+
+          <div class="ui-g-12" style="text-align: -webkit-center" [style.display]="activeIndex===3?'grid':'none'">
+            <app-enroll-complete (cancelButtonEmitter)="cancel()"
+                                 [activeIndex]="activeIndex"
+                                 [finalEnroll]="finalEnroll" *ngIf="finalEnroll"></app-enroll-complete>
+          </div>
+
+        </div>
+      </p-panel>
+    </div>
+    <div class="ui-g-3">
+      <div class="future-fixed">
+        <p-dataList [value]="userEnrolledPrograms">
+          <p-header>
+            Currently enrolled programs
+          </p-header>
+          <ng-template let-program pTemplate="item">
+            <div style="padding: 15px">
+              {{program.name}} - {{program.programType}}
+            </div>
+          </ng-template>
+        </p-dataList>
+        <p></p>
+        <p-dataList [value]="userAppliedPrograms">
+          <p-header>
+            Programs applied for
+          </p-header>
+          <ng-template let-program pTemplate="item">
+            <div style="padding: 15px">
+              {{program.name}} - {{program.programType}}
+            </div>
+          </ng-template>
+        </p-dataList>
+      </div>
+    </div>
+  </div>
+</div>
